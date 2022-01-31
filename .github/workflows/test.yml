@@ -21,7 +21,11 @@ on:
 jobs:
   create-ami:
     runs-on: ubuntu-latest
-    if: github.event.inputs.deploy-environment == 'dev'
     steps:
       - name: output dev
         run: echo ${{ github.event.inputs.deploy-environment }}
+        if: github.event.inputs.deploy-environment == 'dev'
+      - name: output test
+        run: echo ${{ github.event.inputs.deploy-environment }}
+        if: github.event.inputs.deploy-environment == 'test'
+    
