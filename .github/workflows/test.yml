@@ -19,9 +19,9 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  runs-on: ubuntu-latest
-  if: github.event.inputs.deploy-environment == "dev"
-  steps:
-    - name: output dev
-      uses: actions/checkout@v1
-      run: echo ${{ github.event.inputs.deploy-environment }}
+  create-ami:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.deploy-environment == "dev"
+    steps:
+      - name: output dev
+        run: echo ${{ github.event.inputs.deploy-environment }}
