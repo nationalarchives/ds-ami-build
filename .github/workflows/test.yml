@@ -2,7 +2,10 @@
 
 name: Create Website NginX Frontend
 
-# Controls when the workflow will run
+permissions:
+  id-token: write
+  contents: write 
+
 on:
   workflow_dispatch:
     inputs:
