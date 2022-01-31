@@ -1,4 +1,4 @@
-# This is a basic workflow to help you get started with Actions
+# Deploy Website NginX Frontend AMI
 
 name: Create Website NginX Frontend
 
@@ -17,15 +17,18 @@ on:
         - test
         - live
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  create-ami:
+  ami-deployment:
     runs-on: ubuntu-latest
     steps:
-      - name: output dev
-        run: echo ${{ github.event.inputs.deploy-environment }}
+      - name: set ansible var file for dev
         if: github.event.inputs.deploy-environment == 'dev'
-      - name: output test
-        run: echo ${{ github.event.inputs.deploy-environment }}
+        run: echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
+      - name: set ansible var file for test
         if: github.event.inputs.deploy-environment == 'test'
-    
+        run: echo "ANSIBLE_VAR_FILE=vars_test.yml" >> $GITHUB_ENV   
+      - name: output environment details
+        if: github.event.inputs.deploy-environment == 'test'
+        run: |
+          echo ${{ github.event.inputs.deploy-environment }}    
+          echo ${{ env.ANSIBLE_VAR_FILE }}    
