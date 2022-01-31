@@ -1,0 +1,24 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Create Website NginX Frontend
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+    inputs:
+      deploy-environment:
+        type: choice
+        description: Environment
+        options: 
+        - dev
+        - test
+        - live
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  runs-on: ubuntu-latest
+  if: github.event.inputs.deploy-environment == "dev"
+  steps:
+    - name: output dev
+      uses: actions/checkout@v1
+      run: echo ${{ github.event.inputs.deploy-environment }}
