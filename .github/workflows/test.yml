@@ -13,17 +13,25 @@ on:
         type: environment
 
 jobs:
-  ami-deployment:
+  ami-deployment-dev:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - name: set ansible var file for dev
-        if: github.event.inputs.deploy-environment == 'dev'
         run: echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-      - name: set ansible var file for test
-        if: github.event.inputs.deploy-environment == 'test'
-        run: echo "ANSIBLE_VAR_FILE=vars_test.yml" >> $GITHUB_ENV   
       - name: output environment details
-        if: github.event.inputs.deploy-environment == 'test'
         run: |
+          echo "dev"
+          echo ${{ github.event.inputs.deploy-environment }}    
+          echo ${{ env.ANSIBLE_VAR_FILE }}    
+  ami-deployment-statging:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: set ansible var file for test
+        run: echo "ANSIBLE_VAR_FILE=vars_test.yml" >> $GITHUB_ENV    
+      - name: output environment details
+        run: |
+          echo "Staging"
           echo ${{ github.event.inputs.deploy-environment }}    
           echo ${{ env.ANSIBLE_VAR_FILE }}    
