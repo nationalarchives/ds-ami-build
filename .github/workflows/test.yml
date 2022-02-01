@@ -9,11 +9,19 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        type: environment
+      #environment:
+        #type: environment
+      deploy-environment:
+        type: choice
+        description: Environment
+        options: 
+        - dev
+        - staging
+        - production
 
 jobs:
   ami-deployment-dev:
+    if: github.event.inputs.deploy-environment == 'dev'
     runs-on: ubuntu-latest
     environment: dev
     steps:
@@ -25,6 +33,7 @@ jobs:
           echo ${{ github.event.inputs.deploy-environment }}    
           echo ${{ env.ANSIBLE_VAR_FILE }}    
   ami-deployment-staging:
+    if: github.event.inputs.deploy-environment == 'staging'
     runs-on: ubuntu-latest
     environment: staging
     steps:
