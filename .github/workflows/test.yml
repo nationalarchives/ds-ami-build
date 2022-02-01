@@ -24,7 +24,7 @@ jobs:
           echo "dev"
           echo ${{ github.event.inputs.deploy-environment }}    
           echo ${{ env.ANSIBLE_VAR_FILE }}    
-  ami-deployment-statging:
+  ami-deployment-staging:
     runs-on: ubuntu-latest
     environment: staging
     steps:
