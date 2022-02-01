@@ -9,13 +9,8 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
-      deploy-environment:
-        type: choice
-        description: Environment
-        options: 
-        - dev
-        - test
-        - live
+      environment:
+        type: environment
 
 jobs:
   ami-deployment:
