@@ -4,17 +4,15 @@ name: Create Website NginX Frontend
 
 permissions:
   id-token: write
-  contents: write 
+  contents: write
 
 on:
   workflow_dispatch:
     inputs:
-      #environment:
-        #type: environment
       deploy-environment:
         type: choice
         description: Environment
-        options: 
+        options:
         - dev
         - staging
         - production
@@ -25,22 +23,43 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     steps:
+      - name: checkout repo
+      - uses: actions/checkout@v1
+
       - name: set ansible var file for dev
-        run: echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
+        run: |
+          echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE==wp-app-dev-london.pem" >> $GITHUB_ENV
+
+      - name: write ssh key file
+        run: echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+
+      - name: run anisble playbook
+        uses: ./.github/actions/ansible
+        with:
+          playbook: website-nginx-ami-build.yml
+          directory: ./website/nginx
+          options: |
+            --extra-vars ${{ env.ANSIBLE_VAR_FILE }}
+            --private_key ${{ env.SSH_KEY_FILE }}
+            --host_key_checking False
+
+
       - name: output environment details
         run: |
           echo "dev"
-          echo ${{ github.event.inputs.deploy-environment }}    
-          echo ${{ env.ANSIBLE_VAR_FILE }}    
+          echo ${{ github.event.inputs.deploy-environment }}
+          echo ${{ env.ANSIBLE_VAR_FILE }}
+
   ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
     runs-on: ubuntu-latest
     environment: staging
     steps:
       - name: set ansible var file for test
-        run: echo "ANSIBLE_VAR_FILE=vars_test.yml" >> $GITHUB_ENV    
+        run: echo "ANSIBLE_VAR_FILE=vars_test.yml" >> $GITHUB_ENV
       - name: output environment details
         run: |
           echo "Staging"
-          echo ${{ github.event.inputs.deploy-environment }}    
-          echo ${{ env.ANSIBLE_VAR_FILE }}    
+          echo ${{ github.event.inputs.deploy-environment }}
+          echo ${{ env.ANSIBLE_VAR_FILE }}
