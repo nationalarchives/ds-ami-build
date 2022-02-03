@@ -1,0 +1,12 @@
+plans
+.terraform
+.tfstate
+*.tfstate*
+.DS_Store
+plans/
+scratch
+*.retry
+*tmp
+.disable
+*.disable*
+.idea
