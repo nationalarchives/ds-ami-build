@@ -31,8 +31,8 @@ jobs:
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
           echo "SSH_KEY_FILE==wp-app-dev-london.pem" >> $GITHUB_ENV
 
-      - name: authenticate with AWS
-        run:|
+      - name: auth settings
+        run: |
           export AWS_ROLE_ARN=arn:aws:iam::825668827209:role/ami-create
           export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
           export AWS_DEFAULT_REGION=eu-west-2
