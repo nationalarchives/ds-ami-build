@@ -24,7 +24,7 @@ jobs:
     environment: dev
     steps:
       - name: checkout repo
-      - uses: actions/checkout@v1
+        uses: actions/checkout@v1
 
       - name: set ansible var file for dev
         run: |
@@ -58,7 +58,7 @@ jobs:
       - name: write ssh key file
         run: echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
 
-  #    - name: run anisble playbook
+  #    - name: run ansible playbook
   #      uses: ./.github/actions/ansible
   #      with:
   #        playbook: website-nginx-ami-build.yml
