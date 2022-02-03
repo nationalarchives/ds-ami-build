@@ -31,6 +31,13 @@ jobs:
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
           echo "SSH_KEY_FILE==wp-app-dev-london.pem" >> $GITHUB_ENV
 
+      - name: get credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::0123456789:role/ExampleGithubRole
+          web-identity-token-file: "${{ env.AWS_WEB_IDENTITY_TOKEN_FILE }}"
+          aws-region: eu-west-2
+
       - name: auth settings
         run: |
           export AWS_ROLE_ARN=arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL
