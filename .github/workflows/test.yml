@@ -42,26 +42,15 @@ jobs:
       - name: write ssh key file
         run: echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: run ansible playbook
+        uses: ./.github/actions/ansible
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-2
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 1200
-          role-session-name: s-devops-ansible-amis
-
-  #    - name: run ansible playbook
-  #      uses: ./.github/actions/ansible
-  #      with:
-  #        playbook: website-nginx-ami-build.yml
-  #        directory: ./website/nginx
-  #        options: |
-  #          --extra-vars ${{ env.ANSIBLE_VAR_FILE }}
-  #          --private_key ${{ env.SSH_KEY_FILE }}
-  #          --host_key_checking False
-
+          playbook: website-nginx-ami-build.yml
+          directory: ./website/nginx
+          options: |
+            --extra-vars ${{ env.ANSIBLE_VAR_FILE }}
+            --private_key ${{ env.SSH_KEY_FILE }}
+            --host_key_checking False
 
       - name: output environment details
         run: |
