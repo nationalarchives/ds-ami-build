@@ -43,7 +43,7 @@ jobs:
         run: echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
 
       - name: run ansible playbook
-        uses: ./.github/actions/ansible
+        uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: website-nginx-ami-build.yml
           directory: ./website/nginx
@@ -51,12 +51,6 @@ jobs:
             --extra-vars ${{ env.ANSIBLE_VAR_FILE }}
             --private_key ${{ env.SSH_KEY_FILE }}
             --host_key_checking False
-
-      - name: output environment details
-        run: |
-          echo "dev"
-          echo ${{ github.event.inputs.deploy-environment }}
-          echo ${{ env.ANSIBLE_VAR_FILE }}
 
   ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
