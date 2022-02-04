@@ -52,13 +52,9 @@ jobs:
           sudo apt-get install ansible
 
       - name: run ansible playbook
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: website-nginx-ami-build.yml
-          directory: ./website/nginx
-          options: |
-            --extra-vars ${{ env.ANSIBLE_VAR_FILE }}
-            --private_key ${{ env.SSH_KEY_FILE }}
+        run: |
+          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} \
+            --private_key ${{ env.SSH_KEY_FILE }} \
             --host_key_checking False
 
   ami-deployment-staging:
