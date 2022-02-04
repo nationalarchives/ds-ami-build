@@ -49,7 +49,7 @@ jobs:
 
       - name: install ansible
         run: |
-          -sudo apt-get install ansible
+          sudo apt-get install ansible
 
       - name: run ansible playbook
         uses: dawidd6/action-ansible-playbook@v2
