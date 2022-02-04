@@ -20,11 +20,11 @@
     ansible.builtin.meta: end_play
     when: "key_file.stat.exists == false"
 
-#- community.aws.sts_assume_role:
-  #    role_arn: "arn:aws:iam::825668827209:role/IAM_Admin_Role"
-  #    role_session_name: "AdminRole"
-  #    profile: devdsadmin
-  #  register: assumed_role
+- community.aws.sts_assume_role:
+      role_arn: "arn:aws:iam::825668827209:role/IAM_Admin_Role"
+      role_session_name: "AdminRole"
+      profile: devdsadmin
+    register: assumed_role
 
   - name: Get linux2 AMI
     ec2_ami_info:
