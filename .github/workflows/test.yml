@@ -76,6 +76,8 @@ jobs:
           echo [profile s-devops] >> ~/.aws/config
           echo role_arn = ${{ secrets.AWS_ROLE_ARN }} >> ~/.aws/config
           echo source_profile = default >> ~/.aws/config
+          echo region = eu-west-2 >> ~/.aws/config
+          echo output = json >> ~/.aws/config
 
       - name: run ansible playbook
         env:
