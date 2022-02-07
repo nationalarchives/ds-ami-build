@@ -35,12 +35,15 @@
       role_session_name: "s-devops-ansible-amis"
     register: assumed_role
 
+  - community.aws.aws_s3_bucket_info:
+    register: result
+
   - name: show role switch
     ansible.builtin.debug:
      msg:
       - "role changed  {{ assumed_role.changed }}"
       - "role arn: {{ lookup ('env', 'AWS_ROLE_ARN') }}"
-
+      - "{{ result['buckets'] }}"
 
   - name: get linux2 AMI
     amazon.aws.ec2_ami_info:
