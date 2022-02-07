@@ -52,7 +52,6 @@ jobs:
           sudo apt-get install ansible
 
       - name: run ansible playbook
-        working-directory: wp-website/nginx
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-website/nginx
