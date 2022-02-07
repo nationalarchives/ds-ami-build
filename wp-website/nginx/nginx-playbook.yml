@@ -28,8 +28,8 @@
 
   - name: get session credentials
     community.aws.sts_assume_role:
-      aws_access_key: "{{ AWS_ACCESS_KEY_ID }}"
-      aws_secret_key: "{{ AWS_SECRET_ACCESS_KEY }}"
+      #aws_access_key: "{{ AWS_ACCESS_KEY_ID }}"
+      #aws_secret_key: "{{ AWS_SECRET_ACCESS_KEY }}"
       role_arn: "{{ AWS_ROLE_ARN }}"
       role_session_name: "s-devops-ansible-amis"
     register: assumed_role
