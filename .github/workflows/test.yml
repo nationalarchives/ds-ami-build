@@ -52,6 +52,7 @@ jobs:
           sudo apt-get install ansible
 
       - name: prepare ansible hosts file
+        become: yes
         run: |
           sudo echo "hosts: ec2hosts" > /etc/ansible/hosts
           sudo echo "  remote_user: ec2_user" >> /etc/ansible/hosts
