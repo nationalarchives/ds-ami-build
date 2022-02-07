@@ -3,6 +3,7 @@
 
 - name: Create NginX Reverse Proxy Primer
   hosts: localhost
+  become: yes
   gather_facts: false
 
   tasks:
