@@ -52,11 +52,11 @@ jobs:
           python-version: 3
       - name: install boto3
         run: |
-          pip install boto3 requests pyjwt
+          pip3 install boto3 requests pyjwt
 
       - name: install ansible
         run: |
-          sudo apt-get install ansible
+          pip3 install ansible
 
       - name: run ansible playbook
         run: |
