@@ -1,5 +1,4 @@
 key_name: "wp-app-dev-london"
-role_arn: "arn:aws:iam::825668827209:role/ami-create"
 region: "eu-west-2"
 id: "ansible-test"
 sec_group: "ansible-test-sg"
