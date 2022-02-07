@@ -33,7 +33,7 @@
       security_token: "{{ session_credentials.sts_creds.session_token }}"
       role_arn: "{{ lookup ('env', 'AWS_ROLE_ARN') }}"
       role_session_name: "s-devops-ansible-amis"
-      profile: s-devops
+      #profile: s-devops
     register: assumed_role
 
   - name: Get linux2 AMI
