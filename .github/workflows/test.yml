@@ -62,8 +62,8 @@ jobs:
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-website/nginx
-          echo AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}" >> $cur_dir/wp-website/nginx/${{ env.ANSIBLE_VAR_FILE }}
-          echo AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $cur_dir/wp-website/nginx/${{ env.ANSIBLE_VAR_FILE }}
+          #echo AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}" >> $cur_dir/wp-website/nginx/${{ env.ANSIBLE_VAR_FILE }}
+          #echo AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $cur_dir/wp-website/nginx/${{ env.ANSIBLE_VAR_FILE }}
           echo role_arn: "${{ secrets.AWS_ROLE_ARN }}" >> $cur_dir/wp-website/nginx/${{ env.ANSIBLE_VAR_FILE }}
           ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key $cur_dir/${{ env.SSH_KEY_FILE }} -vvv nginx-playbook.yml
 
