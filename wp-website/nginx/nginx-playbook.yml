@@ -11,14 +11,14 @@
     ansible.builtin.include_vars:
       file: vars_dev.yml
 
-  - name: check if keyfile for ssh is in place
-    ansible.builtin.stat:
-      path: "~/{{ ansible_ssh_private_key_file }}"
-    register: key_file
+#  - name: check if keyfile for ssh is in place
+#    ansible.builtin.stat:
+#      path: "~/{{ ansible_ssh_private_key_file }}"
+#    register: key_file
 
-  - name: stop script if key file isn't found
-    ansible.builtin.meta: end_play
-    when: "key_file.stat.exists == false"
+#  - name: stop script if key file isn't found
+#    ansible.builtin.meta: end_play
+#    when: "key_file.stat.exists == false"
 
   - name: Get AWS session token
     community.aws.sts_session_token:

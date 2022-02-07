@@ -52,10 +52,12 @@ jobs:
           sudo apt-get install ansible
 
       - name: run ansible playbook
-        working-directory: ~/wp-website/nginx
+        working-directory: wp-website/nginx
         run: |
+          cur_dir=$(pwd)
+          cd $cur_dir/wp-website/nginx
           ls -alh
-          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key ${{ env.SSH_KEY_FILE }} -vvv nginx-playbook.yml
+          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key $cur_dir/${{ env.SSH_KEY_FILE }} -vvv nginx-playbook.yml
 
   ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
