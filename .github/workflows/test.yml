@@ -68,14 +68,14 @@ jobs:
           echo [default] >> ~/.aws/credentials
           echo AWS_ACCESS_KEY_ID = ${{ secrets.AWS_ACCESS_KEY_ID }} >> ~/.aws/credentials
           echo AWS_SECRET_ACCESS_KEY = ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> ~/.aws/credentials
-          echo >> ~/.aws/credentials
-          echo [s-devops] >> ~/.aws/credential
-          echo role_arn = ${{ secrets.AWS_ROLE_ARN }} >> ~/.aws/credential
-          echo source_profile = default >> ~/.aws/credential
           touch ~/.aws/config
           echo [default] >> ~/.aws/config
           echo region = eu-west-2 >> ~/.aws/config
           echo output = json >> ~/.aws/config
+          echo >> ~/.aws/config
+          echo [profile s-devops] >> ~/.aws/config
+          echo role_arn = ${{ secrets.AWS_ROLE_ARN }} >> ~/.aws/config
+          echo source_profile = default >> ~/.aws/config
 
       - name: run ansible playbook
         env:
