@@ -55,9 +55,6 @@ jobs:
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-website/nginx
-          echo "hosts: ec2hosts" > ./hosts
-          echo "  remote_user: ec2_user" >> ./hosts
-          ls -alh
           ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key $cur_dir/${{ env.SSH_KEY_FILE }} --inventory ./hosts -vvv nginx-playbook.yml
 
   ami-deployment-staging:
