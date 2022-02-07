@@ -38,9 +38,9 @@
 
   - name: Get linux2 AMI
     amazon.aws.ec2_ami_info:
-      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
-      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
-      security_token: "{{ session_credentials.sts_creds.session_token }}"
+      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+      security_token: "{{ assumed_role.sts_creds.session_token }}"
       owners: amazon
       region: "{{ region }}"
       filters:
