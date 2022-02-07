@@ -60,15 +60,16 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3
+      - name: upgrade pip
+        run: pip install --upgrade pip
+      - name: install aws cli
+        run: sudo apt-get install awscli
       - name: install boto3
-        run: |
-          pip3 install boto3 requests pyjwt
+        run: pip3 install boto3 requests pyjwt
       - name: install wheel
-        run: |
-          pip3 install wheel requests pyjwt
+        run: pip3 install wheel requests pyjwt
       - name: install ansible
-        run: |
-          pip3 install ansible
+        run: pip3 install ansible
 
       - name: run ansible playbook
         env:
