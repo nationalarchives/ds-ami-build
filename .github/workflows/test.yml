@@ -51,6 +51,11 @@ jobs:
         run: |
           sudo apt-get install ansible
 
+      - name: prepare ansible hosts file
+        run: |
+          echo "hosts: ec2hosts" > /etc/ansible/hosts
+          echo "  remote_user: ec2_user" >> /etc/ansible/hosts
+
       - name: run ansible playbook
         run: |
           cur_dir=$(pwd)
