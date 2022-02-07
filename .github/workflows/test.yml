@@ -53,7 +53,8 @@ jobs:
 
       - name: run ansible playbook
         run: |
-          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key ${{ env.SSH_KEY_FILE }} nginx-playbook.yml
+          ls -alh
+          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key ${{ env.SSH_KEY_FILE }} -vvv nginx-playbook.yml
 
   ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
