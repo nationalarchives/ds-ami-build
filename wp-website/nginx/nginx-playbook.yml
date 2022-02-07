@@ -25,6 +25,12 @@
 #      duration_seconds: 3600
 #    register: session_credentials
 
+  - name: get session credentials
+    community.aws.sts_assume_role:
+      role_arn: "{{ role_arn }}"
+      role_session_name: "s-devops-ansible-amis"
+    register: assumed_role
+
   - name: Get linux2 AMI
     ec2_ami_info:
       owners: amazon
@@ -43,12 +49,6 @@
       src: "./templates/instance-role-policy.json.j2"
       dest: "./instance-role-policy.json"
       force: yes
-
-  - name: get session credentials
-    community.aws.sts_assume_role:
-      role_arn: "{{ role_arn }}"
-      role_session_name: "s-devops-ansible-amis"
-    register: assumed_role
 
   - name: Create deployment policy
     community.aws.iam_managed_policy:
