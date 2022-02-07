@@ -20,13 +20,16 @@
 #    ansible.builtin.meta: end_play
 #    when: "key_file.stat.exists == false"
 
-#  - name: Get AWS session token
-#    community.aws.sts_session_token:
-#      duration_seconds: 3600
-#    register: session_credentials
+  - name: Get AWS session token
+    community.aws.sts_session_token:
+      duration_seconds: 3600
+    register: session_credentials
 
   - name: get session credentials
     community.aws.sts_assume_role:
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       role_arn: "{{ role_arn }}"
       role_session_name: "s-devops-ansible-amis"
     register: assumed_role
@@ -52,9 +55,9 @@
 
   - name: Create deployment policy
     community.aws.iam_managed_policy:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       policy_name: "{{ service }}-rp-primer-{{ env }}-s3-policy"
       policy: "{{ lookup('file', './instance-role-policy.json') }}"
       state: "present"
@@ -62,9 +65,9 @@
 
   - name: Create reverse proxy IAM role
     community.aws.iam_role:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       name: "{{ service }}-rp-{{ env }}-role"
       region: "{{ region }}"
       assume_role_policy_document: "{{ lookup('file', './rp-role-policy.json') }}"
@@ -76,9 +79,9 @@
 
   - name: Create security group - allowing updates and downloads
     amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       name: "{{ service }}-{{ env }}-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
@@ -121,9 +124,9 @@
 
   - name: Provisioning instance
     amazon.aws.ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"
       # instance_role: "{{ service }}-rp-{{ env }}-role"
@@ -223,9 +226,9 @@
   tasks:
   - name: create AMI
     amazon.aws.ec2_ami:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       instance_id: "{{ instance_id }}"
       name: "{{ service }}-rp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
       description: "Website reverse proxy - ready for deployment"
@@ -242,35 +245,35 @@
 
   - name: terminate instance
     ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       instance_ids: "{{ instance_id }}"
       region: "{{ region }}"
       state: "absent"
 
   - name: remove security group
     amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       name: "{{ service }}-{{ env }}-sg"
       region: "{{ region }}"
       state: "absent"
 
   - name: remove IAM role
     community.aws.iam_role:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       name: "{{ service }}-rp-{{ env }}-role"
       region: "{{ region }}"
       state: "absent"
 
   - name: remove deployment policy
     community.aws.iam_managed_policy:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
       policy_name: "{{ service }}-rp-primer-{{ env }}-s3-policy"
       state: "absent"
