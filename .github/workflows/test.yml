@@ -72,10 +72,10 @@ jobs:
         run: pip3 install ansible
 
       - name: run ansible playbook
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-website/nginx
