@@ -72,14 +72,14 @@ jobs:
           echo source_profile = default >> ~/.aws/credential
 
       - name: run ansible playbook
-#        env:
+        env:
 #          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
 #          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-website/nginx
-          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key $cur_dir/${{ env.SSH_KEY_FILE }} -vvv nginx-playbook.yml
+          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key $cur_dir/${{ env.SSH_KEY_FILE }} nginx-playbook.yml
 
   ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
