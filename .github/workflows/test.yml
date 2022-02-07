@@ -36,8 +36,8 @@ jobs:
           echo AWS_ROLE_ARN=${{ secrets.ARN_ROLE_ARN }} >> $GITHUB_ENV
           echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
 
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> GITHUB_ENV
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> GITHUB_ENV
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> GITHUB_ENV
 
       - name: write ssh key file
         run: echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
@@ -56,7 +56,7 @@ jobs:
           cur_dir=$(pwd)
           cd $cur_dir/wp-website/nginx
           echo $AWS_ROLE_ARN
-          ansible-playbook --extra-vars a_key=${{ secrets.AWS_ACCESS_KEY_ID }} --extra-vars s_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key $cur_dir/${{ env.SSH_KEY_FILE }} --inventory ./hosts -vvv nginx-playbook.yml
+          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key $cur_dir/${{ env.SSH_KEY_FILE }} -vvv nginx-playbook.yml
 
   ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
