@@ -52,6 +52,7 @@ jobs:
           sudo apt-get install ansible
 
       - name: run ansible playbook
+        working-directory: ~/wp-website/nginx
         run: |
           ls -alh
           ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key ${{ env.SSH_KEY_FILE }} -vvv nginx-playbook.yml

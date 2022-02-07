@@ -13,7 +13,7 @@
 
   - name: check if keyfile for ssh is in place
     ansible.builtin.stat:
-      path: "{{ ansible_ssh_private_key_file }}"
+      path: "~/{{ ansible_ssh_private_key_file }}"
     register: key_file
 
   - name: stop script if key file isn't found
