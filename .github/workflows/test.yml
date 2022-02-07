@@ -12,6 +12,7 @@ on:
       deploy-environment:
         type: choice
         description: Environment
+        required: true
         options:
         - dev
         - staging

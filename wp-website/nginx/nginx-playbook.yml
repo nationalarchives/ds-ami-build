@@ -30,7 +30,7 @@
     community.aws.sts_assume_role:
       #aws_access_key: "{{ AWS_ACCESS_KEY_ID }}"
       #aws_secret_key: "{{ AWS_SECRET_ACCESS_KEY }}"
-      role_arn: "{{ lookup ({{ env }}, 'AWS_ROLE_ARN') }}"
+      role_arn: "{{ lookup ('env', 'AWS_ROLE_ARN') }}"
       role_session_name: "s-devops-ansible-amis"
       profile: s-devops
     register: assumed_role
