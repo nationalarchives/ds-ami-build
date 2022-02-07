@@ -29,7 +29,7 @@ jobs:
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE==wp-app-dev-london.pem" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=wp-app-dev-london.pem" >> $GITHUB_ENV
 
       - name: auth settings
         run: |
