@@ -46,8 +46,6 @@
 
   - name: get session credentials
     community.aws.sts_assume_role:
-      aws_access_key: "{{ a_key }}"
-      aws_secret_key: "{{ s_key }}"
       role_arn: "{{ role_arn }}"
       role_session_name: "s-devops-ansible-amis"
     register: assumed_role
@@ -179,6 +177,7 @@
       hostname: "{{ instance_private_ip }}"
       groups: ec2hosts
       ansible_user: ec2-user
+      remote_user: ec2-user
       gather_facts: no
 
   - name: Wait for SSH service to bind on new instance
