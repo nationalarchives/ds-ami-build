@@ -8,9 +8,9 @@
 
   tasks:
 
-#  - name: load variables
-#    ansible.builtin.include_vars:
-#      file: vars_dev.yml
+  - name: load variables
+    ansible.builtin.include_vars:
+      file: {{ lookup('env', 'ansible_var_file') }}
 
 #  - name: check if keyfile for ssh is in place
 #    ansible.builtin.stat:
