@@ -54,8 +54,8 @@ jobs:
           python-version: 3
       - name: upgrade pip
         run: pip install --upgrade pip
-      - name: install aws cli
-        run: sudo apt-get install awscli
+#      - name: install aws cli
+#        run: sudo apt-get install awscli
       - name: install boto3
         run: pip3 install boto3 requests pyjwt
       - name: install wheel
@@ -63,23 +63,23 @@ jobs:
       - name: install ansible
         run: pip3 install ansible
 
-      - name: set aws creds
-        run: |
-          mkdir ~/.aws
-          touch ~/.aws/credentials
-          echo [default] >> ~/.aws/credentials
-          echo AWS_ACCESS_KEY_ID = ${{ secrets.AWS_ACCESS_KEY_ID }} >> ~/.aws/credentials
-          echo AWS_SECRET_ACCESS_KEY = ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> ~/.aws/credentials
-          touch ~/.aws/config
-          echo [default] >> ~/.aws/config
-          echo region = eu-west-2 >> ~/.aws/config
-          echo output = json >> ~/.aws/config
-          echo >> ~/.aws/config
-          echo [profile s-devops] >> ~/.aws/config
-          echo role_arn = ${{ secrets.AWS_ROLE_ARN }} >> ~/.aws/config
-          echo source_profile = default >> ~/.aws/config
-          echo region = eu-west-2 >> ~/.aws/config
-          echo output = json >> ~/.aws/config
+#      - name: set aws creds
+#        run: |
+#          mkdir ~/.aws
+#          touch ~/.aws/credentials
+#          echo [default] >> ~/.aws/credentials
+#          echo AWS_ACCESS_KEY_ID = ${{ secrets.AWS_ACCESS_KEY_ID }} >> ~/.aws/credentials
+#          echo AWS_SECRET_ACCESS_KEY = ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> ~/.aws/credentials
+#          touch ~/.aws/config
+#          echo [default] >> ~/.aws/config
+#          echo region = eu-west-2 >> ~/.aws/config
+#          echo output = json >> ~/.aws/config
+#          echo >> ~/.aws/config
+#          echo [profile s-devops] >> ~/.aws/config
+#          echo role_arn = ${{ secrets.AWS_ROLE_ARN }} >> ~/.aws/config
+#          echo source_profile = default >> ~/.aws/config
+#          echo region = eu-west-2 >> ~/.aws/config
+#          echo output = json >> ~/.aws/config
 
       - name: run ansible playbook
         env:
@@ -89,6 +89,9 @@ jobs:
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-website/nginx
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=eu-west-2
           ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} nginx-playbook.yml
 
   ami-deployment-staging:
