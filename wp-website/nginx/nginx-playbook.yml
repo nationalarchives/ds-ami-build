@@ -197,7 +197,7 @@
 
   - name: wait for SSH service to bind on new instance
     wait_for:
-      host: "{{ instance_private_ip }}"
+      host: "{{ instance_public_ip }}"
       port: 22
       delay: 90
       timeout: 600
