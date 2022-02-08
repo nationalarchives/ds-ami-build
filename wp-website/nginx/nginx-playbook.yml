@@ -10,7 +10,7 @@
 
   - name: load variables
     ansible.builtin.include_vars:
-      file: {{ lookup('env', 'ansible_var_file') }}
+      file: "{{ lookup('env', 'ansible_var_file') }}"
 
 #  - name: check if keyfile for ssh is in place
 #    ansible.builtin.stat:
