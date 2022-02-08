@@ -8,9 +8,9 @@
 
   tasks:
 
-  - name: load variables
-    ansible.builtin.include_vars:
-      file: vars_dev.yml
+#  - name: load variables
+#    ansible.builtin.include_vars:
+#      file: vars_dev.yml
 
 #  - name: check if keyfile for ssh is in place
 #    ansible.builtin.stat:
@@ -95,7 +95,7 @@
       name: "{{ service }}-{{ env }}-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
-      vpc_id: "{{ vpc_id }}"
+      vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
       rules:
         - proto: "tcp"
           from_port: 22
@@ -140,7 +140,7 @@
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"
       # instance_role: "{{ service }}-rp-{{ env }}-role"
-      instance_role: "arn:aws:iam::825668827209:instance-profile/ansible-website-rp-dev-role"
+      instance_role: "arn:aws:iam::825668827209:instance-profile/{{ service }}-rp-dev-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
@@ -149,7 +149,7 @@
       network:
         assign_public_ip: no
         delete_on_termination: yes
-        subnet_id: "{{ subnet_id }}"
+        subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
       region: "{{ region }}"
       security_groups: ["{{ ec2_sec_group.group_id }}"]
       state: "running"
@@ -162,10 +162,10 @@
             delete_on_termination: true
             encrypted: true
             volume_size: "{{ volume_size }}"
-      vpc_subnet_id: "{{ subnet_id }}"
+      vpc_subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
       tags:
-        Environment: "dev"
-        Service: "website"
+        Environment: "{{ env }}"
+        Service: "{{ service }}"
         Owner: "Digital Services"
         CreatedBy: "ansible"
         CostCentre: 53
