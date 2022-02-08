@@ -40,7 +40,9 @@ jobs:
           echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
 
       - name: write ssh key file
-        run: echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+        run: |
+          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          chmod 0600 ${{ env.SSH_KEY_FILE }}
 
 #      - name: install aws cli
 ##        run: |
