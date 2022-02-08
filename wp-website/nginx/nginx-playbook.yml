@@ -189,7 +189,7 @@
 
   - name: register new ec2 as host
     add_host:
-      hostname: "{{ instance_private_ip }}"
+      hostname: "{{ instance_public_ip }}"
       groups: ec2hosts
       ansible_user: ec2-user
       remote_user: ec2-user
