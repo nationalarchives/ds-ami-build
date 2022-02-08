@@ -139,7 +139,6 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"
-      # instance_role: "{{ service }}-rp-{{ env }}-role"
       instance_role: "arn:aws:iam::825668827209:instance-profile/{{ service }}-rp-{{ env }}-role"
       instance_type: "t3a.large"
       metadata_options:
