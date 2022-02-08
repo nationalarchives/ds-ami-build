@@ -85,7 +85,7 @@ jobs:
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-website/nginx
-          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key $cur_dir/${{ env.SSH_KEY_FILE }} -vvv nginx-playbook.yml
+          ansible-playbook --extra-vars ${{ env.ANSIBLE_VAR_FILE }} --private-key $cur_dir/${{ env.SSH_KEY_FILE }} nginx-playbook.yml
 
   ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
