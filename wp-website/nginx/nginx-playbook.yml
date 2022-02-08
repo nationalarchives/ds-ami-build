@@ -10,7 +10,7 @@
 
   - name: load variables
     ansible.builtin.include_vars:
-      file: "{{ lookup('env', 'ansible_var_file') }}"
+      file: "{{ ansible_var_file }}"
 
 #  - name: check if keyfile for ssh is in place
 #    ansible.builtin.stat:
@@ -140,7 +140,7 @@
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"
       # instance_role: "{{ service }}-rp-{{ env }}-role"
-      instance_role: "arn:aws:iam::825668827209:instance-profile/{{ service }}-rp-dev-role"
+      instance_role: "arn:aws:iam::825668827209:instance-profile/{{ service }}-rp-{{ env }}-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
