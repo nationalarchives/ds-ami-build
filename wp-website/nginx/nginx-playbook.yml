@@ -1,9 +1,8 @@
-# AWS playbook
+# NginX playbook
 ---
 
 - name: create NginX Reverse Proxy Primer
   hosts: localhost
-  #become: yes
   gather_facts: false
 
   tasks:
@@ -11,15 +10,6 @@
   - name: load variables
     ansible.builtin.include_vars:
       file: "{{ ansible_var_file }}"
-
-#  - name: check if keyfile for ssh is in place
-#    ansible.builtin.stat:
-#      path: "~/{{ ansible_ssh_private_key_file }}"
-#    register: key_file
-
-#  - name: stop script if key file isn't found
-#    ansible.builtin.meta: end_play
-#    when: "key_file.stat.exists == false"
 
   - name: get AWS session token
     community.aws.sts_session_token:
@@ -139,7 +129,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"
-      instance_role: "arn:aws:iam::825668827209:instance-profile/{{ service }}-rp-{{ env }}-role"
+      instance_role: "arn:aws:iam::{{ lookup('env', 'AWS_ACCOUNT_ID') }}:instance-profile/{{ service }}-rp-{{ env }}-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
