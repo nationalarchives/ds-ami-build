@@ -147,7 +147,7 @@
         http_tokens: "required"
       name : "{{ service }}-rp-primer-{{ env }}"
       network:
-        assign_public_ip: no
+        assign_public_ip: yes
         delete_on_termination: yes
         subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
       region: "{{ region }}"
@@ -175,6 +175,7 @@
   - name: get instance ip address
     set_fact:
       instance_private_ip: "{{ ec2.instances[0].private_ip_address }}"
+      instance_public_ip: "{{ ec2.instances[0].public_ip_address }}"
       instance_id: "{{ ec2.instances[0].instance_id }}"
 
   - ansible.builtin.debug:
@@ -183,6 +184,7 @@
         - "instance started up"
         - "instance private ip: {{ instance_private_ip }}"
         - "instance id: {{ instance_id }}"
+        - "instance public ip {{ instance_public_ip }}"
         - "====================================================================="
 
   - name: register new ec2 as host
