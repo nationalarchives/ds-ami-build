@@ -1,4 +1,4 @@
-# Deploy Website NginX Frontend AMI
+# Create Website NginX Frontend AMI
 
 name: Create Website NginX Frontend
 
@@ -44,18 +44,12 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
-#      - name: install aws cli
-##        run: |
-#          #curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
-#          sudo apt-get install awscli
       - name: install python
         uses: actions/setup-python@v2
         with:
           python-version: 3
       - name: upgrade pip
         run: pip install --upgrade pip
-#      - name: install aws cli
-#        run: sudo apt-get install awscli
       - name: install boto3
         run: pip3 install boto3 requests pyjwt
       - name: install wheel
@@ -63,29 +57,12 @@ jobs:
       - name: install ansible
         run: pip3 install ansible
 
-#      - name: set aws creds
-#        run: |
-#          mkdir ~/.aws
-#          touch ~/.aws/credentials
-#          echo [default] >> ~/.aws/credentials
-#          echo AWS_ACCESS_KEY_ID = ${{ secrets.AWS_ACCESS_KEY_ID }} >> ~/.aws/credentials
-#          echo AWS_SECRET_ACCESS_KEY = ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> ~/.aws/credentials
-#          touch ~/.aws/config
-#          echo [default] >> ~/.aws/config
-#          echo region = eu-west-2 >> ~/.aws/config
-#          echo output = json >> ~/.aws/config
-#          echo >> ~/.aws/config
-#          echo [profile s-devops] >> ~/.aws/config
-#          echo role_arn = ${{ secrets.AWS_ROLE_ARN }} >> ~/.aws/config
-#          echo source_profile = default >> ~/.aws/config
-#          echo region = eu-west-2 >> ~/.aws/config
-#          echo output = json >> ~/.aws/config
-
       - name: run ansible playbook
         env:
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
           VPC_ID: ${{ secrets.VPC_ID }}
           SUBNET_ID: ${{ secrets.SUBNET_ID }}
+          AWS_ACCOUNT_ID: {{ secrets.AWS_ACCOUNT_ID }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-website/nginx
