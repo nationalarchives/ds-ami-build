@@ -1,6 +1,4 @@
-# Create Website NginX Frontend AMI
-
-name: Create Website NginX Frontend
+name: Website NginX Frontend AMI
 
 permissions:
   id-token: write
