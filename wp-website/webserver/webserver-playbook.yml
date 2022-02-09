@@ -48,13 +48,6 @@
         {{ findami.images | sort(attribute='creation_date') | last }}
 
   - name: read secrets from aws secrets manager
-    amazon.aws.aws_secret:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      _terms: "dev/WordPress"
-    register: secrets
-
-  - debug:
+    debug:
       msg:
-        - "values: {{ secrets }}"
+        - "values: {{ lookup('amazon.aws.aws_secret', 'dev/WordPress', region=eu-west-2, aws_acccess_key={{ assumed_role.sts_creds.access_key }}, aws_secret_key={{ assumed_role.sts_creds.secret_key }}, aws_secret_token={{ assumed_role.sts_creds.session_token }}, on_denied='warn') }}"
