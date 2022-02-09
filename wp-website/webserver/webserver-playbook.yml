@@ -50,4 +50,4 @@
   - name: read secrets from aws secrets manager
     debug:
       msg:
-        - "values: {{ lookup('amazon.aws.aws_secret', 'dev/WordPress', on_denied='warn' }}
+        - "values: {{ lookup('amazon.aws.aws_secret', 'dev/WordPress', on_denied='warn' }}"
