@@ -1,0 +1,28 @@
+key_name: "wp-app-dev-london"
+region: "eu-west-2"
+id: "ansible-test"
+sec_group: "ansible-test-sg"
+service: "ansible-website"
+env: "dev"
+volume_size: 100
+s3_deployment_bucket: "ds-dev-wp-deployment"
+s3_deployment_root: "website"
+s3_logfile_bucket: "ds-dev-wp-logfiles"
+s3_logfile_root: "website"
+ssm_download_region: "eu-west-2"
+
+
+    wp_db_name        = data.terraform_remote_state.website.outputs.wp_db_name
+    wp_db_username    = data.terraform_remote_state.website.outputs.wp_db_username
+    wp_db_password    = data.terraform_remote_state.website.outputs.wp_db_password
+    wp_int_siteurl    = data.terraform_remote_state.website.outputs.int_domain_name
+    wp_public_siteurl = data.terraform_remote_state.website.outputs.public_domain_name
+    wp_editor_siteurl = data.terraform_remote_state.website.outputs.editorial_domain_name
+
+    ses_username   = data.terraform_remote_state.website.outputs.ses_username
+    ses_password   = data.terraform_remote_state.website.outputs.ses_password
+    ses_host       = "email-smtp.eu-west-2.amazonaws.com"
+    ses_port       = 587
+    ses_secure     = "tls"
+    ses_from_email = "no-reply@nationalarchives.gov.uk"
+    ses_from_name  = "The National Archives"
