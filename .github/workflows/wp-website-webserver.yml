@@ -1,4 +1,4 @@
-name: Website Webserver Backend AMI
+name: Website WordPress Backend AMI
 
 permissions:
   id-token: write
