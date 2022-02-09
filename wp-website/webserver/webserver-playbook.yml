@@ -61,4 +61,4 @@
     debug:
       msg:
         - "{{ aws_secrets }}"
-        - "{{ aws_secrets.github_token }}"
+        - "{{ aws_secrets  | json_query('*.github_token') }}"
