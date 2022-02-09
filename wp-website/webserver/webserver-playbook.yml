@@ -54,11 +54,21 @@
 
   - name: set secret values
     set_fact:
-      secrets: >
-        "{{ lookup('amazon.aws.aws_secret', 'dev/WordPress', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
+      website_db_username: >
+        "{{ lookup('amazon.aws.aws_secret', 'dev/WordPress.website_db_username', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
+      website_db_password: >
+        "{{ lookup('amazon.aws.aws_secret', 'dev/WordPress.website_db_password', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
+      website_db_name: >
+        "{{ lookup('amazon.aws.aws_secret', 'dev/WordPress.website_db_name', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
+      github_token: >
+        "{{ lookup('amazon.aws.aws_secret', 'dev/WordPress.github_token', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
+      ses_username: >
+        "{{ lookup('amazon.aws.aws_secret', 'dev/WordPress.ses_username', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
+      ses_password: >
+        "{{ lookup('amazon.aws.aws_secret', 'dev/WordPress.ses_password', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
 
   - name: secret output
     debug:
       msg:
-        - "{{ secrets }}"
-        - "{{ secrets.website_db_username }}"
+        - "{{ github_token }}"
+        - "{{ ses_username }}"
