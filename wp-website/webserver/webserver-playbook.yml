@@ -51,3 +51,14 @@
     debug:
       msg:
         - "values: {{ lookup('amazon.aws.aws_secret', 'dev/WordPress', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
+
+  - name: set secret values
+    set_fact:
+      secrets: >
+        "{{ lookup('amazon.aws.aws_secret', 'dev/WordPress', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
+
+  - name: secret output
+    debug:
+      msg:
+        - "{{ secrets }}"
+        - "{{ secrets.website_db_username }}"
