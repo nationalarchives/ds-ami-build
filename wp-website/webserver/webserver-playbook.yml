@@ -122,6 +122,8 @@
     register: ec2_sec_group
 
   - name: template userdata
+    vars:
+      db_host: "db.{{ service }}wp.{{ env }}.local"
     template:
       src: "./templates/userdata.sh.j2"
       dest: "./userdata.sh"
