@@ -50,4 +50,4 @@
   - name: read secrets from aws secrets manager
     debug:
       msg:
-        - "values: {{ lookup('amazon.aws.aws_secret', 'dev/WordPress', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_secret_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
+        - "values: {{ lookup('amazon.aws.aws_secret', 'dev/WordPress', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') }}"
