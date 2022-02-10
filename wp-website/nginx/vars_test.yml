@@ -1,0 +1,12 @@
+key_name: "wp-app-test-london"
+region: "eu-west-2"
+id: "ansible-test"
+sec_group: "ansible-test-sg"
+service: "ansible-website"
+env: "test"
+volume_size: 100
+s3_deployment_bucket: "ds-test-wp-deployment"
+s3_deployment_root: "website"
+s3_logfile_bucket: "ds-test-wp-logfiles"
+s3_logfile_root: "website"
+ssm_download_region: "eu-west-2"
