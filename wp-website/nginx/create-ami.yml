@@ -1,0 +1,18 @@
+  - name: create AMI
+    amazon.aws.ec2_ami:
+      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      instance_id: "{{ instance_id }}"
+      name: "{{ service }}-rp-primer-linux2-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+      description: "Website reverse proxy - ready for deployment"
+      region: "{{ region }}"
+      state: "present"
+      wait: yes
+      tags:
+        Name: "{{ service }}-reverse-proxy-linux2-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+        Service: "{{ service }}"
+        Owner: "Digital Services"
+        CreatedBy: "ansible"
+        CostCentre: 53
+        Terraform: false
