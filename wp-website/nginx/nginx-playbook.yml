@@ -44,10 +44,4 @@
 
   tasks:
   - import_tasks: create-ami.yml
-
-- name: switch to localhost
-  hosts: localhost
-  gather_facts: true
-
-  tasks:
   - import_task: clean-up.yml
