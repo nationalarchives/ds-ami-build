@@ -6,7 +6,6 @@
   gather_facts: false
 
   tasks:
-
   - name: load variables
     ansible.builtin.include_vars:
       file: "{{ ansible_var_file }}"
@@ -31,4 +30,18 @@
       - "role changed  {{ assumed_role.changed }}"
       - "role arn: {{ lookup ('env', 'AWS_ROLE_ARN') }}"
 
-  - import_tasks: provisioning-ami.yml
+  - import_tasks: prepare-instance.yml
+
+- name: on ec2host
+- hosts: ec2hosts
+  gather_facts: false
+  tasks:
+  - import_tasks: prepare-instance.yml
+
+- name: switch to localhost
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+  - import_tasks: create-ami.yml
+  - import_task: clean-up.yml
