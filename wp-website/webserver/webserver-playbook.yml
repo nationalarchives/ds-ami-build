@@ -63,7 +63,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "{{ service }}-wp-primer-{{ env }}-s3-policy"
+      policy_name: "ansible-ami-s3-policy"
       policy: "{{ lookup('file', './instance-role-policy.json') }}"
       state: "present"
     register: s3_policy
@@ -73,7 +73,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "{{ service }}-wp-{{ env }}-role"
+      name: "ansible-ami-role"
       region: "{{ region }}"
       assume_role_policy_document: "{{ lookup('file', './wp-role-policy.json') }}"
       managed_policies: ["{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"]
@@ -87,7 +87,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "{{ service }}-{{ env }}-sg"
+      name: "ansible-ami-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
       vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
@@ -265,7 +265,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "{{ service }}-{{ env }}-sg"
+      name: "ansible-ami-sg"
       region: "{{ region }}"
       state: "absent"
 
@@ -274,7 +274,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "{{ service }}-wp-{{ env }}-role"
+      name: "ansible-ami-role"
       region: "{{ region }}"
       state: "absent"
 
@@ -283,5 +283,5 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "{{ service }}-wp-primer-{{ env }}-s3-policy"
+      policy_name: "ansible-ami-s3-policy"
       state: "absent"

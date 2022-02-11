@@ -253,6 +253,15 @@
       region: "{{ region }}"
       state: "absent"
 
+  - name: remove security group
+    amazon.aws.ec2_group:
+      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      name: "ansible-ami-sg"
+      region: "{{ region }}"
+      state: "absent"
+
   - name: remove IAM role
     community.aws.iam_role:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
@@ -268,13 +277,4 @@
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       policy_name: "ansible-aim-s3-policy"
-      state: "absent"
-
-  - name: remove security group
-    amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-sg"
-      region: "{{ region }}"
       state: "absent"

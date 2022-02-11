@@ -1,7 +1,5 @@
 key_name: "wp-app-dev-london"
 region: "eu-west-2"
-id: "ansible-test"
-sec_group: "ansible-test-sg"
 service: "ansible-website"
 env: "dev"
 volume_size: 100
