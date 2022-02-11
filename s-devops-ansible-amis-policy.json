@@ -58,7 +58,6 @@
                 "ec2:ModifyImageAttribute",
                 "secretsmanager:ListSecretVersionIds",
                 "iam:ListInstanceProfilesForRole",
-                "iam:PassRole",
                 "secretsmanager:GetSecretValue",
                 "ec2:CreateSecurityGroup",
                 "ec2:CreateSnapshot",
