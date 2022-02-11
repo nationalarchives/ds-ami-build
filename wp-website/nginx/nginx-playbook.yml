@@ -31,4 +31,4 @@
       - "role changed  {{ assumed_role.changed }}"
       - "role arn: {{ lookup ('env', 'AWS_ROLE_ARN') }}"
 
-  - import_tasks: deploy-task.yml
+  - import_tasks: provisioning-ami.yml
