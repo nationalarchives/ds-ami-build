@@ -1,8 +1,8 @@
 key_name: "wp-app-test-london"
 region: "eu-west-2"
 id: "ansible-test"
-sec_group: "ansible-test-sg"
-service: "ansible-website"
+sec_group: "s-devops-ansible-ami-sg"
+service: "website"
 env: "test"
 volume_size: 100
 s3_deployment_bucket: "ds-test-wp-deployment"
