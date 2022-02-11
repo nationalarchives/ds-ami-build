@@ -59,6 +59,7 @@
                 "secretsmanager:ListSecretVersionIds",
                 "iam:ListInstanceProfilesForRole",
                 "iam:PassRole",
+                "iam:RemoveRoleFromInstanceProfile",
                 "secretsmanager:GetSecretValue",
                 "ec2:CreateSecurityGroup",
                 "ec2:CreateSnapshot",
