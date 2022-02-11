@@ -49,9 +49,7 @@ jobs:
       - name: upgrade pip
         run: pip install --upgrade pip
       - name: install boto3
-        run: pip3 install boto3 requests pyjwt
-      - name: install wheel
-        run: pip3 install wheel requests pyjwt
+        run: pip3 install boto3 requests pyjwt wheel
       - name: install ansible
         run: pip3 install ansible
 
