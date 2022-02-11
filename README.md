@@ -15,11 +15,12 @@ Currently the snapshots are stored in the accounts which will deploy the AMIs. T
 ### AWS
 - account s-devops-ansible-amis in tna-iam with assume role permission
 - role s-devops-ansible-amis with permission in EC2, S3, IAM and Secrets Manager
-### Action Secrets (each environment - dev, staging and production)
+### Action Secrets (repo-wide)
 - AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+### Action Secrets (each environment - dev, staging and production)
 - AWS_ACCOUNT_ID - target account for storing the AMI
 - AWS_ROLE_ARN - role s-devops-ansible-amis in target account
-- AWS_SECRET_ACCESS_KEY
 - SSH_KEY - ssh key used to log in to primer instance and the deployed instance
 - SUBNET_ID - public subnet in target account
 - VPC_ID - vpc of the public subnet
