@@ -1,0 +1,20 @@
+key_name: "wp-app-dev-eu-west-2"
+region: "eu-west-2"
+service: "ansible-website"
+env: "dev"
+volume_size: 100
+s3_deployment_bucket: "ds-dev-wp-deployment-v2"
+s3_deployment_root: "website"
+s3_logfile_bucket: "ds-dev-wp-logfiles-v2"
+s3_logfile_root: "website"
+ssm_download_region: "eu-west-2"
+
+wp_int_siteurl: "website.dev.local"
+wp_public_siteurl: "dev-www.nationalarchives.gov.uk"
+wp_editor_siteurl: "devwp.nationalarchives.gov.uk"
+
+ses_host: "email-smtp.eu-west-2.amazonaws.com"
+ses_port: 587
+ses_secure: "tls"
+ses_from_email: "no-reply@nationalarchives.gov.uk"
+ses_from_name: "The National Archives"
