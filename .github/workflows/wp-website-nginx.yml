@@ -68,7 +68,7 @@ jobs:
           export AWS_DEFAULT_REGION=eu-west-2
           ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} nginx-playbook.yml
 
-  ami-deployment-new-dev:
+  ami-deployment-newdev:
     if: github.event.inputs.deploy-environment == 'newdev'
     runs-on: ubuntu-latest
     environment: newdev
