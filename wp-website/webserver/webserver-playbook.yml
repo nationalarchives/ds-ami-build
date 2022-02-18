@@ -136,7 +136,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"
-      instance_role: "arn:aws:iam::{{ lookup('env', 'AWS_ACCOUNT_ID') }}:instance-profile/{{ service }}-wp-{{ env }}-role"
+      instance_role: "arn:aws:iam::{{ lookup('env', 'AWS_ACCOUNT_ID') }}:instance-profile/ansible-ami-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
