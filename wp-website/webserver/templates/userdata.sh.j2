@@ -1,47 +1,47 @@
 #!/bin/bash
 
-logger userdata.sh script started here ===========================
+logger userdata.sh script started here ====
 # Update yum
 sudo yum update -y
 
-logger userdata.sh install http tools ===========================
+logger userdata.sh install http tools ====
 # Install apache
 sudo yum install -y httpd httpd-tools mod_ssl
 sudo systemctl enable httpd
 sudo systemctl start httpd
 
-logger userdata.sh install php ===========================
+logger userdata.sh install php ====
 # Install php 7.4
 sudo amazon-linux-extras enable php7.4
 sudo yum clean metadata
 sudo yum install php php-common php-pear -y
 sudo yum install php-{cli,cgi,curl,mbstring,gd,mysqlnd,gettext,json,xml,fpm,intl,zip,simplexml,gd} -y
 
-logger userdata.sh install mysql ===========================
+logger userdata.sh install mysql ====
 # Install mysql5.7
 sudo rpm -Uvh https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
 sudo yum install mysql-community-server -y
 sudo systemctl enable mysqld
 sudo systemctl start mysqld
 
-logger userdata.sh install imagemagick ===========================
+logger userdata.sh install imagemagick ====
 # Install ImageMagick
 sudo yum -y install php-devel gcc ImageMagick ImageMagick-devel
 sudo bash -c "yes '' | pecl install -f imagick"
 sudo bash -c "echo 'extension=imagick.so' > /etc/php.d/imagick.ini"
 
-logger userdata.sh restart php/apache ===========================
+logger userdata.sh restart php/apache ====
 sudo systemctl restart php-fpm.service
 sudo systemctl restart httpd.service
 
-logger userdata.sh install nfs packages ===========================
+logger userdata.sh install nfs packages ====
 # Install NFS packages
 sudo yum install -y amazon-efs-utils
 sudo yum install -y nfs-utils
 sudo service nfs start
 sudo service nfs status
 
-logger userdata.sh install cloudwatch agent ===========================
+logger userdata.sh install cloudwatch agent ====
 # Install Cloudwatch agent
 sudo yum install amazon-cloudwatch-agent -y
 sudo amazon-linux-extras install -y collectd
@@ -52,7 +52,7 @@ sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
 sudo /sbin/mkswap /var/swap.1
 sudo /sbin/swapon /var/swap.1s
 
-logger userdata.sh install wordpress CLI ===========================
+logger userdata.sh install wordpress CLI ====
 # Install WP CLI
 mkdir /build
 cd /build
@@ -62,7 +62,7 @@ sudo mv wp-cli.phar /usr/local/bin/wp
 wp cli info
 cd /
 
-logger userdata.sh generate WP content ===========================
+logger userdata.sh generate WP content ====
 cd /var/www/html
 echo "<html><head><title>Health Check</title></head><body><h1>Hello world!</h1></body></html>" >> healthcheck.html
 echo "apache_modules:
@@ -93,7 +93,7 @@ sudo echo "# file: /etc/httpd/conf.d/wordpress.conf
 </VirtualHost>" >> /etc/httpd/conf.d/wordpress.conf
 sudo systemctl restart httpd
 
-logger userdata.sh create .htaccess ===========================
+logger userdata.sh create .htaccess ====
 # Create .htaccess
 sudo echo "<IfModule mod_expires.c>
 ExpiresActive On
@@ -118,7 +118,7 @@ RewriteRule . index.php [L]
 # END WordPress
 Options All -Indexes" >> /var/www/html/.htaccess
 
-logger userdata.sh generate wp-config ===========================
+logger userdata.sh generate wp-config ====
 wp core download --allow-root
 
 # Create WP config file
@@ -166,7 +166,7 @@ PHP
 # Reset .htaccess
 /usr/local/bin/wp rewrite flush --allow-root 2>>/var/www/html/wp-cli.log
 
-logger userdata.sh download TNA theme & plugins ===========================
+logger userdata.sh download TNA theme & plugins ====
 # Download TNA theme and licensed plugins
 mkdir /home/ec2-user/themes
 curl -H "Authorization: token {{ github_token }}" -L https://github.com/nationalarchives/tna/archive/master.zip > /home/ec2-user/themes/tna.zip
@@ -177,7 +177,7 @@ sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/advanced-cu
 sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/post-tags-and-categories-for-pages.zip ~/plugins/post-tags-and-categories-for-pages.zip
 sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/wds-active-plugin-data.zip ~/plugins/wds-active-plugin-data.zip
 
-logger userdata.sh install themes ===========================
+logger userdata.sh install themes ====
 # Install themes
 /usr/local/bin/wp theme install /home/ec2-user/themes/tna.zip --force --allow-root 2>>/var/www/html/wp-cli.log
 /usr/local/bin/wp theme install https://github.com/nationalarchives/tna-base/archive/master.zip --force --allow-root 2>>/var/www/html/wp-cli.log
@@ -216,7 +216,7 @@ logger userdata.sh install themes ===========================
 /usr/local/bin/wp theme install https://github.com/nationalarchives/tna-child-archives-sector/archive/master.zip --force --allow-root 2>>/var/www/html/wp-cli.log
 /usr/local/bin/wp theme install https://github.com/nationalarchives/tna-child-portals/archive/master.zip --force --allow-root 2>>/var/www/html/wp-cli.log
 
-logger userdata.sh install plugins ===========================
+logger userdata.sh install plugins ====
 # Install plugins
 /usr/local/bin/wp plugin install wordpress-seo --force --allow-root 2>>/var/www/html/wp-cli.log
 /usr/local/bin/wp plugin install advanced-custom-fields --force --allow-root 2>>/var/www/html/wp-cli.log
@@ -246,7 +246,7 @@ logger userdata.sh install plugins ===========================
 # Rename TNA theme dir
 sudo mv /var/www/html/wp-content/themes/tna-master /var/www/html/wp-content/themes/tna
 
-logger userdata.sh apache file permissions ===========================
+logger userdata.sh apache file permissions ====
 # Set file permissions for apache
 sudo usermod -a -G apache ec2-user
 sudo usermod -a -G apache ssm-user
@@ -259,4 +259,4 @@ cat << EOF > /var/finish-init.txt
 [status]
 finished = true
 EOF
-logger userdata.sh script finished here ===========================
+logger userdata.sh script finished here ====
