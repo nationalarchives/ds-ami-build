@@ -17,13 +17,6 @@ sudo yum clean metadata
 sudo yum install php php-common php-pear -y
 sudo yum install php-{cli,cgi,curl,mbstring,gd,mysqlnd,gettext,json,xml,fpm,intl,zip,simplexml,gd} -y
 
-logger userdata.sh install mysql ====
-# Install mysql5.7
-sudo rpm -Uvh https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
-sudo yum install mysql-community-server -y
-sudo systemctl enable mysqld
-sudo systemctl start mysqld
-
 logger userdata.sh install imagemagick ====
 # Install ImageMagick
 sudo yum -y install php-devel gcc ImageMagick ImageMagick-devel
