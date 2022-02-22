@@ -6,15 +6,6 @@
   gather_facts: false
 
   tasks:
-  - ansible.builtin.debug:
-      msg:
-        - "====================================================================="
-        - "arn: {{ lookup ('env', 'AWS_ROLE_ARN') }}"
-        - "vpc id: {{ lookup ('env', 'VPC_ID') }}"
-        - "subnet id: {{ lookup ('env', 'SUBNET_ID') }}"
-        - "account: {{ lookup ('env', 'AWS_ACCOUNT_ID') }}"
-        - "====================================================================="
-
   - name: load variables
     ansible.builtin.include_vars:
       file: "{{ ansible_var_file }}"
