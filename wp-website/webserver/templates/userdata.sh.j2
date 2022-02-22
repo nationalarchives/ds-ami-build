@@ -118,8 +118,6 @@ Options All -Indexes" >> /var/www/html/.htaccess
 logger userdata.sh generate wp-config ====
 wp core download --allow-root
 
-sudo echo "{{ db_host }} - {{ website_db_name }}" >> /var/www/html/db-info.log
-
 # Create WP config file
 /usr/local/bin/wp config create --dbhost={{ db_host }} --dbname={{ website_db_name }} --dbuser={{ website_db_username }} --dbpass="{{ website_db_password }}" --allow-root --extra-php <<PHP
 /* Turn HTTPS 'on' if HTTP_X_FORWARDED_PROTO matches 'https' */
