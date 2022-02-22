@@ -28,7 +28,6 @@ jobs:
         with:
           ref: "${{ github.event.inputs.branch }}"
 
-
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
