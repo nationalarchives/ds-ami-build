@@ -55,6 +55,10 @@ sudo mv wp-cli.phar /usr/local/bin/wp
 wp cli info
 cd /
 
+logger userdata.sh install mysql client ====
+# client required by wp config command
+sudo yum install mysql -y
+
 logger userdata.sh generate WP content ====
 cd /var/www/html
 echo "<html><head><title>Health Check</title></head><body><h1>Hello world!</h1></body></html>" >> healthcheck.html
