@@ -24,7 +24,10 @@ jobs:
     environment: dev
     steps:
       - name: checkout repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+        with:
+          ref: "${{ github.event.inputs.branch }}"
+
 
       - name: set ansible var file for dev
         run: |
