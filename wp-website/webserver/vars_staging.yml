@@ -1,0 +1,20 @@
+key_name: "wp-app-test-london"
+region: "eu-west-2"
+service: "website"
+env: "test"
+volume_size: 100
+s3_deployment_bucket: "ds-test-wp-deployment"
+s3_deployment_root: "website"
+s3_logfile_bucket: "ds-test-wp-logfiles"
+s3_logfile_root: "website"
+ssm_download_region: "eu-west-2"
+
+wp_int_siteurl: "website.test.local"
+wp_public_siteurl: "test-www.nationalarchives.gov.uk"
+wp_editor_siteurl: "testwp.nationalarchives.gov.uk"
+
+ses_host: "email-smtp.eu-west-2.amazonaws.com"
+ses_port: 587
+ses_secure: "tls"
+ses_from_email: "no-reply@nationalarchives.gov.uk"
+ses_from_name: "The National Archives"
