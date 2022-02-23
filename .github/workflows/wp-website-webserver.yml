@@ -134,10 +134,10 @@ jobs:
         with:
           ref: "${{ github.event.inputs.branch }}"
 
-      - name: set ansible var file for dev
+      - name: set ansible var file for staging
         run: |
-          echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=wp-app-dev-london.pem" >> $GITHUB_ENV
+          echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=wp-app-staging-london.pem" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
