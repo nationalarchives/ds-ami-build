@@ -227,7 +227,7 @@
   - debug:
       var: instance_finished
 
-- meta: end_play
+  - meta: end_play
 
 - name: switch to localhost
   hosts: localhost
