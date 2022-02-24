@@ -71,14 +71,15 @@
       msg:
         - "====================================================================="
         - "{{ db_sg }}"
+        - "{{ db_sg.security_groups[0].group_id }}"
         - "====================================================================="
 
-  - name: Create and associate production DMZ network ACL with DMZ subnets
+  - name: Create NACL
     community.aws.ec2_vpc_nacl:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-#      vpc_id: "{{ VPC_ID }}"
+      vpc_id: "{{ VPC_ID }}"
       name: ansible-nacl
       region: "{{ region }}"
 #      subnets: ['public-subnet-2b-dev']
@@ -95,19 +96,14 @@
           - [100, 'all', 'allow', '0.0.0.0/0', null, null, null, null]
       state: 'present'
 
-  - name: add NACL rle
+  - name: add NACL rule
     community.aws.ec2_vpc_nacl:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-#      vpc_id: "{{ VPC_ID }}"
+      vpc_id: "{{ VPC_ID }}"
       name: ansible-nacl
       region: "{{ region }}"
-#      subnets: ['public-subnet-2b-dev']
-      tags:
-        CostCode: CC1234
-        Project: phoenix
-        Description: production DMZ
       ingress:
           - [300, 'tcp', 'allow', '10.0.0.0/8', null, null, 22, 22]
       egress:
@@ -196,6 +192,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
+      vpc_id: "{{ VPC_ID }}"
       name: ansible-nacl
       region: "{{ region }}"
       ingress:
