@@ -152,7 +152,7 @@
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
 #      instance_role: "arn:aws:iam::{{ lookup('env', 'AWS_ACCOUNT_ID') }}:instance-profile/ansible-ami-role"
-      instance_role: "{{ wp_iam_role.iam_role.arn }}"
+      instance_role: "ansible-ami-website-wp-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
