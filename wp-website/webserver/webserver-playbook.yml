@@ -227,6 +227,8 @@
   - debug:
       var: instance_finished
 
+- meta: end_play
+
 - name: switch to localhost
   hosts: localhost
   gather_facts: true
