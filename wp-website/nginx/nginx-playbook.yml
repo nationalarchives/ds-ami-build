@@ -128,7 +128,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"
-      instance_role: "arn:aws:iam::{{ lookup('env', 'AWS_ACCOUNT_ID') }}:instance-profile/ansible-ami-role"
+      instance_role: "ansible-ami-website-rp-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
@@ -212,13 +212,6 @@
     retries: 45
     delay: 20
 
-  - name: set finishing status
-    set_fact:
-      instance_finished: "{{ init_finished.stat.exists }}"
-
-  - debug:
-      var: instance_finished
-
 - name: switch to localhost
   hosts: localhost
   gather_facts: true
@@ -268,6 +261,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-website-rp-role"
       region: "{{ region }}"
+      delete_instance_profile: yes
       state: "absent"
 
   - name: remove deployment policy

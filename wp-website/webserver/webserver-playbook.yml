@@ -58,6 +58,21 @@
       dest: "./instance-role-policy.json"
       force: yes
 
+  - name: get RDS security group ID
+    amazon.aws.ec2_group_info:
+      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      filters:
+        group-name:
+          - "website-wp-{{ env }}-app-sg"
+    register: db_sg
+  - ansible.builtin.debug:
+      msg:
+        - "====================================================================="
+        - "{{ db_sg.security_groups[0].group_id }}"
+        - "====================================================================="
+
   - name: create deployment policy
     community.aws.iam_managed_policy:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
@@ -135,8 +150,8 @@
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
-      image_id: "{{ latest_ami.image_id }}"
-      instance_role: "arn:aws:iam::{{ lookup('env', 'AWS_ACCOUNT_ID') }}:instance-profile/ansible-ami-role"
+      image_id: "{{ latest_ami.image_id }}"#
+      instance_role: "ansible-ami-website-wp-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
@@ -147,7 +162,7 @@
         delete_on_termination: yes
         subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
       region: "{{ region }}"
-      security_groups: ["{{ ec2_sec_group.group_id }}"]
+      security_groups: ["{{ ec2_sec_group.group_id }}", "{{ db_sg.security_groups[0].group_id }}"]
       state: "running"
       termination_protection: no
       user_data: "{{ lookup('file', './userdata.sh') }}"
@@ -220,12 +235,10 @@
     retries: 45
     delay: 20
 
-  - name: set finishing status
-    set_fact:
-      instance_finished: "{{ init_finished.stat.exists }}"
-
-  - debug:
-      var: instance_finished
+  - name: check if wp-config.php exists
+    ansible.builtin.stat:
+      path: "/var/wwww/html/wp-config.php"
+    remote_user: ec2-user
 
 - name: switch to localhost
   hosts: localhost
@@ -276,6 +289,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-website-wp-role"
       region: "{{ region }}"
+      delete_instance_profile: yes
       state: "absent"
 
   - name: remove deployment policy
