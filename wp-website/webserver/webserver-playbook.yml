@@ -236,17 +236,10 @@
     retries: 45
     delay: 20
 
-  - name: set finishing status
-    set_fact:
-      instance_finished: "{{ init_finished.stat.exists }}"
-
   - name: check if wp-config.php exists
     ansible.builtin.stat:
       path: "/var/wwww/html/wp-config.php"
     remote_user: ec2-user
-
-  - debug:
-      var: instance_finished
 
 - name: switch to localhost
   hosts: localhost
