@@ -93,7 +93,6 @@
       assume_role_policy_document: "{{ lookup('file', './wp-role-policy.json') }}"
       managed_policies: ["{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"]
       create_instance_profile: yes
-      delete_instance_profile: yes
       purge_policies: yes
       state: "present"
     register: wp_iam_role
@@ -241,6 +240,11 @@
     set_fact:
       instance_finished: "{{ init_finished.stat.exists }}"
 
+  - name: check if wp-config.php exists
+    ansible.builtin.stat:
+      path: "/var/wwww/html/wp-config.php"
+    remote_user: ec2-user
+
   - debug:
       var: instance_finished
 
@@ -293,6 +297,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-website-wp-role"
       region: "{{ region }}"
+      delete_instance_profile: yes
       state: "absent"
 
   - name: remove deployment policy
