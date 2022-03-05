@@ -5,8 +5,7 @@ env: "dev"
 volume_size: 100
 deployment_s3_bucket: "ds-dev-wp-deployment"
 s3_deployment_root: "website"
-s3_logfile_bucket: "ds-dev-wp-logfiles"
-s3_logfile_root: "website"
+
 ssm_download_region: "eu-west-2"
 
 blog_domain_name: "dev-blog.nationalarchives.gov.uk"
