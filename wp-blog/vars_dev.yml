@@ -1,4 +1,4 @@
-key_name: "wp-app-dev-london"
+key_name: "wp-app-dev-eu-west-2"
 region: "eu-west-2"
 service: "blog"
 env: "dev"
