@@ -138,6 +138,7 @@
   - name: template userdata
     vars:
       db_host: "db.{{ service }}wp.{{ env }}.local"
+      db_name: "{{ service }}wp"
     template:
       src: "./templates/userdata.sh.j2"
       dest: "./userdata.sh"
