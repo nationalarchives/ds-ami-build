@@ -1,0 +1,24 @@
+key_name: "wp-app-dev-london"
+region: "eu-west-2"
+service: "blog"
+env: "dev"
+volume_size: 100
+deployment_s3_bucket: "ds-dev-wp-deployment"
+s3_deployment_root: "website"
+
+ssm_download_region: "eu-west-2"
+
+blog_domain_name: "dev-blog.nationalarchives.gov.uk"
+
+ses_host: "email-smtp.eu-west-2.amazonaws.com"
+ses_port: 587
+ses_secure: "tls"
+ses_from_email: "no-reply@nationalarchives.gov.uk"
+ses_from_name: "The National Archives"
+
+
+domain: "dev-blog.nationalarchives.gov.uk"
+cdn_bucket_name: "tna-cdn-dev-uk"
+cdn_aws_region: "eu-west-2"
+cdn_cloudfront_url: "dev-cdn.nationalarchives.gov.uk"
+cdn_dir: "blog"
