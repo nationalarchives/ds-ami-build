@@ -171,3 +171,8 @@ sudo chown apache:apache /var/www -R
 sudo find /var/www -type d -exec chmod 775 { } \;
 sudo find /var/www -type f -exec chmod 664 { } \;
 sudo systemctl restart httpd
+
+cat << EOF > /var/finish-init.txt
+[status]
+finished = true
+EOF
