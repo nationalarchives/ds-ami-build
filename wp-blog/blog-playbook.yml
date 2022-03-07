@@ -144,6 +144,13 @@
       dest: "./userdata.sh"
       force: yes
 
+  - ansible.builtin.debug:
+      msg:
+        - "====================================================================="
+        - "key_name"
+        - "{{ keyname }}"
+        - "====================================================================="
+
   - name: provisioning instance
     amazon.aws.ec2_instance:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
