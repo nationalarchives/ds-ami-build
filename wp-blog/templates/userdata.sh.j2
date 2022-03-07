@@ -12,7 +12,7 @@ sudo systemctl start httpd
 sudo amazon-linux-extras enable php7.4
 sudo yum clean metadata
 sudo yum install php php-common php-pear -y
-sudo yum install php-{cli,cgi,curl,mbstring,gd,mysqlnd,gettext,json,xml,fpm,intl,zip,simplexml,gd } -y
+sudo yum install php-{cli,cgi,curl,mbstring,gd,mysqlnd,gettext,json,xml,fpm,intl,zip,simplexml,gd} -y
 
 # Install mysql
 sudo yum install mysql -y
@@ -85,8 +85,8 @@ sudo echo "# BEGIN WordPress
 RewriteEngine On
 RewriteBase /
 RewriteRule ^index\.php$ - [L]
-RewriteCond %%{REQUEST_FILENAME }} !-f
-RewriteCond %%{REQUEST_FILENAME }} !-d
+RewriteCond %%{REQUEST_FILENAME} !-f
+RewriteCond %%{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 # END WordPress
 Options All -Indexes" >> /var/www/html/.htaccess
