@@ -17,7 +17,7 @@ on:
         - production
 
 jobs:
-  ami-deployment-dev:
+  blog-ami-deployment-dev:
     if: github.event.inputs.deploy-environment == 'dev'
     runs-on: ubuntu-latest
     environment: blog-dev
