@@ -30,7 +30,7 @@ jobs:
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=wp-app-dev-london.pem" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=blog-wp-app-dev-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
