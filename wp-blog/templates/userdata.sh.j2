@@ -168,6 +168,6 @@ PHP
 sudo usermod -a -G apache ec2-user
 sudo usermod -a -G apache ssm-user
 sudo chown apache:apache /var/www -R
-sudo find /var/www -type d -exec chmod 775 { }} \;
-sudo find /var/www -type f -exec chmod 664 { }} \;
+sudo find /var/www -type d -exec chmod 775 { } \;
+sudo find /var/www -type f -exec chmod 664 { } \;
 sudo systemctl restart httpd
