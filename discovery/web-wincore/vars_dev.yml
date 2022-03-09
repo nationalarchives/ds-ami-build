@@ -1,18 +1,10 @@
+---
 key-file: "discovery-web-wincore-dev-eu-west-2"
 region: "eu-west-2"
 service: "discovery"
+tier: "web"
 env: "dev"
 volume_size: 30
 
-s3_deployment_bucket: ""
-username
-password
-engine
-host
-port
-dbInstanceIdentifier
-
-$accountNo = "825668827209"
-  $vpcId = "vpc-e5982a83"
-  $subnetId = "subnet-a39a56c5"
-  $securityGroupId = "sg-79a5da03"
+s3_deployment_bucket: "ds-intersite-deployment"
+s3_deployment_root: "discovery/installation-packages"
