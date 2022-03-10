@@ -196,46 +196,46 @@
   hosts: ec2hosts
   gather_facts: false
   tasks:
-    - name: IIS and ASP.NET install
-      ansible.windows.win_feature:
-      win_feature:
-        name: Web-Default-Doc, Web-Dir-Browsing, Web-Http-Errors, Web-Static-Content, Web-Http-Redirect, Web-Http-Logging, Web-Stat-Compression, Web-Filtering, Web-Url-Auth, Web-Net-Ext45, Web-Asp-Net45, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Mgmt-Console,NET-Framework-45-Core, NET-WCF-HTTP-Activation, NET-WCF-TCP-PortSharing
+  - name: IIS and ASP.NET install
+    ansible.windows.win_feature:
+    win_feature:
+      name: Web-Default-Doc, Web-Dir-Browsing, Web-Http-Errors, Web-Static-Content, Web-Http-Redirect, Web-Http-Logging, Web-Stat-Compression, Web-Filtering, Web-Url-Auth, Web-Net-Ext45, Web-Asp-Net45, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Mgmt-Console,NET-Framework-45-Core, NET-WCF-HTTP-Activation, NET-WCF-TCP-PortSharing
 
-    - name: ensure temp dir exists
-      win_file:
-        path: c:\temp
-        state: directory
+  - name: ensure temp dir exists
+    win_file:
+      path: c:\temp
+      state: directory
 
-    - name: ensure tna-startup dir exists
-      win_file:
-        path: c:\tna-startup
-        state: directory
+  - name: ensure tna-startup dir exists
+    win_file:
+      path: c:\tna-startup
+      state: directory
 
-    - name: copy file-downloader script
-      win_copy:
-        src: "./files/file-downloader.ps1"
-        dest: "c:\\temp\\file-downloader.ps1"
+  - name: copy file-downloader script
+    win_copy:
+      src: "./files/file-downloader.ps1"
+      dest: "c:\\temp\\file-downloader.ps1"
 
-    - name: copy server-setup script
-      win_copy:
-        src: "./files/server-setup.ps1"
-        dest: "c:\\temp\\server-setup.ps1"
+  - name: copy server-setup script
+    win_copy:
+      src: "./files/server-setup.ps1"
+      dest: "c:\\temp\\server-setup.ps1"
 
-    - name: copy startup script
-      win_copy:
-        src: "./files/startup.ps1"
-        dest: "c:\\tna-startup\\startup.ps1"
+  - name: copy startup script
+    win_copy:
+      src: "./files/startup.ps1"
+      dest: "c:\\tna-startup\\startup.ps1"
 
-    - name: copy updEnv script
-      win_copy:
-        src: "./files/updEnv.ps1"
-        dest: "c:\\tna-startup\\updEnv.ps1"
+  - name: copy updEnv script
+    win_copy:
+      src: "./files/updEnv.ps1"
+      dest: "c:\\tna-startup\\updEnv.ps1"
 
-    - name: run server-setup script
-      ansible.windows.win_powershell:
-        script: |
-          cd c:\temp
-          server-setup.ps1 -environment "{{ env }}" -tier "web" -application "discovery"
+  - name: run server-setup script
+    ansible.windows.win_powershell:
+      script: |
+        cd c:\temp
+        server-setup.ps1 -environment "{{ env }}" -tier "web" -application "discovery"
 
 
 - name: switch to localhost
