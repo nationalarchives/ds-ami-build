@@ -9,7 +9,10 @@ cmd.exe /c reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal
 cmd.exe /c netsh advfirewall firewall set rule group="windows remote management" new enable=yes
 cmd.exe /c netsh firewall add portopening TCP 5985 "Port 5985"
 
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile ConfigureRemotingForAnsible.ps1
+powershell -ExecutionPolicy RemoteSigned .\ConfigureRemotingForAnsible.ps1
 $admin = [adsi]("WinNT://./administrator, user")
-$admin.PSBase.Invoke("SetPassword", "{{ winrm_password }}")
-Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
+$admin.SetPassword("{{ winrm_password }}")
+#$admin.PSBase.Invoke("SetPassword", "{{ winrm_password }}")
+#Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
 </powershell>
