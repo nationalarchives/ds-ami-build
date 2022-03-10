@@ -61,7 +61,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-discover-web-role"
+      name: "ansible-ami-discovery-web-role"
       region: "{{ region }}"
       assume_role_policy_document: "{{ lookup('file', './discovery-web-wincore-role-policy.json') }}"
       managed_policies: [ "{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM" ]
