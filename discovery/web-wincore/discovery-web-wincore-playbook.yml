@@ -214,22 +214,22 @@
     - name: copy file-downloader script
       win_copy:
         src: "./files/file-downloader.ps1"
-        dest: "c:\temp\file-downloader.ps1"
+        dest: "c:\\temp\\file-downloader.ps1"
 
     - name: copy server-setup script
       win_copy:
         src: "./files/server-setup.ps1"
-        dest: "c:\temp\server-setup.ps1"
+        dest: "c:\\temp\\server-setup.ps1"
 
     - name: copy startup script
       win_copy:
         src: "./files/startup.ps1"
-        dest: "c:\tna-startup\startup.ps1"
+        dest: "c:\\tna-startup\\startup.ps1"
 
     - name: copy updEnv script
       win_copy:
         src: "./files/updEnv.ps1"
-        dest: "c:\tna-startup\updEnv.ps1"
+        dest: "c:\\tna-startup\\updEnv.ps1"
 
     - name: run server-setup script
       ansible.windows.win_powershell:
