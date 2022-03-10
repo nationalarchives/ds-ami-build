@@ -51,31 +51,31 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-discovery-web-s3-policy"
       policy: "{{ lookup('file', './instance-role-policy.json') }}"
+      policy_name: "ansible-ami-discovery-web-s3-policy"
       state: "present"
     register: s3_policy
 
-  - name: create webserver IAM role
+  - name: create discovery webserver IAM role
     community.aws.iam_role:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-website-wp-role"
+      name: "ansible-ami-discover-web-role"
       region: "{{ region }}"
-      assume_role_policy_document: "{{ lookup('file', './wp-role-policy.json') }}"
+      assume_role_policy_document: "{{ lookup('file', './discovery-web-wincore-policy.json') }}"
       managed_policies: [ "{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM" ]
       create_instance_profile: yes
       purge_policies: yes
       state: "present"
-    register: wp_iam_role
+    register: discovery_iam_role
 
   - name: create security group - allowing updates and downloads
     amazon.aws.ec2_group:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-website-wp-sg"
+      name: "ansible-ami-discovery-web-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
       vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
@@ -132,7 +132,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
-      instance_role: "ansible-ami-website-wp-role"
+      instance_role: "ansible-ami-discovery-web-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
@@ -253,13 +253,13 @@
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance_id: "{{ instance_id }}"
-      name: "{{ service }}-wp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
-      description: "Website webserver - ready for deployment"
+      name: "{{ service }}-discovery-web-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+      description: "Discovery Frontend server - wincore - ready for deployment"
       region: "{{ region }}"
       state: "present"
       wait: yes
       tags:
-        Name: "{{ service }}-wp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+        Name: "{{ service }}-discovery-web-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
         Service: "{{ service }}"
         Owner: "Digital Services"
         CreatedBy: "ansible"
@@ -280,7 +280,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-website-wp-sg"
+      name: "ansible-ami-discovery-web-sg"
       region: "{{ region }}"
       state: "absent"
 
@@ -289,7 +289,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-website-wp-role"
+      name: "ansible-ami-discover-web-role"
       region: "{{ region }}"
       delete_instance_profile: yes
       state: "absent"
@@ -299,5 +299,5 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-website-wp-s3-policy"
+      policy_name: "ansible-ami-discovery-web-s3-policy"
       state: "absent"
