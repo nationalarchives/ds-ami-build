@@ -15,4 +15,7 @@ $admin = [adsi]("WinNT://./administrator, user")
 $admin.SetPassword("{{ winrm_password }}")
 #$admin.PSBase.Invoke("SetPassword", "{{ winrm_password }}")
 #Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
+
+"[status]" | Out-File -FilePath /finish-init.txt
+"finished = true" | Out-File -FilePath /finish-init.txt -Append
 </powershell>
