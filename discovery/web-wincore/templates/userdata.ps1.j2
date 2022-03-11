@@ -19,3 +19,4 @@ $admin.SetPassword("{{ winrm_password }}")
 "[status]" | Out-File -FilePath /finish-init.txt
 "finished = true" | Out-File -FilePath /finish-init.txt -Append
 </powershell>
+<persist>true</persist>
