@@ -113,6 +113,12 @@
     set_fact:
       winrm_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
 
+  - ansible.builtin.debug:
+      msg:
+        - "====================================================================="
+        - "{{ winrm_password }}"
+        - "====================================================================="
+
   - name: template userdata
     template:
       src: "./templates/userdata.ps1.j2"
