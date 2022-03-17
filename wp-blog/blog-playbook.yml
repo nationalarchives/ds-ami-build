@@ -64,7 +64,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       filters:
         group-name:
-          - "blog-wp-{{ env }}-db-sg"
+          - "blog-wp-{{ env }}-app-sg"
     register: db_sg
   - ansible.builtin.debug:
       msg:
