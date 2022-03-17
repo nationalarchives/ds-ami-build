@@ -237,8 +237,16 @@
 
   - name: check if wp-config.php exists
     ansible.builtin.stat:
-      path: "/var/wwww/html/wp-config.php"
+      path: "/var/www/html/wp-config.php"
     remote_user: ec2-user
+    register: wpconfig_finished
+
+  - ansible.builtin.debug:
+      msg:
+        - "====================================================================="
+        - "wp-config.php"
+        - "{{ wpconfig_finished.stat.exists }}"
+        - "====================================================================="
 
 - name: switch to localhost
   hosts: localhost
