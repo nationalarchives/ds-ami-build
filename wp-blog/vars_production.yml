@@ -1,3 +1,4 @@
+---
 key_name: "blog-wp-app-live-eu-west-2"
 region: "eu-west-2"
 service: "blog"
@@ -17,3 +18,4 @@ cdn_bucket_name: "ds-cdn"
 cdn_aws_region: "eu-west-2"
 cdn_cloudfront_url: "cdn.nationalarchives.gov.uk"
 cdn_dir: "blog"
+...
