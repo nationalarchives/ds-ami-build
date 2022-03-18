@@ -16,6 +16,6 @@ ses_from_name: "The National Archives"
 domain: "dev-blog.nationalarchives.gov.uk"
 cdn_bucket_name: "ds-dev-cdn"
 cdn_aws_region: "eu-west-2"
-cdn_cloudfront_url: "dev-cdn.nationalarchives.gov.uk"
+cdn_cloudfront_url: "dev-cdn-v2.nationalarchives.gov.uk"
 cdn_dir: "blog"
 ...
