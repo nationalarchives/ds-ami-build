@@ -8,16 +8,16 @@ cmd.exe /c reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal
 # open firewall for WinRM
 cmd.exe /c netsh advfirewall firewall set rule group="windows remote management" new enable=yes
 cmd.exe /c netsh firewall add portopening TCP 5985 "Port 5985"
-cmd.exe /c netsh firewall add portopening TCP 5985 "Port 5986"
+cmd.exe /c netsh firewall add portopening TCP 5986 "Port 5986"
 
-#Enable-PSRemoting -Force
-#Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
-#cmd.exe /c winrm set winrm/config/service/auth '@{Basic="true"}'
+Enable-PSRemoting -Force
+Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
+cmd.exe /c winrm set winrm/config/service/auth '@{Basic="true"}'
 
 # from powershell:
 Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
 
-$password = "{{ ansible_password }}" -AsSecureString
+$password = "{{ ansible_password }}" | ConvertTo-SecureString -AsPlainText -Force
 New-LocalUser "ansible-winrm" -Password $password -FullName "Ansible WinRM User" -Description "winrm account for ansible"
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
 #3$admin = [adsi]("WinNT://./administrator, user")
