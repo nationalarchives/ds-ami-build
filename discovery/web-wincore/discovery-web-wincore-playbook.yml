@@ -205,8 +205,8 @@
     add_host:
       hostname: "{{ instance_public_ip }}"
       groups: ec2hosts
-#      ansible_user: ec2-user
-      remote_user: "Administrator"
+      ansible_user: ec2-user
+      remote_user: "ansible-winrm"
       gather_facts: no
 
   - name: set access details
@@ -228,7 +228,7 @@
 
 - name: switch to ec2hosts
   hosts: ec2hosts
-  gather_facts: false
+  gather_facts: no
 
   tasks:
   - ansible.builtin.debug:
