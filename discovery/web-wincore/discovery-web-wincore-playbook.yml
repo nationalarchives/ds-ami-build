@@ -176,11 +176,6 @@
       instance_private_ip: "{{ ec2.instances[0].private_ip_address }}"
       instance_public_ip: "{{ ec2.instances[0].public_ip_address }}"
       instance_id: "{{ ec2.instances[0].instance_id }}"
-      ansible_user: "ansible-winrm"
-      ansible_connection: "winrm"
-      ansible_winrm_server_cert_validation: "ignore"
-      ansible_winrm_transport: "basic"
-      ansible_ssh_pass: "{{ ansible_password }}"
 
 #  - name: get the Administrator passwor
 #    community.aws.ec2_win_password
@@ -210,9 +205,17 @@
     add_host:
       hostname: "{{ instance_public_ip }}"
       groups: ec2hosts
-      ansible_user: ansible-winrm
-      remote_user: ansible-winrm
+#      ansible_user: ec2-user
+      remote_user: "Administrator"
       gather_facts: no
+
+  - name: set access details
+    set_fact:
+      ansible_user: "ansible-winrm"
+      ansible_connection: "winrm"
+      ansible_winrm_server_cert_validation: "ignore"
+      ansible_winrm_transport: "basic"
+      ansible_ssh_pass: "{{ ansible_password }}"
 
   - name: wait for WinRM to answer on hosts
     wait_for:
