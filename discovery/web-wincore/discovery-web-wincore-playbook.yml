@@ -125,11 +125,11 @@
       dest: "./userdata.ps1"
       force: yes
 
-  - name: template hosts
-    template:
-      src: "./templates/hosts.j2"
-      dest: "./hosts"
-      force: yes
+#  - name: template hosts
+#    template:
+#      src: "./templates/hosts.j2"
+#      dest: "./hosts"
+#      force: yes
 
   - name: provisioning instance
     amazon.aws.ec2_instance:
