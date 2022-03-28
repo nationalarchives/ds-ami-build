@@ -109,9 +109,9 @@
       state: "present"
     register: ec2_sec_group
 
-  - name: generate admin password
-    set_fact:
-      winrm_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+#  - name: generate admin password
+#    set_fact:
+#      winrm_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
 
   - ansible.builtin.debug:
       msg:
@@ -178,6 +178,28 @@
       instance_public_ip: "{{ ec2.instances[0].public_ip_address }}"
       instance_id: "{{ ec2.instances[0].instance_id }}"
 
+  - name: get the Administrator password
+    community.aws.ec2_win_password:
+      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      instance_id: "{{ ec2.instances[0].instance_id }}"
+      region: "eu-west-2"
+      key_file: "{{ key_name }}"
+    register: ec2-password
+  - ansible.builtin.debug:
+      msg:
+        - "====================================================================="
+        - "{{ ec2-password }}"
+        - "====================================================================="
+
+  -name: set connection details
+    set_fact:
+      ansible_user: "Administrator"
+      ansible_password: "{{ ec2-password }}"
+      ansible_connection: "winrm"
+      ansible_winrm_transport: "basic"
+
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
@@ -217,7 +239,7 @@
         - "====================================================================="
 
   - name: check if ec2 instance is ready
-    ansible.builtin.stat:
+    ansible.builtin.win_stat:
       path: "/finish-init.txt"
     remote_user: Administrator
     register: init_finished
