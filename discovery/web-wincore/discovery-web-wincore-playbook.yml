@@ -176,7 +176,7 @@
       instance_private_ip: "{{ ec2.instances[0].private_ip_address }}"
       instance_public_ip: "{{ ec2.instances[0].public_ip_address }}"
       instance_id: "{{ ec2.instances[0].instance_id }}"
-      ansible_user: "Administrator"
+      ansible_user: "ansible-winrm"
       ansible_connection: "winrm"
       ansible_winrm_server_cert_validation: "ignore"
       ansible_winrm_transport: "basic"
