@@ -216,7 +216,7 @@
 
   - name: wait for WinRM to answer on hosts
     wait_for:
-      port: 5986
+      port: 5985
       host: "{{ instance_public_ip }}"
       delay: 90
       timeout: 300
