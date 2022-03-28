@@ -177,7 +177,7 @@
       instance_public_ip: "{{ ec2.instances[0].public_ip_address }}"
       instance_id: "{{ ec2.instances[0].instance_id }}"
 
-#  - name: get the Administrator passwor
+#  - name: get the Administrator password
 #    community.aws.ec2_win_password
 #      aws_access_key: "{{ assumed_role.sts_creds.access_key }}
 #      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}
@@ -204,30 +204,26 @@
   - name: register new ec2 as host
     add_host:
       hostname: "{{ instance_public_ip }}"
-      groups: ec2hosts
-      ansible_user: ec2-user
-      remote_user: "ansible-winrm"
+      groups: winhosts
+      ansible_user: ansible-winrm
+      remote_user: ansible-winrm
       gather_facts: no
 
-  - name: set access details
+  - name: set winrm pw
     set_fact:
-      ansible_user: "ansible-winrm"
-      ansible_connection: "winrm"
-      ansible_winrm_server_cert_validation: "ignore"
-      ansible_winrm_transport: "basic"
-      ansible_ssh_pass: "{{ ansible_password }}"
+      ansible_password: "{{ ansible_password }}"
 
   - name: wait for WinRM to answer on hosts
     wait_for:
-      port: 5986
       host: "{{ instance_public_ip }}"
+      port: 5986
       delay: 90
       timeout: 300
       state: started
     tags: [ ami ]
 
 - name: switch to ec2hosts
-  hosts: ec2hosts
+  hosts: winhosts
   gather_facts: no
 
   tasks:
