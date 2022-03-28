@@ -211,12 +211,12 @@
       hostname: "{{ instance_public_ip }}"
       groups: ec2hosts
       ansible_user: ec2-user
-      remote_user: "Administrator"
+      remote_user: "ansible-winrm"
       gather_facts: no
 
   - name: wait for WinRM to answer on hosts
     wait_for:
-      port: 5985
+      port: 5986
       host: "{{ instance_public_ip }}"
       delay: 90
       timeout: 300

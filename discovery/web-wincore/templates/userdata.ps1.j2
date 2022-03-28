@@ -12,8 +12,12 @@ cmd.exe /c netsh firewall add portopening TCP 5985 "Port 5986"
 
 Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile ConfigureRemotingForAnsible.ps1
 powershell -ExecutionPolicy RemoteSigned .\ConfigureRemotingForAnsible.ps1
-$admin = [adsi]("WinNT://./administrator, user")
-$admin.SetPassword("{{ ansible_password }}")
+
+$password = "{{ ansible_password }}" -AsSecureString
+New-LocalUser "ansible-winrm" -Password $Password -FullName "Ansible WinRM" -Description "winrm account for ansible"
+Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
+#3$admin = [adsi]("WinNT://./administrator, user")
+#$admin.SetPassword("{{ ansible_password }}")
 #$admin.PSBase.Invoke("SetPassword", "{{ ansible_password }}")
 #Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
 
