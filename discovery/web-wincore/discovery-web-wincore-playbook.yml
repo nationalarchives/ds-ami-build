@@ -218,7 +218,7 @@
       host: "{{ instance_public_ip }}"
       port: 5986
       delay: 90
-      timeout: 300
+      timeout: 600
       state: started
     tags: [ ami ]
 
