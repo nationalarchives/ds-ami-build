@@ -20,10 +20,6 @@ Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw
 $password = "{{ ansible_password }}" | ConvertTo-SecureString -AsPlainText -Force
 New-LocalUser "ansible-winrm" -Password $password -FullName "Ansible WinRM User" -Description "winrm account for ansible"
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
-#3$admin = [adsi]("WinNT://./administrator, user")
-#$admin.SetPassword("{{ ansible_password }}")
-#$admin.PSBase.Invoke("SetPassword", "{{ ansible_password }}")
-#Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
 
 "[status]" | Out-File -FilePath /finish-init.txt
 "finished = true" | Out-File -FilePath /finish-init.txt -Append

@@ -237,6 +237,8 @@
   - name: check if ec2 instance is ready
     ansible.builtin.win_stat:
       path: "/finish-init.txt"
+    environment:
+      LIB: ''  # Unsets the variable for the task/play
     register: init_finished
     until: "init_finished.stat.exists"
     retries: 45
