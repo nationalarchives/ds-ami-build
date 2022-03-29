@@ -1,9 +1,7 @@
 <powershell>
 Set-ExecutionPolicy -ExecutionPolicy bypass -Force
 
-#cmd.exe /c netsh advfirewall firewall add rule name="Open RDP Port 3389" dir=in action=allow protocol=TCP localport=3389
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "DenyTSConnections" -Value 0 -PropertyType DWORD -Force | Out-Null
-#cmd.exe /c reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
 
 # open firewall for WinRM
 Set-NetFirewallRule -DisplayGroup "Windows Firewall Remote Management" -Enabled True -Action Allow
@@ -11,10 +9,6 @@ Set-NetFirewallRule -DisplayGroup "Windows Firewall Remote Management" -Enabled 
 New-NetFirewallRule -DisplayName "Allow RDP Port 3389" -Direction Inbound -LocalPort 3389 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "Allow WinRM Port 5985" -Direction Inbound -LocalPort 5985 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "Allow WinRM Port 5986" -Direction Inbound -LocalPort 5986 -Protocol TCP -Action Allow
-#cmd.exe /c netsh advfirewall firewall set rule group="windows remote management" new enable=yes
-#cmd.exe /c netsh advfirewall firewall add rule name="Port 22 - SSH" dir=in action=allow protocol=TCP localport=22
-#cmd.exe /c netsh advfirewall firewall add rule name="Port 5985 - WinRM" dir=in action=allow protocol=TCP localport=5985
-#cmd.exe /c netsh advfirewall firewall add rule name="Port 5986 - WinRM" dir=in action=allow protocol=TCP localport=5986
 
 Enable-PSRemoting -SkipNetworkProfileCheck -Force
 Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
