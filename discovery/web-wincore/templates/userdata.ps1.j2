@@ -7,8 +7,9 @@ cmd.exe /c reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal
 
 # open firewall for WinRM
 cmd.exe /c netsh advfirewall firewall set rule group="windows remote management" new enable=yes
-cmd.exe /c netsh firewall add portopening TCP 5985 "Port 5985"
-cmd.exe /c netsh firewall add portopening TCP 5986 "Port 5986"
+cmd.exe /c netsh advfirewall firewall add rule name="Port 22 - SSH" dir=in action=allow protocol=TCP localport=22
+cmd.exe /c netsh advfirewall firewall add rule name="Port 5985 - WinRM" dir=in action=allow protocol=TCP localport=5985
+cmd.exe /c netsh advfirewall firewall add rule name="Port 5986 - WinRM" dir=in action=allow protocol=TCP localport=5986
 
 Enable-PSRemoting -Force
 Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
