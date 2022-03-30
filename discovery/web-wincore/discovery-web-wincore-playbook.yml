@@ -212,15 +212,18 @@
   - name: wait for WinRM to answer on hosts
     wait_for:
       host: "{{ instance_public_ip }}"
-      port: "{{ ansible_port }}"
+      port: 5986
       delay: 90
       timeout: 600
       state: started
     tags: [ ami ]
 
-- name: switch to ec2hosts
+- name: switch to ecnamehosts
   hosts: winhosts
   gather_facts: no
+
+    - name: ping the instance
+      win_ping:
 
   tasks:
   - ansible.builtin.debug:
