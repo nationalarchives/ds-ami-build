@@ -222,10 +222,10 @@
   hosts: winhosts
   gather_facts: no
 
-  - name: ping the instance
-    win_ping:
-
   tasks:
+  - name: ping the instance
+    ansible.builtin.win_ping:
+
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
