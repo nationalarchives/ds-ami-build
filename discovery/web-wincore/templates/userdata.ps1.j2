@@ -18,7 +18,7 @@ Set-Item -Path WSMan:\localhost\Service\Auth\CredSSP -Value $true
 # from powershell:
 Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
 
-$password = "{{ ansible_password }}" | ConvertTo-SecureString -AsPlainText -Force
+$password = "{{ password }}" | ConvertTo-SecureString -AsPlainText -Force
 $newUserParams = @{
         Name                 = "ansible-winrm"
         AccountNeverExpires  = $true
