@@ -11,9 +11,9 @@ New-NetFirewallRule -DisplayName "Allow WinRM Port 5985" -Direction Inbound -Loc
 New-NetFirewallRule -DisplayName "Allow WinRM Port 5986" -Direction Inbound -LocalPort 5986 -Protocol TCP -Action Allow
 
 Enable-PSRemoting -SkipNetworkProfileCheck -Force
-Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
+Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $false
 Set-Item -Path WSMan:\localhost\Service\Auth\Certificate -Value $true
-#cmd.exe /c winrm set winrm/config/service/auth '@{Basic="true"}'
+Set-Item -Path WSMan:\localhost\Service\Auth\CredSSP -Value $true
 
 # from powershell:
 Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))

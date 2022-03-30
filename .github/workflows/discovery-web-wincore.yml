@@ -56,8 +56,10 @@ jobs:
         run: pip3 install wheel requests pyjwt
       - name: install ansible
         run: pip3 install ansible
-      - name: install winrm
+      - name: install pywinrm
         run: pip install pywinrm
+      - name: install requests-credssp
+        run: pip install requests-credssp
 
       - name: run ansible playbook
         env:
