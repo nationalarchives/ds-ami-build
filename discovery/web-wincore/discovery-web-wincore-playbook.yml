@@ -206,7 +206,7 @@
       hostname: "{{ instance_public_ip }}"
       groups: winhosts
       ansible_user: ansible-winrm
-      remote_user: ansible-winrm
+      #remote_user: ansible-winrm
       gather_facts: no
 
   - name: set winrm pw
