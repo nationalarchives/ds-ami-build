@@ -111,12 +111,12 @@
 
   - name: generate admin password
     set_fact:
-      ansible_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+      password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
 
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
-        - "{{ ansible_password }}"
+        - "{{ password }}"
         - "====================================================================="
 
   - name: template userdata
@@ -206,6 +206,7 @@
       hostname: "{{ instance_public_ip }}"
       groups: winhosts
       ansible_user: ansible-winrm
+      ansible_password: "{{ password }}"
       ansible_connection: winrm
       ansible_port: 5986
       ansible_winrm_scheme: https
