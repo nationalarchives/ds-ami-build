@@ -209,14 +209,10 @@
       #remote_user: ansible-winrm
       gather_facts: no
 
-  - name: set winrm pw
-    set_fact:
-      ansible_password: "{{ ansible_password }}"
-
   - name: wait for WinRM to answer on hosts
     wait_for:
       host: "{{ instance_public_ip }}"
-      port: 5986
+      port: "{{ ansible_port }}"
       delay: 90
       timeout: 600
       state: started
@@ -237,8 +233,6 @@
   - name: check if ec2 instance is ready
     ansible.builtin.win_stat:
       path: "/finish-init.txt"
-    environment:
-      LIB: ''  # Unsets the variable for the task/play
     register: init_finished
     until: "init_finished.stat.exists"
     retries: 45
