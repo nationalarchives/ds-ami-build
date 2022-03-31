@@ -234,7 +234,7 @@ try {
 
     Write-Host "=================> end of server setup script"
 
-    "[status]" | Out-File -FilePath /setup-status.txt
+    "[status]" | Out-File -FileP.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
 } catch {
