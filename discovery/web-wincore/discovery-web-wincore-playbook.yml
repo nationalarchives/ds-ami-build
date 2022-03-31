@@ -236,7 +236,7 @@
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
-        - "checking status of new instance before ami can be build"
+        - "checking status of instance initial script"
         - "20 second interval with max duration of 15 minutes"
         - "====================================================================="
 
@@ -287,6 +287,22 @@
       script: |
         cd c:\temp
         server-setup.ps1 -environment "{{ env }}" -tier "web" -application "discovery"
+
+  - ansible.builtin.debug:
+      msg:
+        - "====================================================================="
+        - "checking status of instance setup"
+        - "20 second interval with max duration of 15 minutes"
+        - "====================================================================="
+
+  - name: check if ec2 instance is ready
+    ansible.builtin.win_stat:
+      path: "/setup-status.txt"
+    register: setup_status
+    until: "setup_status.stat.exists"
+    retries: 45
+    delay: 20
+
 
 - name: switch to localhost
   hosts: localhost
