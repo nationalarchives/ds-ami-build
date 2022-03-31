@@ -12,6 +12,7 @@ New-NetFirewallRule -DisplayName "Allow WinRM Port 5986" -Direction Inbound -Loc
 Enable-PSRemoting -SkipNetworkProfileCheck -Force
 Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $false
 Set-Item -Path WSMan:\localhost\Service\Auth\Certificate -Value $true
+Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $true
 Set-Item -Path WSMan:\localhost\Service\Auth\CredSSP -Value $true
 
 # from powershell:

@@ -233,6 +233,10 @@ try {
     Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
     Write-Host "=================> end of server setup script"
+
+    "[status]" | Out-File -FilePath /setup-status.txt
+    "finished = true" | Out-File -FilePath /setup-status.txt -Append
+
 } catch {
     Write-Host "Caught an exception:"
     Write-Host "Exception Type: $($_.Exception.GetType().FullName)"
