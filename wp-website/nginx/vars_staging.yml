@@ -1,4 +1,4 @@
-key_name: "wp-app-test-london"
+key_name: "rp-app-test-london"
 region: "eu-west-2"
 service: "website"
 env: "test"
