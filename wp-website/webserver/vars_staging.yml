@@ -1,3 +1,4 @@
+---
 key_name: "wp-app-staging-eu-west-2"
 region: "eu-west-2"
 service: "website"
@@ -18,3 +19,4 @@ ses_port: 587
 ses_secure: "tls"
 ses_from_email: "no-reply@nationalarchives.gov.uk"
 ses_from_name: "The National Archives"
+...

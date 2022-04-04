@@ -271,3 +271,4 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       policy_name: "ansible-aim-website-rp-s3-policy"
       state: "absent"
+...

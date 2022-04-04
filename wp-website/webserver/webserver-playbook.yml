@@ -299,3 +299,4 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       policy_name: "ansible-ami-website-wp-s3-policy"
       state: "absent"
+...

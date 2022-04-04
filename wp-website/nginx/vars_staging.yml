@@ -1,3 +1,4 @@
+---
 key_name: "rp-app-staging-eu-west-2"
 region: "eu-west-2"
 service: "website"
@@ -8,3 +9,4 @@ s3_deployment_root: "website"
 s3_logfile_bucket: "ds-staging-wp-logfiles"
 s3_logfile_root: "website"
 ssm_download_region: "eu-west-2"
+...
