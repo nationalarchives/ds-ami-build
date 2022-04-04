@@ -1,3 +1,4 @@
+---
 name: Blog AMI
 
 permissions:
@@ -17,6 +18,9 @@ on:
         - production
 
 jobs:
+# ------------------------------------------------------------------------------
+# dev deployment
+# ------------------------------------------------------------------------------
   blog-ami-deployment-dev:
     if: github.event.inputs.deploy-environment == 'dev'
     runs-on: ubuntu-latest
@@ -30,7 +34,7 @@ jobs:
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=blog-wp-app-dev-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=blog-app-dev-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -71,6 +75,9 @@ jobs:
           export AWS_DEFAULT_REGION=eu-west-2
           ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} blog-playbook.yml
 
+# ------------------------------------------------------------------------------
+# staging deployment
+# ------------------------------------------------------------------------------
   blog-ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
     runs-on: ubuntu-latest
@@ -125,6 +132,9 @@ jobs:
           export AWS_DEFAULT_REGION=eu-west-2
           ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} blog-playbook.yml
 
+# ------------------------------------------------------------------------------
+# live deployment
+# ------------------------------------------------------------------------------
   blog-ami-deployment-production:
     if: github.event.inputs.deploy-environment == 'production'
     runs-on: ubuntu-latest
@@ -138,7 +148,7 @@ jobs:
       - name: set ansible var file for production
         run: |
           echo "ANSIBLE_VAR_FILE=vars_production.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=blog-wp-app-live-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=blog-app-live-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -178,3 +188,4 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           export AWS_DEFAULT_REGION=eu-west-2
           ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} blog-playbook.yml
+...
