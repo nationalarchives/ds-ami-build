@@ -1,0 +1,21 @@
+---
+key_name: "blog-wp-app-staging-eu-west-2"
+region: "eu-west-2"
+service: "blog"
+env: "staging"
+volume_size: 100
+s3_deployment_bucket: "ds-staging-wp-deployment"
+s3_deployment_root: "website"
+
+ses_host: "email-smtp.eu-west-2.amazonaws.com"
+ses_port: 587
+ses_secure: "tls"
+ses_from_email: "no-reply@nationalarchives.gov.uk"
+ses_from_name: "The National Archives"
+
+domain: "staging-blog.nationalarchives.gov.uk"
+cdn_bucket_name: "ds-staging-cdn"
+cdn_aws_region: "eu-west-2"
+cdn_cloudfront_url: "staging-cdn.nationalarchives.gov.uk"
+cdn_dir: "blog"
+...
