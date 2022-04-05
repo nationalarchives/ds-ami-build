@@ -1,5 +1,5 @@
 ---
-key_name: "blog-wp-app-dev-eu-west-2"
+key_name: "blog-app-dev-eu-west-2"
 region: "eu-west-2"
 service: "blog"
 env: "dev"
