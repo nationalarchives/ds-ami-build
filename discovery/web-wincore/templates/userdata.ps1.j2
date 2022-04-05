@@ -45,9 +45,10 @@ Set-Item -Path WSMan:\localhost\Service\Auth\CredSSP -Value $true
 
 #start ssh server service and open port
 Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
-Start-Service sshd
 
-"[status]" | Out-File -FilePath /finish-init.txt
-"finished = true" | Out-File -FilePath /finish-init.txt -Append
+"[status]" | Out-File -FilePath C:\finish-init.txt
+"finished = true" | Out-File -FilePath C:\finish-init.txt -Append
+
+Start-Service sshd
 </powershell>
 <persist>true</persist>
