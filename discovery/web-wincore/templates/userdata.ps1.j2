@@ -13,6 +13,7 @@ $newUserParams = @{
     }
 $null = New-LocalUser @newUserParams
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
+Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
 
 "port opening" | Out-File -FilePath C:\finish-init.txt -Append
 "port 22" | Out-File -FilePath C:\finish-init.txt -Append
@@ -32,9 +33,9 @@ Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw
 "allow remote desktop" | Out-File -FilePath C:\finish-init.txt -Append
 "set fDenyTSConnections" | Out-File -FilePath C:\finish-init.txt -Append
 # allow remote desktop
-Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\" -Name "fDenyTSConnections" -Value 0 -PropertyType DWORD -Force | Out-Null
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\" -Name "fDenyTSConnections" -Value $false
 "set UserAuthentication" | Out-File -FilePath C:\finish-init.txt -Append
-Set-ItemProperty ‘HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\‘ -Name “UserAuthentication” -Value 1
+Set-ItemProperty ‘HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\‘ -Name “UserAuthentication” -Value $true
 "enable Remote Desktop" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
 
