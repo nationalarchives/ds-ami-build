@@ -15,6 +15,12 @@ $null = New-LocalUser @newUserParams
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
 
+"install openssh" | Out-File -FilePath C:\finish-init.txt -Append
+#start ssh server service and open port
+Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+"start sshd" | Out-File -FilePath C:\finish-init.txt -Append
+Start-Service sshd
+
 "port opening" | Out-File -FilePath C:\finish-init.txt -Append
 "port 22" | Out-File -FilePath C:\finish-init.txt -Append
 New-NetFirewallRule -DisplayName "sshd" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
@@ -50,8 +56,8 @@ Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
 Enable-NetFirewallRule -DisplayGroup "Remote Service Management"
 "enable Remote Volume Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Remote Volume Management"
-#"enable Windows Firewall Remote Management" | Out-File -FilePath C:\finish-init.txt -Append
-#Enable-NetFirewallRule -DisplayGroup "Windows Firewall Remote Management"
+"enable Windows Firewall Remote Management" | Out-File -FilePath C:\finish-init.txt -Append
+Enable-NetFirewallRule -DisplayGroup "Windows Firewall Remote Management"
 "enable Remote Event Log Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
 "enable Remote Scheduled Tasks Management" | Out-File -FilePath C:\finish-init.txt -Append
@@ -67,12 +73,6 @@ Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $true
 if (!(Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue | Select-Object Name, Enabled)) {
     New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
 }
-
-"install openssh" | Out-File -FilePath C:\finish-init.txt -Append
-#start ssh server service and open port
-Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
-"start sshd" | Out-File -FilePath C:\finish-init.txt -Append
-Start-Service sshd
 
 #"[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
