@@ -50,8 +50,8 @@ Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
 Enable-NetFirewallRule -DisplayGroup "Remote Service Management"
 "enable Remote Volume Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Remote Volume Management"
-"enable Windows Firewall Remote Management" | Out-File -FilePath C:\finish-init.txt -Append
-Enable-NetFirewallRule -DisplayGroup "Windows Firewall Remote Management"
+#"enable Windows Firewall Remote Management" | Out-File -FilePath C:\finish-init.txt -Append
+#Enable-NetFirewallRule -DisplayGroup "Windows Firewall Remote Management"
 "enable Remote Event Log Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
 "enable Remote Scheduled Tasks Management" | Out-File -FilePath C:\finish-init.txt -Append
