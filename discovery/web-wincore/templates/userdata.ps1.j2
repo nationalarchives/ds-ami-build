@@ -1,6 +1,8 @@
 <powershell>
 Set-ExecutionPolicy -ExecutionPolicy bypass -Force
+
 "[status]" | Out-File -FilePath C:\finish-init.txt
+"set password and add user" | Out-File -FilePath C:\finish-init.txt -Append
 # create ansible winrm admin user
 $password = "{{ password }}" | ConvertTo-SecureString -AsPlainText -Force
 $newUserParams = @{
@@ -11,31 +13,50 @@ $newUserParams = @{
     }
 $null = New-LocalUser @newUserParams
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
+
 "port opening" | Out-File -FilePath C:\finish-init.txt -Append
+"port 22" | Out-File -FilePath C:\finish-init.txt -Append
 New-NetFirewallRule -DisplayName "sshd" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
+"port 3389" | Out-File -FilePath C:\finish-init.txt -Append
 New-NetFirewallRule -DisplayName "rdp" -Direction Inbound -LocalPort 3389 -Protocol TCP -Action Allow
+"port 5985" | Out-File -FilePath C:\finish-init.txt -Append
 # open firewall for WinRM
 New-NetFirewallRule -DisplayName "Allow WinRM Port 5985" -Direction Inbound -LocalPort 5985 -Protocol TCP -Action Allow
+"port 598" | Out-File -FilePath C:\finish-init.txt -Append
 New-NetFirewallRule -DisplayName "Allow WinRM Port 5986" -Direction Inbound -LocalPort 5986 -Protocol TCP -Action Allow
+
 "ansible script" | Out-File -FilePath C:\finish-init.txt -Append
 # from powershell:
 Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
+
 "allow remote desktop" | Out-File -FilePath C:\finish-init.txt -Append
+"set fDenyTSConnections" | Out-File -FilePath C:\finish-init.txt -Append
 # allow remote desktop
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\" -Name "fDenyTSConnections" -Value 0 -PropertyType DWORD -Force | Out-Null
+"set UserAuthentication" | Out-File -FilePath C:\finish-init.txt -Append
 Set-ItemProperty ‘HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\‘ -Name “UserAuthentication” -Value 1
+"enable Remote Desktop" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
 
 # allow remote management
+"enable PSRemoting" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-PSRemoting -SkipNetworkProfileCheck -Force
+"enable Windows Management Instrumentation (DCOM-In)" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (DCOM-In)"
+"enable Remote Event Log Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
+"enable Remote Service Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Remote Service Management"
+"enable Remote Volume Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Remote Volume Management"
+"enable Windows Firewall Remote Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Windows Firewall Remote Management"
+"enable Remote Event Log Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
+"enable Remote Scheduled Tasks Management" | Out-File -FilePath C:\finish-init.txt -Append
 Enable-NetFirewallRule -DisplayGroup "Remote Scheduled Tasks Management"
 
+"set WSMan" | Out-File -FilePath C:\finish-init.txt -Append
 Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
 #Set-Item -Path WSMan:\localhost\Service\Auth\Certificate -Value $true
 Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $true
@@ -49,7 +70,9 @@ if (!(Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyCon
 "install openssh" | Out-File -FilePath C:\finish-init.txt -Append
 #start ssh server service and open port
 Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+"start sshd" | Out-File -FilePath C:\finish-init.txt -Append
 Start-Service sshd
+
 #"[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
 </powershell>
