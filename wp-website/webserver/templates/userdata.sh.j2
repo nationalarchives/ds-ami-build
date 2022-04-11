@@ -124,7 +124,7 @@ wp core download --allow-root
 if (isset(\$_SERVER['HTTP_X_FORWARDED_PROTO']) &&  strpos(\$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false) {
     \$_SERVER['HTTPS'] = 'on';
 }
-define( 'WP_ENV', '{{ environment }}' );
+define( 'WP_ENV', '{{ env }}' );
 define( 'PUBLIC_SITEURL', '{{ wp_public_siteurl }}' );
 define( 'EDITOR_SITEURL', '{{ wp_editor_siteurl }}' );
 define( 'wp_int_siteurl', '{{ wp_int_siteurl }}' );
