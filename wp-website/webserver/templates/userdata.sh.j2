@@ -64,7 +64,7 @@ cd /var/www/html
 echo "<html><head><title>Health Check</title></head><body><h1>Hello world!</h1></body></html>" >> healthcheck.html
 echo "apache_modules:
   - mod_rewrite" >> wp-cli.yml
-if [[ "{{ environment }}" == "live" ]]; then
+if [[ "{{ env }}" == "live" ]]; then
     echo $"User-agent: *
 Disallow: /wp-admin/
 Allow: /wp-admin/admin-ajax.php" >> robots.txt
