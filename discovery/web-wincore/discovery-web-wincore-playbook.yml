@@ -236,6 +236,8 @@
       path: "C:\finish-init.txt"
       port: 5986
       state: present
+      sleep: 20
+      timeout: 900
 
 - name: switch to hosts
   hosts: winhosts
