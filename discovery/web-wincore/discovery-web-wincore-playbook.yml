@@ -234,7 +234,6 @@
     ansible.windows.win_wait_for:
       host: "{{ instance_public_ip }}"
       path: "C:\finish-init.txt"
-      port: 5986
       state: present
       sleep: 20
       timeout: 900
