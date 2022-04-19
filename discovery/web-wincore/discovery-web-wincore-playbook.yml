@@ -247,24 +247,26 @@
   gather_facts: no
 
   tasks:
-  - ansible.builtin.debug:
-      msg:
-        - "====================================================================="
-        - "checking status of instance initial script"
-        - "20 second interval with max duration of 15 minutes"
-        - "====================================================================="
+#  - ansible.builtin.debug:
+#      msg:
+#        - "====================================================================="
+#        - "checking status of instance initial script"
+#        - "20 second interval with max duration of 15 minutes"
+#        - "====================================================================="
 
-  - name: check if ec2 instance is ready
-    ansible.builtin.win_stat:
-      path: "C:\finish-init.txt"
-    register: init_finished
-    until: "init_finished.stat.exists"
-    retries: 45
-    delay: 20
+#  - name: check if ec2 instance is ready
+#    ansible.builtin.win_stat:
+#      path: "C:\finish-init.txt"
+#    register: init_finished
+#    until: "init_finished.stat.exists"
+#    retries: 45
+#    delay: 20
 
   - name: IIS and ASP.NET install
     ansible.windows.win_feature:
       name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging,Web-Stat-Compression,Web-Filtering,Web-Url-Auth,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Mgmt-Console,NET-Framework-45-Core,NET-WCF-HTTP-Activation,NET-WCF-TCP-PortSharing
+      restart: no
+    notify: restart iis
 
   - name: ensure temp dir exists
     win_file:
