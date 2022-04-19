@@ -217,7 +217,7 @@
       gather_facts: no
 
   - name: wait for WinRM port is open
-    wait_for:
+    ansible.windows.win_wait_for:
       host: "{{ instance_public_ip }}"
       port: 5986
       delay: 120
@@ -231,17 +231,6 @@
       msg:
         - "====================================================================="
         - "port opening time {{ port.elapsed }}"
-        - "====================================================================="
-
-  - name: wait for WinRM to answer on hosts
-    ansible.builtin.wait_for_connection:
-        timeout: 900
-    register: connection
-
-  - ansible.builtin.debug:
-      msg:
-        - "====================================================================="
-        - "port opening time {{ connection.elapsed }}"
         - "====================================================================="
 
   - name: Wait until userdata has been processed
