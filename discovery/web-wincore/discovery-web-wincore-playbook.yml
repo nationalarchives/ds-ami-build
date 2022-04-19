@@ -232,8 +232,10 @@
 
   - name: Wait until process complete is in the file before continuing
     ansible.windows.win_wait_for:
-      path: "C:\finish-init.txt"
       host: "{{ instance_public_ip }}"
+      path: "C:\finish-init.txt"
+      port: 5986
+      state: present
 
 - name: switch to hosts
   hosts: winhosts
