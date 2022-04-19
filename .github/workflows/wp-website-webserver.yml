@@ -134,3 +134,56 @@ jobs:
 # ------------------------------------------------------------------------------
 # live deployment
 # ------------------------------------------------------------------------------
+  ami-deployment-live:
+    if: github.event.inputs.deploy-environment == 'live'
+    runs-on: ubuntu-latest
+    environment: live
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+        with:
+          ref: "${{ github.event.inputs.branch }}"
+
+      - name: set ansible var file for staging
+        run: |
+          echo "ANSIBLE_VAR_FILE=vars_live.yml" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=wp-app-live-eu-west-2" >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+
+      - name: write ssh key file
+        run: |
+          echo "${{ secrets.WP_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          chmod 0600 ${{ env.SSH_KEY_FILE }}
+
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3
+      - name: upgrade pip
+        run: pip install --upgrade pip
+      - name: install boto3
+        run: pip3 install boto3 requests pyjwt
+      - name: install wheel
+        run: pip3 install wheel requests pyjwt
+      - name: install ansible
+        run: pip3 install ansible
+
+      - name: run ansible playbook
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          VPC_ID: ${{ secrets.VPC_ID }}
+          SUBNET_ID: ${{ secrets.SUBNET_ID }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          cur_dir=$(pwd)
+          cd $cur_dir/wp-website/webserver
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=eu-west-2
+          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} webserver-playbook.yml
