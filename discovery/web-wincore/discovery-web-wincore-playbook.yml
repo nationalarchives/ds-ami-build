@@ -216,22 +216,23 @@
       #remote_user: ansible-winrm
       gather_facts: no
 
-#  - name: wait for WinRM to answer on hosts
-#    wait_for:
-#      host: "{{ instance_public_ip }}"
-#      port: 5986
-#      delay: 120
-#      timeout: 600
-#      sleep: 10
-#      state: started
-#    tags: [ ami ]
+  - name: wait for WinRM to answer on hosts
+    wait_for:
+      host: "{{ instance_public_ip }}"
+      port: 5986
+      delay: 120
+      timeout: 600
+      sleep: 10
+      state: started
+    tags: [ ami ]
 
-#  - name: wait for WinRM to answer on hosts
-#    ansible.builtin.wait_for_connection:
-#        timeout: 900
+  - name: wait for WinRM to answer on hosts
+    ansible.builtin.wait_for_connection:
+        timeout: 900
 
-  - name: Wait until process complete is in the file before continuing
+  - name: Wait until userdata has been processed
     ansible.windows.win_wait_for:
+      connect_timeout: 10
       host: "{{ instance_public_ip }}"
       path: "C:\finish-init.txt"
       state: present
