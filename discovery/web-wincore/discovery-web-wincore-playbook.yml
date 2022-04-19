@@ -226,9 +226,14 @@
 #      state: started
 #    tags: [ ami ]
 
-  - name: wait for WinRM to answer on hosts
-    ansible.builtin.wait_for_connection:
-        timeout: 900
+#  - name: wait for WinRM to answer on hosts
+#    ansible.builtin.wait_for_connection:
+#        timeout: 900
+
+  - name: Wait until process complete is in the file before continuing
+    ansible.windows.win_wait_for:
+      path: "C:\finish-init.txt"
+      host: "{{ instance_public_ip }}"
 
 - name: switch to hosts
   hosts: winhosts
