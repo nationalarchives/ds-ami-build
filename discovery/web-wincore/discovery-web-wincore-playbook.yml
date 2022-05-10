@@ -238,7 +238,7 @@
 #        - "====================================================================="
 
   - name: Wait until userdata has been processed
-    ansible.windows.win_wait_for:
+    ansible.windows.wait_for:
       connect_timeout: 10
       host: "{{ instance_public_ip }}"
       path: "c:\\finish-init.txt"
