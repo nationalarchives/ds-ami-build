@@ -217,8 +217,8 @@
       gather_facts: no
 
   - name: Wait for system to become reachable over WinRM
-      wait_for_connection:
-        timeout: 900
+    wait_for_connection:
+      timeout: 900
 #
 #  - name: wait for WinRM port is open
 #    ansible.windows.win_wait_for:
