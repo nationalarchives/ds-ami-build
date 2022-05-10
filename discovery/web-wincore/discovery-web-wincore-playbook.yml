@@ -208,29 +208,29 @@
       ansible_user: ansible-winrm
       ansible_password: "{{ password }}"
       ansible_connection: winrm
-      #ansible_port: 5986
-      ansible_winrm_scheme: https
+      ansible_port: 5986
+      #ansible_winrm_scheme: https
       #ansible_winrm_transport: credssp
       ansible_winrm_message_encryption: auto
       ansible_winrm_server_cert_validation: ignore
       #remote_user: ansible-winrm
       gather_facts: no
 
-  - name: Wait for system to become reachable over WinRM
-    wait_for_connection:
-      timeout: 900
-#
-#  - name: wait for WinRM port is open
-#    ansible.windows.win_wait_for:
-#      host: "{{ instance_public_ip }}"
-#      port: 5986
-#      delay: 120
-#      timeout: 600
-#      sleep: 10
-#      state: started
-#    register: port
-#    tags: [ ami ]
-#
+#  - name: Wait for system to become reachable over WinRM
+#    wait_for_connection:
+#      timeout: 900
+
+  - name: wait for WinRM port is open
+    ansible.windows.win_wait_for:
+      host: "{{ instance_public_ip }}"
+      port: 5986
+      delay: 120
+      timeout: 600
+      sleep: 10
+      state: started
+    register: port
+    tags: [ ami ]
+
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
