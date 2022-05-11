@@ -237,11 +237,17 @@
 #        - "port opening time {{ port.elapsed }}"
 #        - "====================================================================="
 
+  - name: Start Python Session
+    ansible.builtin.shell:
+      cmd: Python -c "import winrm; winrm_session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
+      delay: 120
+      timeout: 780
+
   - name: Wait until userdata has been processed
     wait_for:
       connect_timeout: 10
       host: "{{ instance_public_ip }}"
-      path: "c:\\finish-init.txt"
+      path: "c:\finish-init.txt"
       state: present
       sleep: 20
       timeout: 900
