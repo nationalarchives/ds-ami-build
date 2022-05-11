@@ -239,7 +239,7 @@
 
   - name: Start Python Session
     ansible.builtin.shell:
-      cmd: Python -c "import winrm; winrm_session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
+      cmd: python -c "import winrm; winrm_session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
 
   - name: Wait until userdata has been processed
     wait_for:
