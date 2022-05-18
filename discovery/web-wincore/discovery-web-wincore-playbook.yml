@@ -237,10 +237,6 @@
 #        - "port opening time {{ port.elapsed }}"
 #        - "====================================================================="
 
-  - name: Prepare Python
-    ansible.builtin.shell:
-      cmd: python -m pip install pywinrm
-
   - name: Start Python Session
     ansible.builtin.shell:
       cmd: python -c "import winrm; winrm_session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
