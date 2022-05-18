@@ -15,6 +15,10 @@ $null = New-LocalUser @newUserParams
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
 
+winrm set winrm/config/client/auth @{Basic="true"}
+winrm set winrm/config/service/auth @{Basic="true"}
+winrm set winrm/config/service @{AllowUnencrypted="true"}
+
 "port opening" | Out-File -FilePath C:\debug.txt -Append
 "port 22" | Out-File -FilePath C:\debug -Append
 New-NetFirewallRule -DisplayName "sshd" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
