@@ -239,7 +239,7 @@
 
   - name: Start Python Session
     ansible.builtin.shell:
-      cmd: python -c "import winrm; session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))
+      cmd: python -c "import winrm; session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
 
   - name: Attempting hostname command
     ansible.builtin.shell:
