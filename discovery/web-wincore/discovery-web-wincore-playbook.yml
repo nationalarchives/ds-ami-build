@@ -241,14 +241,6 @@
     ansible.builtin.shell:
       cmd: python -c "import winrm; session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
 
-  - name: Attempting hostname command
-    ansible.builtin.shell:
-      cmd: result = session.run_ps("hostname")
-
-  - name: Hostname command result
-    ansible.builtin.shell:
-      cmd: print(result.std_out)
-
   - name: Wait until userdata has been processed
     wait_for:
       connect_timeout: 10
