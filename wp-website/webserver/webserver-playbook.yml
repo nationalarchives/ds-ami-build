@@ -239,8 +239,8 @@
     ansible.builtin.stat:
       path: "/var/wwww/html/wp-config.php"
     remote_user: ec2-user
-    register: wp-config
-    until: "wp-config.stat.exists"
+    register: wpconfig
+    until: "wpconfig.stat.exists"
     retries: 9
     delay: 20
 
@@ -248,8 +248,8 @@
     ansible.builtin.stat:
       path: "/var/wwww/html/wp-content/themes/tna"
     remote_user: ec2-user
-    register: tna-theme
-    until: "tna-theme.stat.exists"
+    register: tnatheme
+    until: "tnatheme.stat.exists"
     retries: 15
     delay: 20
 
