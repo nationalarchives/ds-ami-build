@@ -253,6 +253,13 @@
     retries: 15
     delay: 20
 
+  - name: wp-cli.log output
+    ansible.builtin.debug:
+      msg:
+        - "wp-cli.log =========================================================="
+        - "{{ lookup('file', '/var/www/html/wp-cli.log') }}"
+        - "====================================================================="
+
 - name: switch to localhost
   hosts: localhost
   gather_facts: true
