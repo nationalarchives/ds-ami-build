@@ -237,7 +237,7 @@
 
   - name: check if wp-config.php exists
     ansible.builtin.stat:
-      path: "/var/wwww/html/wp-config.php"
+      path: "/var/www/html/wp-config.php"
     remote_user: ec2-user
     register: wpconfig
     until: "wpconfig.stat.exists"
@@ -246,7 +246,7 @@
 
   - name: check if tna theme exists
     ansible.builtin.stat:
-      path: "/var/wwww/html/wp-content/themes/tna"
+      path: "/var/www/html/wp-content/themes/tna"
     remote_user: ec2-user
     register: tnatheme
     until: "tnatheme.stat.exists"
