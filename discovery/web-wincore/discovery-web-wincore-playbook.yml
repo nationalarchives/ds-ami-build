@@ -245,6 +245,12 @@
     wait_for_connection:
       timeout: 300
 
+  - name: "Check if directory exists"
+    stat:
+      host: "{{ instance_public_ip }}"
+      path: "c:\\"
+    register: result
+
   - name: Wait until userdata has been processed
     wait_for:
       connect_timeout: 10
