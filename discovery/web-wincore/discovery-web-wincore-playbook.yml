@@ -246,7 +246,6 @@
       timeout: 300
 
   - name: Check if directory exists
-    host: "{{ instance_public_ip }}"
     stat:
       path: "c:\\"
     register: result
