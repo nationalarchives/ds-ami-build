@@ -250,6 +250,11 @@
       path: "c:\\"
     register: result
 
+  - name: "Check if file exists"
+    stat:
+      path: "C:\textfile.txt"
+    register: result
+
   - name: Wait until userdata has been processed
     wait_for:
       connect_timeout: 10
