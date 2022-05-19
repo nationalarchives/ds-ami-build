@@ -241,6 +241,10 @@
     ansible.builtin.shell:
       cmd: python -c "import winrm; session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
 
+  - name: Wait for system to become reachable over WinRM
+    wait_for_connection:
+      timeout: 300
+
   - name: Wait until userdata has been processed
     wait_for:
       connect_timeout: 10
