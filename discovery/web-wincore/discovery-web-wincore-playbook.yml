@@ -245,15 +245,14 @@
     wait_for_connection:
       timeout: 300
 
-  - name: Check if directory exists
-    stat:
+  - name: Wait until connection to path is verified
+    wait_for:
+      connect_timeout: 10
+      host: "{{ instance_public_ip }}"
       path: "c:\\"
-    register: result
-
-  - name: "Check if file exists"
-    stat:
-      path: "C:\textfile.txt"
-    register: result
+      state: present
+      sleep: 20
+      timeout: 900
 
   - name: Wait until userdata has been processed
     wait_for:
