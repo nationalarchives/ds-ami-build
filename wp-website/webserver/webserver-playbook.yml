@@ -237,8 +237,21 @@
 
   - name: check if wp-config.php exists
     ansible.builtin.stat:
-      path: "/var/wwww/html/wp-config.php"
+      path: "/var/www/html/wp-config.php"
     remote_user: ec2-user
+    register: wpconfig
+    until: "wpconfig.stat.exists"
+    retries: 9
+    delay: 20
+
+  - name: check if tna theme exists
+    ansible.builtin.stat:
+      path: "/var/www/html/wp-content/themes/tna"
+    remote_user: ec2-user
+    register: tnatheme
+    until: "tnatheme.stat.exists"
+    retries: 15
+    delay: 20
 
 - name: switch to localhost
   hosts: localhost
