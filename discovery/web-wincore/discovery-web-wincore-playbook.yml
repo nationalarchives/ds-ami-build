@@ -237,57 +237,59 @@
 #        - "port opening time {{ port.elapsed }}"
 #        - "====================================================================="
 
-  - name: Start Python Session
-    ansible.builtin.shell:
-      cmd: python -c "import winrm; session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
-
-  - name: Wait for system to become reachable over WinRM
-    wait_for_connection:
-      timeout: 300
-
-  - name: Checking if test file exists
-    stat:
-      path: "C:\textfile.txt"
-    register: file_data
-
-  - name: Report if test file exists
-    debug:
-       msg: "The file or directory exists"
-    when: file_data.stat.exists
-
-  - name: Report if test file doesn't exist
-    debug:
-      msg: "The file or directory doesn't exist"
-    when: not file_data.stat.exists
-
-  - name: Wait until userdata has been processed
-    wait_for:
-      connect_timeout: 10
-      host: "{{ instance_public_ip }}"
-      path: "c:\finish-init.txt"
-      state: present
-      sleep: 20
-      timeout: 900
+#  - name: Start Python Session
+#    ansible.builtin.shell:
+#      cmd: python -c "import winrm; session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
+#
+#  - name: Wait for system to become reachable over WinRM
+#    wait_for_connection:
+#      timeout: 300
+#
+#  - name: Checking if test file exists
+#    stat:
+#      path: "C:\textfile.txt"
+#    register: file_data
+#
+#  - name: Report if test file exists
+#    debug:
+#       msg: "The file or directory exists"
+#    when: file_data.stat.exists
+#
+#  - name: Report if test file doesn't exist
+#    debug:
+#      msg: "The file or directory doesn't exist"
+#    when: not file_data.stat.exists
+#
+#  - name: Wait until userdata has been processed
+#    wait_for:
+#      connect_timeout: 10
+#      host: "{{ instance_public_ip }}"
+#      path: "c:\finish-init.txt"
+#      state: present
+#      sleep: 20
+#      timeout: 900
 
 - name: switch to hosts
   hosts: winhosts
   gather_facts: no
+  connection: winrm
+  port: 5986
+  remote_user: administrator
 
   tasks:
-#  - ansible.builtin.debug:
-#      msg:
-#        - "====================================================================="
-#        - "checking status of instance initial script"
-#        - "20 second interval with max duration of 15 minutes"
-#        - "====================================================================="
-
-#  - name: check if ec2 instance is ready
-#    ansible.builtin.win_stat:
-#      path: "C:\finish-init.txt"
-#    register: init_finished
-#    until: "init_finished.stat.exists"
-#    retries: 45
-#    delay: 20
+  - ansible.builtin.debug:
+      msg:
+        - "====================================================================="
+        - "checking status of instance initial script"
+        - "20 second interval with max duration of 15 minutes"
+        - "====================================================================="
+  - name: check if ec2 instance is ready
+    ansible.builtin.win_stat:
+      path: "C:\finish-init.txt"
+    register: init_finished
+    until: "init_finished.stat.exists"
+    retries: 45
+    delay: 20
 
   - name: IIS and ASP.NET install
     ansible.windows.win_feature:
