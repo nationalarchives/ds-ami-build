@@ -11,7 +11,7 @@ $newUserParams = @{
         Name                 = "ansible-winrm"
         AccountNeverExpires  = $true
         PasswordNeverExpires = $true
-        Password             = "pc_ij_may24Aspaces"
+        Password             = $password
     }
 $null = New-LocalUser @newUserParams
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
