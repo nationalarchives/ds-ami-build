@@ -206,11 +206,11 @@
       hostname: "{{ instance_public_ip }}"
       groups: winhosts
       ansible_user: ansible-winrm
-      ansible_password: "{{ password }}"
+      ansible_password: "pc_ij_may24Aspaces"
       ansible_connection: winrm
       ansible_port: 5986
       #ansible_winrm_scheme: https
-      ansible_winrm_transport: ntlm
+      ansible_winrm_transport: basic
       ansible_winrm_message_encryption: auto
       ansible_winrm_server_cert_validation: ignore
       #remote_user: ansible-winrm
