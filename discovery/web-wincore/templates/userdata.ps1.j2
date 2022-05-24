@@ -2,7 +2,7 @@
 Set-ExecutionPolicy -ExecutionPolicy bypass -Force
 
 ni C:\textfile.txt
-Set-ItemProperty -Path registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL -Name ClientAuthTrustMode -Type DWord -Value 2
+
 
 "[debug]" | Out-File -FilePath C:\debug.txt
 "set password and add user" | Out-File -FilePath C:\debug.txt -Append
