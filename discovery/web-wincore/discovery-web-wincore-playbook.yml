@@ -274,7 +274,7 @@
   gather_facts: no
   connection: winrm
   port: 5986
-  remote_user: administrator
+  remote_user: ansible-winrm
 
   tasks:
   - ansible.builtin.debug:
