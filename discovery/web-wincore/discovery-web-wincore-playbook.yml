@@ -274,8 +274,9 @@
   gather_facts: no
   connection: winrm
   port: 5986
-  remote_user: ansible-winrm
-  ansible_password: "{{ password }}"
+  vars:
+    remote_user: ansible-winrm
+    ansible_password: "{{ password }}"
 
   tasks:
   - ansible.builtin.debug:
