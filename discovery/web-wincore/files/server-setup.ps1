@@ -226,6 +226,9 @@ try {
     Write-Host "---- schedule EC2Launch for next start"
     C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
+    "[status]" | Out-File -FilePath /setup-status..txt
+    "finished = true" | Out-File -FilePath /setup-status.txt -Append
+
     Write-Host "===> Windows Admin Center"
     netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
@@ -233,9 +236,6 @@ try {
     Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
     Write-Host "=================> end of server setup script"
-
-    "[status]" | Out-File -FilePath /setup-status..txt
-    "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
 } catch {
     Write-Host "Caught an exception:"

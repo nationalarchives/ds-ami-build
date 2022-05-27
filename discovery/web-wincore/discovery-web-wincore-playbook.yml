@@ -236,33 +236,37 @@
     ansible.windows.win_feature:
       name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
 
+  - name: reboot if installing Web-Server feature requires it
+    ansible.windows.win_reboot:
+    when: win_feature.reboot_required
+
   - name: ensure temp dir exists
-    win_file:
+    ansible.windows.win_file:
       path: "c:\\temp"
       state: directory
 
   - name: ensure tna-startup dir exists
-    win_file:
+    ansible.windows.win_file:
       path: "c:\\tna-startup"
       state: directory
 
   - name: copy file-downloader script
-    win_copy:
+    ansible.windows.win_copy:
       src: "./files/file-downloader.ps1"
       dest: "c:\\temp\\file-downloader.ps1"
 
   - name: copy server-setup script
-    win_copy:
+    ansible.windows.win_copy:
       src: "./files/server-setup.ps1"
       dest: "c:\\temp\\server-setup.ps1"
 
   - name: copy startup script
-    win_copy:
+    ansible.windows.win_copy:
       src: "./files/startup.ps1"
       dest: "c:\\tna-startup\\startup.ps1"
 
   - name: copy updEnv script
-    win_copy:
+    ansible.windows.win_copy:
       src: "./files/updEnv.ps1"
       dest: "c:\\tna-startup\\updEnv.ps1"
 
