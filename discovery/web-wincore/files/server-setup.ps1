@@ -67,17 +67,17 @@ try {
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
     $env:Path = "$env:Path;$pathAWScli"
 
-    Write-Host "===> Windows features for IIS"
-    Write-Host "---- IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-ASPNET45, IIS-NetFxExtensibility45"
-    Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-NetFxExtensibility45 -All
-    if ($tier -eq "api") {
-        Write-Host "---- IIS-HttpRedirect for application server"
-        Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpRedirect
-    }
-    Write-Host "---- NetFx4Extended-ASPNET45"
-    Enable-WindowsOptionalFeature -Online -FeatureName NetFx4Extended-ASPNET45
-    Write-Host "---- WCF-HTTP-Activation45"
-    Enable-WindowsOptionalFeature -Online -FeatureName WCF-HTTP-Activation45 -All
+#    Write-Host "===> Windows features for IIS"
+#    Write-Host "---- IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-ASPNET45, IIS-NetFxExtensibility45"
+#    Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-NetFxExtensibility45 -All
+#    if ($tier -eq "api") {
+#        Write-Host "---- IIS-HttpRedirect for application server"
+#        Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpRedirect
+#    }
+#    Write-Host "---- NetFx4Extended-ASPNET45"
+#    Enable-WindowsOptionalFeature -Online -FeatureName NetFx4Extended-ASPNET45
+#    Write-Host "---- WCF-HTTP-Activation45"
+#    Enable-WindowsOptionalFeature -Online -FeatureName WCF-HTTP-Activation45 -All
 
     Write-Host "===> WebPlatformInstaller and URLRewrite2"
     (new-object System.Net.WebClient).DownloadFile("http://download.microsoft.com/download/C/F/F/CFF3A0B8-99D4-41A2-AE1A-496C08BEB904/WebPlatformInstaller_amd64_en-US.msi", "$tmpDir/WebPlatformInstaller_amd64_en-US.msi")
@@ -234,7 +234,7 @@ try {
 
     Write-Host "=================> end of server setup script"
 
-    "[status]" | Out-File -FileP.txt
+    "[status]" | Out-File -FilePath /setup-status..txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
 } catch {

@@ -266,11 +266,17 @@
       src: "./files/updEnv.ps1"
       dest: "c:\\tna-startup\\updEnv.ps1"
 
+  - ansible.builtin.debug:
+      msg:
+        - "====================================================================="
+        - "run server setup for {{ hostvars['localhost']['env'] }} - tier web
+        - "====================================================================="
+
   - name: run server-setup script
     ansible.windows.win_powershell:
       script: |
         cd c:\temp
-        server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
+        ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
 
   - ansible.builtin.debug:
       msg:
