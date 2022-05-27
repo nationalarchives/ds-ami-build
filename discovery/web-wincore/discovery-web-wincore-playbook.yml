@@ -275,6 +275,7 @@
   connection: winrm
   port: 5986
   remote_user: ansible-winrm
+  ansible_password: "{{ password }}"
 
   tasks:
   - ansible.builtin.debug:
