@@ -294,24 +294,18 @@
   - name: IIS and ASP.NET install
     ansible.windows.win_feature:
       name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging
-      restart: no
-    notify: restart iis
 
   - name: IIS and ASP.NET install
     ansible.windows.win_feature:
       name: Web-Stat-Compression,Web-Filtering,Web-Url-Auth,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Mgmt-Console
-      restart: no
-    notify: restart iis
 
   - name: IIS and ASP.NET install
     ansible.windows.win_feature:
-      name: NET-Framework-45-Core
-      restart: no
-    notify: restart iis
+      name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
 
 #  - name: IIS and ASP.NET install
 #    ansible.windows.win_feature:
-#      name: NET-WCF-HTTP-Activation,NET-WCF-TCP-PortSharing
+#      name: NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
 #      restart: no
 #    notify: restart iis
 
