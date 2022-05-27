@@ -125,12 +125,6 @@
       dest: "./userdata.ps1"
       force: yes
 
-#  - name: template hosts
-#    template:
-#      src: "./templates/hosts.j2"
-#      dest: "./hosts"
-#      force: yes
-
   - name: provisioning instance
     amazon.aws.ec2_instance:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
@@ -177,21 +171,6 @@
       instance_public_ip: "{{ ec2.instances[0].public_ip_address }}"
       instance_id: "{{ ec2.instances[0].instance_id }}"
 
-#  - name: get the Administrator password
-#    community.aws.ec2_win_password
-#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}
-#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}
-#      security_token: "{{ assumed_role.sts_creds.session_token }}
-#      instance_id: "{{ ec2.instances[0].instance_id }}
-#      region: "eu-west-2
-#      key_file: "{{ key_name }}
-#    register: ec2_password
-#  - ansible.builtin.debug
-#      msg
-#        - "=====================================================================
-#        - "{{ ec2-password }}
-#        - "=====================================================================
-
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
@@ -209,14 +188,9 @@
       ansible_password: "{{ password }}"
       ansible_connection: winrm
       ansible_port: 5986
-      #ansible_winrm_scheme: https
       ansible_winrm_transport: basic
       ansible_winrm_message_encryption: auto
       ansible_winrm_server_cert_validation: ignore
-
-#  - name: Wait for system to become reachable over WinRM
-#    wait_for_connection:
-#      timeout: 900
 
   - name: wait for WinRM port to be open
     ansible.builtin.wait_for:
@@ -228,53 +202,12 @@
       state: started
     register: port
     tags: [ ami ]
-#
-#  - ansible.builtin.debug:
-#      msg:
-#        - "====================================================================="
-#        - "port opening time {{ port.elapsed }}"
-#        - "====================================================================="
-
-#  - name: Start Python Session
-#    ansible.builtin.shell:
-#      cmd: python -c "import winrm; session = winrm.Session('{{ instance_public_ip }}', auth=('ansible-winrm','{{ password }}'))"
-#
-#  - name: Wait for system to become reachable over WinRM
-#    wait_for_connection:
-#      timeout: 300
-#
-#  - name: Checking if test file exists
-#    stat:
-#      path: "C:\textfile.txt"
-#    register: file_data
-#
-#  - name: Report if test file exists
-#    debug:
-#       msg: "The file or directory exists"
-#    when: file_data.stat.exists
-#
-#  - name: Report if test file doesn't exist
-#    debug:
-#      msg: "The file or directory doesn't exist"
-#    when: not file_data.stat.exists
-#
-#  - name: Wait until userdata has been processed
-#    wait_for:
-#      connect_timeout: 10
-#      host: "{{ instance_public_ip }}"
-#      path: "c:\finish-init.txt"
-#      state: present
-#      sleep: 20
-#      timeout: 900
 
 - name: switching hosts
   hosts: winhosts
   gather_facts: no
   connection: winrm
   port: 5986
-#  vars:
-#    remote_user: ansible-winrm
-#    ansible_password: "{{ password }}"
 
   tasks:
   - ansible.builtin.debug:
@@ -291,23 +224,17 @@
     retries: 45
     delay: 20
 
-  - name: IIS and ASP.NET install
+  - name: IIS and ASP.NET features part 1 - 3
     ansible.windows.win_feature:
       name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging
 
-  - name: IIS and ASP.NET install
+  - name: IIS and ASP.NET features part 2 - 3
     ansible.windows.win_feature:
       name: Web-Stat-Compression,Web-Filtering,Web-Url-Auth,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Mgmt-Console
 
-  - name: IIS and ASP.NET install
+  - name: IIS and ASP.NET features part 3 - 3
     ansible.windows.win_feature:
       name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
-
-#  - name: IIS and ASP.NET install
-#    ansible.windows.win_feature:
-#      name: NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
-#      restart: no
-#    notify: restart iis
 
   - name: ensure temp dir exists
     win_file:
@@ -343,7 +270,7 @@
     ansible.windows.win_powershell:
       script: |
         cd c:\temp
-        server-setup.ps1 -environment "{{ env }}" -tier "web" -application "discovery"
+        server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
 
   - ansible.builtin.debug:
       msg:
@@ -354,7 +281,7 @@
 
   - name: check if ec2 instance is ready
     ansible.builtin.win_stat:
-      path: "/setup-status.txt"
+      path: "C:\\setup-status.txt"
     register: setup_status
     until: "setup_status.stat.exists"
     retries: 45
