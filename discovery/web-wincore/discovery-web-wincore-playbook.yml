@@ -220,16 +220,16 @@
 #    wait_for_connection:
 #      timeout: 900
 
-#  - name: wait for WinRM port is open
-#    ansible.windows.win_wait_for:
-#      host: "{{ instance_public_ip }}"
-#      port: 5986
-#      delay: 120
-#      timeout: 600
-#      sleep: 10
-#      state: started
-#    register: port
-#    tags: [ ami ]
+  - name: wait for WinRM port is open
+    ansible.windows.win_wait_for:
+      host: "{{ instance_public_ip }}"
+      port: 5986
+      delay: 120
+      timeout: 600
+      sleep: 10
+      state: started
+    register: port
+    tags: [ ami ]
 #
 #  - ansible.builtin.debug:
 #      msg:
