@@ -269,7 +269,7 @@
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
-        - "run server setup for {{ hostvars['localhost']['env'] }} - tier web
+        - "run server setup for {{ hostvars['localhost']['env'] }} - tier web"
         - "====================================================================="
 
   - name: run server-setup script
