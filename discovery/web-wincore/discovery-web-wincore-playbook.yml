@@ -284,7 +284,7 @@
         - "20 second interval with max duration of 15 minutes"
         - "====================================================================="
   - name: check if ec2 instance is ready
-    ansible.builtin.win_stat:
+    ansible.windows.win_stat:
       path: "C:\finish-init.txt"
     register: init_finished
     until: "init_finished.stat.exists"
