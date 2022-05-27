@@ -221,7 +221,7 @@
 #      timeout: 900
 
   - name: wait for WinRM port is open
-    ansible.windows.wait_for:
+    ansible.builtin.wait_for:
       host: "{{ instance_public_ip }}"
       port: 5986
       delay: 120
