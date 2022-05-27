@@ -205,7 +205,7 @@
     add_host:
       hostname: "{{ instance_public_ip }}"
       groups: winhosts
-      ansible_user: ansible-winrm
+#      ansible_user: ansible-winrm
       ansible_password: "{{ password }}"
       ansible_connection: winrm
       ansible_port: 5986
@@ -213,7 +213,9 @@
       ansible_winrm_transport: basic
       ansible_winrm_message_encryption: auto
       ansible_winrm_server_cert_validation: ignore
-      #remote_user: ansible-winrm
+      remote_user: ansible-winrm
+      connection: winrm
+      port: 5986
       gather_facts: no
 
 #  - name: Wait for system to become reachable over WinRM
@@ -271,12 +273,6 @@
 
 - name: switch to hosts
   hosts: winhosts
-  gather_facts: no
-  connection: winrm
-  port: 5986
-  vars:
-    remote_user: ansible-winrm
-    ansible_password: "{{ password }}"
 
   tasks:
   - ansible.builtin.debug:
