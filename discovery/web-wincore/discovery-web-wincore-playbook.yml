@@ -285,9 +285,9 @@
         - "====================================================================="
   - name: check if ec2 instance is ready
     ansible.windows.win_stat:
-      path: "C:\finish-init.txt"
+      path: "C:\\finish-init.txt"
     register: init_finished
-    until: "init_finished.stat.exists"
+    until: init_finished.stat.exists
     retries: 45
     delay: 20
 
