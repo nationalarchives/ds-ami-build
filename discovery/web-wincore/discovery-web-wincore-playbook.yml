@@ -281,9 +281,9 @@
 
   - name: run server-setup script
     ansible.windows.win_powershell:
+      chdir: "c:\\temp"
       script: |
         [CmdletBinding(SupportsShouldProcess)]
-        cd c:\temp
         ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
 
   - ansible.builtin.debug:
