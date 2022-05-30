@@ -224,22 +224,22 @@
     retries: 45
     delay: 20
 
-  - name: IIS and ASP.NET features part 1 - 3
+  - name: IIS and ASP.NET features part 1 - 3 :: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging
     ansible.windows.win_feature:
       name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging
     register: iis_install_1
 
-  - name: IIS and ASP.NET features part 2 - 3
+  - name: IIS and ASP.NET features part 2 - 3 :: Web-Stat-Compression,Web-Filtering,Web-Url-Auth,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Mgmt-Console
     ansible.windows.win_feature:
       name: Web-Stat-Compression,Web-Filtering,Web-Url-Auth,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Mgmt-Console
     register: iis_install_2
 
-  - name: IIS and ASP.NET features part 3 - 3
+  - name: IIS and ASP.NET features part 3 - 3 :: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
     ansible.windows.win_feature:
       name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
     register: iis_install_3
 
-  - name: reboot if installing Web-Server feature requires it
+  - name: reboot instance if installing Web-Server feature requires it
     ansible.windows.win_reboot:
     when: iis_install_1.reboot_required or iis_install_2.reboot_required or iis_install_3.reboot_required
 

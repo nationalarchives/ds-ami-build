@@ -16,11 +16,11 @@ $tmpDir = "c:\temp"
 # required packages
 $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
 
-$wacInstaller = "WindowsAdminCenter2103.msi"
+$wacInstaller = "WindowsAdminCenter2110.2.msi"
 $dotnetInstaller = "ndp48-web.exe"
 $dotnetPackagename = ".NET Framework 4.8 Platform (web installer)"
-$dotnetCoreInstaller = "dotnet-hosting-3.1.7-win.exe"
-$dotnetCorePackagename = ".NET Core 3.1.7"
+$dotnetCoreInstaller = "dotnet-hosting-6.0.5-win.exe"
+$dotnetCorePackagename = ".NET Core 6.0.5"
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 
@@ -247,18 +247,18 @@ try {
     Write-Host "---- schedule EC2Launch for next start"
     C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
-    "[status]" | Out-File -FilePath /setup-status.txt
-    "finished = true" | Out-File -FilePath /setup-status.txt -Append
-
     "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> Windows Admin Center"
     netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
     Write-Host "---- start installation process"
-    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
+    Start-Process "msiexec.exe" -ArgumentList "/i $tmpDir\$wacInstaller /qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0"  -NoNewWindow -PassThru -Wait
 
+    "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
     Write-Host "=================> end of server setup script"
 
+    "[status]" | Out-File -FilePath /setup-status.txt
+    "finished = true" | Out-File -FilePath /setup-status.txt -Append
 } catch {
     Write-Host "Caught an exception:"
     Write-Host "Exception Type: $($_.Exception.GetType().FullName)"
