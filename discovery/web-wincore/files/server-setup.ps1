@@ -9,7 +9,7 @@ param(
 
 # Set-ExecutionPolicy Bypass -Scope Process
 
-"[debug]" | Out-File -FilePath /debug..txt
+"[debug]" | Out-File -FilePath /debug.txt
 
 $tmpDir = "c:\temp"
 
@@ -247,7 +247,7 @@ try {
     Write-Host "---- schedule EC2Launch for next start"
     C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
-    "[status]" | Out-File -FilePath /setup-status..txt
+    "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
     "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
