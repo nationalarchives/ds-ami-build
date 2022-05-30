@@ -101,37 +101,37 @@ try {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
 
-    "===> AWS X-Ray" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> AWS X-Ray"
-    Write-Host "---- Daemon"
-    if ( Get-Service "AWSXRayDaemon" -ErrorAction SilentlyContinue ) {
-        sc.exe stop AWSXRayDaemon
-        sc.exe delete AWSXRayDaemon
-    }
-    $targetLocation = "C:\Program Files\Amazon\XRay"
-    if ((Test-Path $targetLocation) -eq 0) {
-        mkdir $targetLocation
-    }
-    Write-Host "---- AWS XRay"
-    $zipFileName = "aws-xray-daemon-windows-service-3.x.zip"
-    $zipPath = "$targetLocation\$zipFileName"
-    $destPath = "$targetLocation\aws-xray-daemon"
-    if ((Test-Path $destPath) -eq 1) {
-        Remove-Item -Recurse -Force $destPath
-    }
-    Write-Host "---- downloading AWS X-Ray daemon"
-    $daemonPath = "$destPath\xray.exe"
-    $daemonLogPath = "$targetLocation\xray-daemon.log"
-    $url = "https://s3.dualstack.us-west-2.amazonaws.com/aws-xray-assets.us-west-2/xray-daemon/aws-xray-daemon-windows-service-3.x.zip"
-    Invoke-WebRequest -Uri $url -OutFile $zipPath
-
-    Write-Host "---- expanding AWS X-Ray zip file"
-    Add-Type -Assembly "System.IO.Compression.Filesystem"
-    [io.compression.zipfile]::ExtractToDirectory($zipPath, $destPath)
-
-    Write-Host "---- installing AWS X-Ray daemon"
-    New-Service -Name "AWSXRayDaemon" -StartupType Automatic -BinaryPathName "`"$daemonPath`" -f `"$daemonLogPath`""
-    sc.exe start AWSXRayDaemon
+#    "===> AWS X-Ray" | Out-File -FilePath /debug.txt -Append
+#    Write-Host "===> AWS X-Ray"
+#    Write-Host "---- Daemon"
+#    if ( Get-Service "AWSXRayDaemon" -ErrorAction SilentlyContinue ) {
+#        sc.exe stop AWSXRayDaemon
+#        sc.exe delete AWSXRayDaemon
+#    }
+#    $targetLocation = "C:\Program Files\Amazon\XRay"
+#    if ((Test-Path $targetLocation) -eq 0) {
+#        mkdir $targetLocation
+#    }
+#    Write-Host "---- AWS XRay"
+#    $zipFileName = "aws-xray-daemon-windows-service-3.x.zip"
+#    $zipPath = "$targetLocation\$zipFileName"
+#    $destPath = "$targetLocation\aws-xray-daemon"
+#    if ((Test-Path $destPath) -eq 1) {
+#        Remove-Item -Recurse -Force $destPath
+#    }
+#    Write-Host "---- downloading AWS X-Ray daemon"
+#    $daemonPath = "$destPath\xray.exe"
+#    $daemonLogPath = "$targetLocation\xray-daemon.log"
+#    $url = "https://s3.dualstack.us-west-2.amazonaws.com/aws-xray-assets.us-west-2/xray-daemon/aws-xray-daemon-windows-service-3.x.zip"
+#    Invoke-WebRequest -Uri $url -OutFile $zipPath
+#
+#    Write-Host "---- expanding AWS X-Ray zip file"
+#    Add-Type -Assembly "System.IO.Compression.Filesystem"
+#    [io.compression.zipfile]::ExtractToDirectory($zipPath, $destPath)
+#
+#    Write-Host "---- installing AWS X-Ray daemon"
+#    New-Service -Name "AWSXRayDaemon" -StartupType Automatic -BinaryPathName "`"$daemonPath`" -f `"$daemonLogPath`""
+#    sc.exe start AWSXRayDaemon
 
     "===> aquire AWS credentials" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> aquire AWS credentials"
@@ -144,8 +144,8 @@ try {
     Write-Host "===> download and install required packages and config files"
     Set-Location -Path $tmpDir
 
-    Write-Host "---- AWS X-Ray config file"
-    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/xray-cfg.yaml `"$targetLocation`""
+#    Write-Host "---- AWS X-Ray config file"
+#    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/xray-cfg.yaml `"$targetLocation`""
 
     "===> install CloudWatch Agent" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> install CloudWatch Agent"
@@ -196,13 +196,13 @@ try {
     # remove unwanted IIS headers
     Clear-WebConfiguration "/system.webServer/httpProtocol/customHeaders/add[@name='X-Powered-By']"
 
-    "===> AWS XRay .NET Agent" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> AWS XRay .NET Agent"
-    Write-Host "---- download installer"
-    Invoke-WebRequest -Uri https://s3.amazonaws.com/aws-xray-assets.us-east-1/xray-agent-installer/aws-xray-dotnet-agent-installer-beta-X64.msi -OutFile c:/temp/aws-xray-dotnet-agent-installer-beta-X64.msi
-    Write-Host "---- installing XRay .NET Agent"
-    #Start-Process msiexec.exe -Wait -ArgumentList '/i c:/temp/aws-xray-dotnet-agent-installer-beta-X64.msi /qn /norestart' -NoNewWindow
-    Invoke-Expression -Command "c:/temp/aws-xray-dotnet-agent-installer-beta-X64.msi"
+#    "===> AWS XRay .NET Agent" | Out-File -FilePath /debug.txt -Append
+#    Write-Host "===> AWS XRay .NET Agent"
+#    Write-Host "---- download installer"
+#    Invoke-WebRequest -Uri https://s3.amazonaws.com/aws-xray-assets.us-east-1/xray-agent-installer/aws-xray-dotnet-agent-installer-beta-X64.msi -OutFile c:/temp/aws-xray-dotnet-agent-installer-beta-X64.msi
+#    Write-Host "---- installing XRay .NET Agent"
+#    #Start-Process msiexec.exe -Wait -ArgumentList '/i c:/temp/aws-xray-dotnet-agent-installer-beta-X64.msi /qn /norestart' -NoNewWindow
+#    Invoke-Expression -Command "c:/temp/aws-xray-dotnet-agent-installer-beta-X64.msi"
 
     Start-WebSite -Name $webSiteName
 
