@@ -295,6 +295,7 @@
         - log.txt
         - SME_PORT=3390
         - SSL_CERTIFICATE_OPTION=generate
+        - RESTART_WINRM=0
 
   - ansible.builtin.debug:
       msg:
