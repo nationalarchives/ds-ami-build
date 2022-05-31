@@ -239,6 +239,10 @@
       name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
     register: iis_install_3
 
+  - name: reboot instance after installing Web-Server feature
+    ansible.windows.win_reboot:
+    when: iis_install_1.reboot_required or iis_install_2.reboot_required or iis_install_3.reboot_required
+
   - name: ensure temp dir exists
     ansible.windows.win_file:
       path: "c:\\temp"
