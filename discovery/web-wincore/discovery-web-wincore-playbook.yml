@@ -213,15 +213,15 @@
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
-        - "checking status of instance initial script"
-        - "20 second interval with max duration of 15 minutes"
+        - "checking userdata script has finished"
+        - "20 second interval with max duration of 5 minutes"
         - "====================================================================="
-  - name: check if ec2 instance is ready
+  - name: check if userdata script has finished
     ansible.windows.win_stat:
       path: "C:\\finish-init.txt"
     register: init_finished
     until: init_finished.stat.exists
-    retries: 45
+    retries: 15
     delay: 20
 
   - name: IIS and ASP.NET features part 1 - 3 || Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging
@@ -238,10 +238,6 @@
     ansible.windows.win_feature:
       name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
     register: iis_install_3
-
-  - name: reboot instance if installing Web-Server feature requires it
-    ansible.windows.win_reboot:
-    when: iis_install_1.reboot_required or iis_install_2.reboot_required or iis_install_3.reboot_required
 
   - name: ensure temp dir exists
     ansible.windows.win_file:
@@ -276,7 +272,7 @@
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
-        - "run server setup for {{ hostvars['localhost']['env'] }} - tier web"
+        - "setup for {{ hostvars['localhost']['env'] }} - web tier"
         - "====================================================================="
 
   - name: run server-setup script
@@ -284,6 +280,9 @@
       chdir: "c:\\temp"
       script: |
         ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
+
+  - name: reboot instance
+    ansible.windows.win_reboot:
 
 - name: switch to localhost
   hosts: localhost
@@ -310,7 +309,7 @@
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
-        - "checking status of instance setup"
+        - "checking setup script has finished"
         - "20 second interval with max duration of 5 minutes"
         - "====================================================================="
 
