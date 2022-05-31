@@ -288,7 +288,7 @@
   - name: install WAC
     ansible.windows.win_package:
       path: "C:\\temp\\WindowsAdminCenter2110.2.msi"
-      argument:
+      arguments:
         - /qn
         - /L*v
         - log.txt
