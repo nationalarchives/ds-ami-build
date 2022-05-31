@@ -260,8 +260,7 @@ try {
 
     "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
-
-    Get-Service -Name WinRM | Restart-Service
+    exit 0
 } catch {
     Write-Host "Caught an exception:"
     Write-Host "Exception Type: $($_.Exception.GetType().FullName)"
