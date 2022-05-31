@@ -284,7 +284,6 @@
       chdir: "c:\\temp"
       script: |
         ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
-      register: setupscript
 
   - name: install WAC
     ansible.windows.win_package:
