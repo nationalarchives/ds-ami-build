@@ -192,7 +192,7 @@
       ansible_winrm_message_encryption: auto
       ansible_winrm_server_cert_validation: ignore
 
-  - name: wait for WinRM port to be open
+  - name: wait for WinRM port
     ansible.builtin.wait_for:
       host: "{{ instance_public_ip }}"
       port: 5986
@@ -208,8 +208,8 @@
   gather_facts: no
   connection: winrm
   port: 5986
-
   tasks:
+
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
@@ -285,11 +285,33 @@
       script: |
         ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
 
+- name: switch to localhost
+  hosts: localhost
+  gather_facts: no
+  tasks:
+
+  - name: wait for WinRM port
+    ansible.builtin.wait_for:
+      host: "{{ instance_public_ip }}"
+      port: 5986
+      delay: 120
+      timeout: 600
+      sleep: 10
+      state: started
+    register: port
+
+- name: switching hosts
+  hosts: winhosts
+  gather_facts: no
+  connection: winrm
+  port: 5986
+  tasks:
+
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
         - "checking status of instance setup"
-        - "20 second interval with max duration of 15 minutes"
+        - "20 second interval with max duration of 5 minutes"
         - "====================================================================="
 
   - name: check if ec2 instance is ready
@@ -297,7 +319,7 @@
       path: "C:\\setup-status.txt"
     register: setup_status
     until: "setup_status.stat.exists"
-    retries: 45
+    retries: 15
     delay: 20
 
 
