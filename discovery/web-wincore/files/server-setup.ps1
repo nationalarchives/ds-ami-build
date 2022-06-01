@@ -260,6 +260,8 @@ try {
 
     "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
+
+    Restart-Computer
 } catch {
 #    Write-Host "Caught an exception:"
 #    Write-Host "Exception Type: $($_.Exception.GetType().FullName)"
