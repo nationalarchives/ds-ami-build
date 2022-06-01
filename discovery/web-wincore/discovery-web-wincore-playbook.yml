@@ -285,11 +285,6 @@
       script: |
         ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
 
-  - name: install WAC
-    ansible.windows.win_package:
-      path: "C:\\temp\\WindowsAdminCenter2110.2.msi"
-      arguments: "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0"
-
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
