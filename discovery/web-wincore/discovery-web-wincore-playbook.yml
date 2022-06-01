@@ -4,7 +4,6 @@
 - name: create Discovery webserver AMI
   hosts: localhost
   gather_facts: false
-
   tasks:
   - name: load variables
     ansible.builtin.include_vars:
@@ -209,7 +208,6 @@
   connection: winrm
   port: 5986
   tasks:
-
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
@@ -288,9 +286,8 @@
 
 - name: switch to localhost
   hosts: localhost
-  gather_facts: true
+  gather_facts: false
   tasks:
-
   - name: wait for WinRM port
     ansible.builtin.wait_for:
       host: "{{ instance_public_ip }}"
@@ -308,7 +305,6 @@
   connection: winrm
   port: 5986
   tasks:
-
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
