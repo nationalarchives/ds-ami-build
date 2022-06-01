@@ -284,6 +284,30 @@
       chdir: "c:\\temp"
       script: |
         ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
+    ignore_unreachable: yes
+
+- name: switch to localhost
+  hosts: localhost
+  gather_facts: true
+  tasks:
+
+  - name: wait for WinRM port
+    ansible.builtin.wait_for:
+      host: "{{ instance_public_ip }}"
+      port: 5986
+      delay: 120
+      timeout: 600
+      sleep: 10
+      state: started
+    register: port
+    tags: [ ami ]
+
+- name: switching hosts
+  hosts: winhosts
+  gather_facts: no
+  connection: winrm
+  port: 5986
+  tasks:
 
   - ansible.builtin.debug:
       msg:
