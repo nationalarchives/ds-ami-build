@@ -284,7 +284,7 @@
       chdir: "c:\\temp"
       script: |
         ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
-    ignore_unreachable: yes
+    ignore_errors: yes
 
 - name: switch to localhost
   hosts: localhost
