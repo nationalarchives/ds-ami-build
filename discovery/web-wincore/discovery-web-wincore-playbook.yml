@@ -236,7 +236,7 @@
 
   - name: IIS and ASP.NET features part 3 - 3 || NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
     ansible.windows.win_feature:
-      name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45,Win-RM-Ext
+      name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45,IIS-WebServerManagementTools
     register: iis_install_3
 
   - name: reboot instance after installing Web-Server feature
