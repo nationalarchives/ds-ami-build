@@ -110,7 +110,7 @@
 
   - name: generate admin password
     set_fact:
-      password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+      password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=27') }}"
 
   - ansible.builtin.debug:
       msg:
