@@ -79,11 +79,11 @@
       region: "{{ region }}"
       vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
       rules:
-        - proto: "tcp"
-          from_port: 22
-          to_port: 22
-          cidr_ip: "0.0.0.0/0"
-          rule_desc: "allow incoming ssh connections"
+#        - proto: "tcp"
+#          from_port: 22
+#          to_port: 22
+#          cidr_ip: "0.0.0.0/0"
+#          rule_desc: "allow incoming ssh connections"
         - proto: "tcp"
           from_port: 1024
           to_port: 65535
