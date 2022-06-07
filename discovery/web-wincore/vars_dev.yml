@@ -1,5 +1,5 @@
 ---
-key-file: "discovery-web-wincore-dev-eu-west-2"
+key_name: "discovery-web-dev-eu-west-2"
 region: "eu-west-2"
 service: "discovery"
 tier: "web"

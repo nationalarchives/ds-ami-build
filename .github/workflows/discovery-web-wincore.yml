@@ -30,7 +30,7 @@ jobs:
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=discovery-web-wincore-dev-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=discovery-web-dev-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -41,7 +41,7 @@ jobs:
 
       - name: write ssh key file
         run: |
-          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
@@ -56,8 +56,12 @@ jobs:
         run: pip3 install wheel requests pyjwt
       - name: install ansible
         run: pip3 install ansible
-      - name: install winrm
+      - name: install pywinrm
         run: pip install pywinrm
+#      - name: install requests-credssp
+#        run: pip install requests-credssp
+      - name: install ansible.windows
+        run: ansible-galaxy collection install ansible.windows
 
       - name: run ansible playbook
         env:
