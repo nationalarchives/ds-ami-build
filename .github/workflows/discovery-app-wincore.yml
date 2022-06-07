@@ -56,6 +56,10 @@ jobs:
         run: pip3 install wheel requests pyjwt
       - name: install ansible
         run: pip3 install ansible
+      - name: install pywinrm
+        run: pip install pywinrm
+      - name: install ansible.windows
+        run: ansible-galaxy collection install ansible.windows
 
       - name: run ansible playbook
         env:
