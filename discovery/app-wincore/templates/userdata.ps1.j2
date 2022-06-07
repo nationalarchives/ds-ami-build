@@ -1,0 +1,52 @@
+<powershell>
+Set-ExecutionPolicy -ExecutionPolicy bypass -Force
+
+# create ansible winrm admin user
+$password = "{{ password }}" | ConvertTo-SecureString -AsPlainText -Force
+$newUserParams = @{
+        Name                 = "ansible-winrm"
+        AccountNeverExpires  = $true
+        PasswordNeverExpires = $true
+        Password             = $password
+    }
+$null = New-LocalUser @newUserParams
+Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
+Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
+
+winrm set winrm/config/client/auth @{Basic="true"}
+winrm set winrm/config/service/auth @{Basic="true"}
+winrm set winrm/config/service @{AllowUnencrypted="true"}
+
+New-NetFirewallRule -DisplayName "sshd" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
+New-NetFirewallRule -DisplayName "rdp" -Direction Inbound -LocalPort 3389 -Protocol TCP -Action Allow
+# open firewall for WinRM
+New-NetFirewallRule -DisplayName "Allow WinRM Port 5985" -Direction Inbound -LocalPort 5985 -Protocol TCP -Action Allow
+New-NetFirewallRule -DisplayName "Allow WinRM Port 5986" -Direction Inbound -LocalPort 5986 -Protocol TCP -Action Allow
+
+# from powershell:
+Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
+
+# allow remote desktop
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\" -Name "fDenyTSConnections" -Value $false
+Set-ItemProperty ‘HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\‘ -Name “UserAuthentication” -Value $true
+Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
+
+# allow remote management
+Enable-PSRemoting -SkipNetworkProfileCheck -Force
+Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (DCOM-In)"
+Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
+Enable-NetFirewallRule -DisplayGroup "Remote Service Management"
+Enable-NetFirewallRule -DisplayGroup "Remote Volume Management"
+#Enable-NetFirewallRule -DisplayGroup "Windows Firewall Remote Management"
+Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
+Enable-NetFirewallRule -DisplayGroup "Remote Scheduled Tasks Management"
+
+Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
+#Set-Item -Path WSMan:\localhost\Service\Auth\Certificate -Value $true
+Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $true
+#Set-Item -Path WSMan:\localhost\Service\Auth\CredSSP -Value $true
+
+"[status]" | Out-File -FilePath C:\finish-init.txt
+"finished = true" | Out-File -FilePath C:\finish-init.txt -Append
+</powershell>
+<persist>true</persist>
