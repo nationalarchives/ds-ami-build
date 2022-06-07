@@ -39,36 +39,6 @@
       latest_ami: >
         {{ findami.images | sort(attribute='creation_date') | last }}
 
-#  - name: template deployment policy
-#    template:
-#      src: "./templates/instance-role-policy.json.j2"
-#      dest: "./instance-role-policy.json"
-#      force: yes
-#
-#  - name: create deployment policy
-#    community.aws.iam_managed_policy:
-#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-#      security_token: "{{ assumed_role.sts_creds.session_token }}"
-#      policy: "{{ lookup('file', './instance-role-policy.json') }}"
-#      policy_name: "ansible-ami-discovery-web-s3-policy"
-#      state: "present"
-#    register: s3_policy
-
-#  - name: create discovery webserver IAM role
-#    community.aws.iam_role:
-#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-#      security_token: "{{ assumed_role.sts_creds.session_token }}"
-#      name: "ansible-ami-discovery-web-role"
-#      region: "{{ region }}"
-#      assume_role_policy_document: "{{ lookup('file', './discovery-web-wincore-role-policy.json') }}"
-#      managed_policies: [ "{{ s3_policy.policy.arn }}", "arn:aws:iam::846769538626:policy/discovery-deployment-policy", "arn:aws:iam::aws:policy/service-role/AmazonSSMManagedInstanceCore" ]
-#      create_instance_profile: yes
-#      purge_policies: yes
-#      state: "present"
-#    register: discovery_iam_role
-
   - name: create security group - allowing updates and downloads
     amazon.aws.ec2_group:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
@@ -79,11 +49,6 @@
       region: "{{ region }}"
       vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
       rules:
-#        - proto: "tcp"
-#          from_port: 22
-#          to_port: 22
-#          cidr_ip: "0.0.0.0/0"
-#          rule_desc: "allow incoming ssh connections"
         - proto: "tcp"
           from_port: 1024
           to_port: 65535
@@ -361,21 +326,3 @@
       name: "ansible-ami-discovery-web-sg"
       region: "{{ region }}"
       state: "absent"
-
-#  - name: remove IAM role
-#    community.aws.iam_role:
-#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-#      security_token: "{{ assumed_role.sts_creds.session_token }}"
-#      name: "ansible-ami-discover-web-role"
-#      region: "{{ region }}"
-#      delete_instance_profile: yes
-#      state: "absent"
-#
-#  - name: remove deployment policy
-#    community.aws.iam_managed_policy:
-#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-#      security_token: "{{ assumed_role.sts_creds.session_token }}"
-#      policy_name: "ansible-ami-discovery-web-s3-policy"
-#      state: "absent"
