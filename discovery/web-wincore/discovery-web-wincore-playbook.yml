@@ -39,35 +39,35 @@
       latest_ami: >
         {{ findami.images | sort(attribute='creation_date') | last }}
 
-  - name: template deployment policy
-    template:
-      src: "./templates/instance-role-policy.json.j2"
-      dest: "./instance-role-policy.json"
-      force: yes
+#  - name: template deployment policy
+#    template:
+#      src: "./templates/instance-role-policy.json.j2"
+#      dest: "./instance-role-policy.json"
+#      force: yes
+#
+#  - name: create deployment policy
+#    community.aws.iam_managed_policy:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      policy: "{{ lookup('file', './instance-role-policy.json') }}"
+#      policy_name: "ansible-ami-discovery-web-s3-policy"
+#      state: "present"
+#    register: s3_policy
 
-  - name: create deployment policy
-    community.aws.iam_managed_policy:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy: "{{ lookup('file', './instance-role-policy.json') }}"
-      policy_name: "ansible-ami-discovery-web-s3-policy"
-      state: "present"
-    register: s3_policy
-
-  - name: create discovery webserver IAM role
-    community.aws.iam_role:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-discovery-web-role"
-      region: "{{ region }}"
-      assume_role_policy_document: "{{ lookup('file', './discovery-web-wincore-role-policy.json') }}"
-      managed_policies: [ "{{ s3_policy.policy.arn }}", "arn:aws:iam::846769538626:policy/discovery-deployment-policy", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM" ]
-      create_instance_profile: yes
-      purge_policies: yes
-      state: "present"
-    register: discovery_iam_role
+#  - name: create discovery webserver IAM role
+#    community.aws.iam_role:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      name: "ansible-ami-discovery-web-role"
+#      region: "{{ region }}"
+#      assume_role_policy_document: "{{ lookup('file', './discovery-web-wincore-role-policy.json') }}"
+#      managed_policies: [ "{{ s3_policy.policy.arn }}", "arn:aws:iam::846769538626:policy/discovery-deployment-policy", "arn:aws:iam::aws:policy/service-role/AmazonSSMManagedInstanceCore" ]
+#      create_instance_profile: yes
+#      purge_policies: yes
+#      state: "present"
+#    register: discovery_iam_role
 
   - name: create security group - allowing updates and downloads
     amazon.aws.ec2_group:
@@ -131,7 +131,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
-      instance_role: "ansible-ami-discovery-web-role"
+      instance_role: "ansible-github-discovery-deployment-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
@@ -362,20 +362,20 @@
       region: "{{ region }}"
       state: "absent"
 
-  - name: remove IAM role
-    community.aws.iam_role:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-discover-web-role"
-      region: "{{ region }}"
-      delete_instance_profile: yes
-      state: "absent"
-
-  - name: remove deployment policy
-    community.aws.iam_managed_policy:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-discovery-web-s3-policy"
-      state: "absent"
+#  - name: remove IAM role
+#    community.aws.iam_role:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      name: "ansible-ami-discover-web-role"
+#      region: "{{ region }}"
+#      delete_instance_profile: yes
+#      state: "absent"
+#
+#  - name: remove deployment policy
+#    community.aws.iam_managed_policy:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      policy_name: "ansible-ami-discovery-web-s3-policy"
+#      state: "absent"
