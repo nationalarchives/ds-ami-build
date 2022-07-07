@@ -98,7 +98,7 @@ try {
 
     "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
     powershell.exe -Command Read-S3Object -BucketName aws-codedeploy-eu-west-2 -Key latest/codedeploy-agent.msi -File $tmpDir\codedeploy-agent.msi
-    $tmpDir\codedeploy-agent.msi /quiet /l $tmpDir\host-agent-install-log.txt
+    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
 
     "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
@@ -171,7 +171,7 @@ try {
     "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
     netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
-    msiexec /i "$tmpDir\$wacInstaller" /norestart /qn /L*v "log.txt" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0
+    msiexec /i "$tmpDir\$wacInstaller" /norestart /qn /L*v "wac-log.txt" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0
 
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 
