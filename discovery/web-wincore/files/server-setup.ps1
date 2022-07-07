@@ -70,7 +70,7 @@ try {
 
     "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> AWS for PowerShell"
-    Import-Module AWSPowerShell
+    Import-Module AWSPowerShell.NetCore
 
     "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> WebPlatformInstaller and URLRewrite2"
@@ -106,7 +106,7 @@ try {
 
     "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> install CodeDeploy Agent"
-    Read-S3Object -BucketName aws-codedeploy-eu-west-2 -Key latest/codedeploy-agent.msi -File "$tmpDir\codedeploy-agent.msi"
+    powershell.exe -Command Read-S3Object -BucketName aws-codedeploy-eu-west-2 -Key latest/codedeploy-agent.msi -File "$tmpDir\codedeploy-agent.msi"
     Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l*v `"$tmpDir\codedeploy-log.txt`""
 
     "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
