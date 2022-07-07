@@ -70,7 +70,7 @@ try {
 
     "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> AWS for PowerShell"
-    Import-Module AWSPowerShell.NetCore
+    Import-Module AWSPowerShell
 
     "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> WebPlatformInstaller and URLRewrite2"
