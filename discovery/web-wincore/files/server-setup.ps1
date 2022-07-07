@@ -66,6 +66,9 @@ try {
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
     $env:Path = "$env:Path;$pathAWScli"
 
+    "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
+    Import-Module AWSPowerShell
+
     "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?LinkId=287166", "$tmpDir/WebPlatformInstaller_x64_en-US.msi")
     Start-Process -FilePath "$tmpDir/WebPlatformInstaller_x64_en-US.msi" -ArgumentList "/qn" -PassThru -Wait
@@ -92,6 +95,10 @@ try {
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet"
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
+
+    "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
+    powershell.exe -Command Read-S3Object -BucketName aws-codedeploy-eu-west-2 -Key latest/codedeploy-agent.msi -File $tmpDir\codedeploy-agent.msi
+    $tmpDir\codedeploy-agent.msi /quiet /l $tmpDir\host-agent-install-log.txt
 
     "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
