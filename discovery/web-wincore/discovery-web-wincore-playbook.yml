@@ -282,7 +282,7 @@
       path: "C:\\setup-status.txt"
     register: setup_status
     until: "setup_status.stat.exists"
-    reties: 15
+    retries: 15
     delay: 20
 
 - name: switch to localhost
