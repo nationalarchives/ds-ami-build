@@ -93,6 +93,11 @@ try {
     $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
     $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
 
+    "===> set AWS profile" | Out-File -FilePath /debug.txt -Append
+    Write-Host "===> set AWS profile"
+    Set-AWSCredential -AccessKey "$sts.Credentials.AccessKeyId" -SecretKey "$sts.Credentials.SecretAccessKey" -StoreAs InitProfile
+    Initialize-AWSDefaultConfiguration -ProfileName InitProfile -Region eu-west-2
+
     "===> download and install required packages and config files" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> download and install required packages and config files"
     Set-Location -Path $tmpDir
