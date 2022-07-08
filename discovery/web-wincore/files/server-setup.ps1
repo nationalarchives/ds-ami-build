@@ -93,11 +93,6 @@ try {
     $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
     $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
 
-    "===> set AWS profile" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> set AWS profile"
-    Set-AWSCredential -AccessKey "$sts.Credentials.AccessKeyId" -SecretKey "$sts.Credentials.SecretAccessKey" -StoreAs InitProfile
-    Initialize-AWSDefaultConfiguration -ProfileName InitProfile -Region eu-west-2
-
     "===> download and install required packages and config files" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> download and install required packages and config files"
     Set-Location -Path $tmpDir
@@ -111,8 +106,8 @@ try {
 
     "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> install CodeDeploy Agent"
-    powershell.exe -Command Read-S3Object -BucketName aws-codedeploy-eu-west-2 -Key latest/codedeploy-agent.msi -File "$tmpDir\codedeploy-agent.msi"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l*v `"$tmpDir\codedeploy-log.txt`""
+    Invoke-Expression -Command "Read-S3Object -BucketName aws-codedeploy-eu-west-2 -Key latest/codedeploy-agent.msi -File $tmpDir\codedeploy-agent.msi"
+    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
 
     "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
     Write-Host "===> $dotnetPackagename"

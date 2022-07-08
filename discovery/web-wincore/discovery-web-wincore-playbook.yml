@@ -248,6 +248,9 @@
       script: |
         ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
     ignore_errors: yes
+    register: setup_out
+
+    - debug: var=setup_out.stdout_lines
 
 - name: switch to localhost
   hosts: localhost
