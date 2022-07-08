@@ -48,19 +48,17 @@ $envHash = @{
 }
 
 "start server setup script" | Out-File -FilePath /debug.txt -Append
-Write-Host "start server setup script"
+
 try {
     # Catch non-terminateing errors
     $ErrorActionPreference = "Stop"
 
     "---- create required directories" | Out-File -FilePath /debug.txt -Append
-    Write-Host "---- create required directories"
     New-Item -itemtype "directory" $webSiteRoot -Force
     New-Item -itemtype "directory" "$servicesPath" -Force
     New-Item -itemtype "directory" "$webSitePath" -Force
 
     "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> AWS CLI V2"
     Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:/temp/AWSCLIV2.msi
     Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\AWSCLIV2.msi /qn /norestart' -NoNewWindow
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
@@ -69,49 +67,41 @@ try {
     $env:Path = "$env:Path;$pathAWScli"
 
     "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> AWS for PowerShell"
     Import-Module AWSPowerShell
 
     "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> WebPlatformInstaller and URLRewrite2"
     (new-object System.Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?LinkId=287166", "$tmpDir/WebPlatformInstaller_x64_en-US.msi")
     Start-Process -FilePath "$tmpDir/WebPlatformInstaller_x64_en-US.msi" -ArgumentList "/qn" -PassThru -Wait
     $logFile = "$tmpDir/WebpiCmd.log"
     Start-Process -FilePath "C:/Program Files/Microsoft/Web Platform Installer\WebpiCmd.exe" -ArgumentList "/Install /Products:'UrlRewrite2' /AcceptEULA /Log:$logFile" -PassThru -Wait
 
     "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> IIS Remote Management"
     netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
     Install-WindowsFeature Web-Mgmt-Service
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
 
     "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> install CodeDeploy Agent"
     Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
     #Invoke-Expression -Command "Read-S3Object -BucketName aws-codedeploy-eu-west-2 -Key latest/codedeploy-agent.msi -File $tmpDir\codedeploy-agent.msi"
     Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
 
     "===> aquire AWS credentials" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> aquire AWS credentials"
     $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
     $Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
     $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
     $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
 
     "===> download and install required packages and config files" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> download and install required packages and config files"
     Set-Location -Path $tmpDir
 
     "===> install CloudWatch Agent" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> install CloudWatch Agent"
     (new-object System.Net.WebClient).DownloadFile($cloudwatchAgentInstaller, "$tmpDir\amazon-cloudwatch-agent.msi")
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet /l `"$tmpDir\cloudwatch-log.txt`""
-#    & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
+    & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
 
     "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> $dotnetPackagename"
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
     Start-Process -FilePath $dotnetInstaller -ArgumentList "/q /norestart" -PassThru -Wait
 
@@ -122,21 +112,18 @@ try {
     }
 
     "===> create AppPool" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> create AppPool"
     Import-Module WebAdministration
     New-WebAppPool -name $appPool  -force
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value 'v4.0'
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value 'True'
 
     "===> create website" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> create website"
     Stop-Website -Name "Default Web Site"
     Set-ItemProperty "IIS:\Sites\Default Web Site" serverAutoStart False
     Remove-WebSite -Name "Default Web Site"
     $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
 
     "===> give IIS_USRS permissions" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> give IIS_USRS permissions"
     $acl = Get-ACL $webSiteRoot
     $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("IIS_IUSRS", "FullControl", "ContainerInherit,ObjectInherit", "None", "Allow")
     $acl.AddAccessRule($accessRule)
@@ -149,7 +136,6 @@ try {
 
     # set system variables for application
     "===> environment variables" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> environment variables"
     foreach ($key in $envHash.keys) {
         $envKey = $($key)
         $envValue = $($envHash[$key])
@@ -157,7 +143,6 @@ try {
     }
 
     "===> set network interface profile to private" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> set network interface profile to private"
     $networks = Get-NetConnectionProfile
     Write-Output $networks
     $interfaceIndex = $networks.InterfaceIndex
@@ -165,11 +150,9 @@ try {
     Write-Output $(Get-NetConnectionProfile -InterfaceIndex $interfaceIndex)
 
     "===> enable SMBv2 signing" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> enable SMBv2 signing"
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
     "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> EC2Launch"
     $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
     Set-Content -Path "$destination\LaunchConfig.json" -Value @"
 {
@@ -187,13 +170,11 @@ try {
     C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
     "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
-    Write-Host "===> Windows Admin Center"
     netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
     msiexec /i "$tmpDir\$wacInstaller" /norestart /qn /L*v "wac-log.txt" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0
 
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
-    Write-Host "=================> end of server setup script"
 
     "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
