@@ -24,7 +24,7 @@ $dotnetCorePackagename = ".NET Core 6.0.5"
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 
-$cloudwatchAgentInstaller = "https://s3.eu-west-1.amazonaws.com/amazoncloudwatch-agent-eu-west-1/windows/amd64/latest/amazon-cloudwatch-agent.msi"
+$cloudwatchAgentInstaller = "https://s3.eu-west-2.amazonaws.com/amazoncloudwatch-agent-eu-west-2/windows/amd64/latest/amazon-cloudwatch-agent.msi"
 $ec2launchInstallerUrl = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest"
 $ec2launchInstaller = "AmazonEC2Launch.msi"
 
@@ -81,6 +81,11 @@ try {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
 
+    "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
+    Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
+    #Invoke-Expression -Command "Read-S3Object -BucketName aws-codedeploy-eu-west-2 -Key latest/codedeploy-agent.msi -File $tmpDir\codedeploy-agent.msi"
+    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
+
     "===> aquire AWS credentials" | Out-File -FilePath /debug.txt -Append
     $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
     $Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
@@ -93,12 +98,8 @@ try {
     "===> install CloudWatch Agent" | Out-File -FilePath /debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile($cloudwatchAgentInstaller, "$tmpDir\amazon-cloudwatch-agent.msi")
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet"
+    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet /l `"$tmpDir\cloudwatch-log.txt`""
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
-
-    "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
-    powershell.exe -Command Read-S3Object -BucketName aws-codedeploy-eu-west-2 -Key latest/codedeploy-agent.msi -File $tmpDir\codedeploy-agent.msi
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
 
     "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
