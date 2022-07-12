@@ -14,7 +14,7 @@ on:
         options:
         - dev
         - staging
-        - production
+        - live
 
 jobs:
 # ------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ jobs:
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=discovery-app-wincore-dev-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=discovery-app-dev-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -44,7 +44,7 @@ jobs:
 
       - name: write ssh key file
         run: |
-          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          echo "${{ secrets.APP_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
@@ -94,7 +94,7 @@ jobs:
       - name: set ansible var file for staging
         run: |
           echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=discovery-app-wincore-staging-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=discovery-app-staging-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -105,7 +105,7 @@ jobs:
 
       - name: write ssh key file
         run: |
-          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          echo "${{ secrets.APP_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python

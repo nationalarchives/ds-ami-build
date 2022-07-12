@@ -14,7 +14,7 @@ on:
         options:
         - dev
         - staging
-        - production
+        - live
 
 jobs:
 # ------------------------------------------------------------------------------
@@ -61,8 +61,6 @@ jobs:
         run: pip3 install ansible
       - name: install pywinrm
         run: pip install pywinrm
-#      - name: install requests-credssp
-#        run: pip install requests-credssp
       - name: install ansible.windows
         run: ansible-galaxy collection install ansible.windows
 
@@ -124,8 +122,6 @@ jobs:
         run: pip3 install ansible
       - name: install pywinrm
         run: pip install pywinrm
-#      - name: install requests-credssp
-#        run: pip install requests-credssp
       - name: install ansible.windows
         run: ansible-galaxy collection install ansible.windows
 
