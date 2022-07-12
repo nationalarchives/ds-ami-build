@@ -147,7 +147,7 @@ jobs:
 
       - name: set ansible var file for live
         run: |
-          echo "ANSIBLE_VAR_FILE=live.yml" >> $GITHUB_ENV
+          echo "ANSIBLE_VAR_FILE=vars_live.yml" >> $GITHUB_ENV
           echo "SSH_KEY_FILE=blog-app-live-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
