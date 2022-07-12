@@ -136,7 +136,7 @@ jobs:
 # live deployment
 # ------------------------------------------------------------------------------
   blog-ami-deployment-production:
-    if: github.event.inputs.deploy-environment == 'production'
+    if: github.event.inputs.deploy-environment == 'live'
     runs-on: ubuntu-latest
     environment: blog-live
     steps:
