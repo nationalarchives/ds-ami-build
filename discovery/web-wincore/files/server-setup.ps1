@@ -25,8 +25,8 @@ $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 
 $cloudwatchAgentInstaller = "https://s3.eu-west-2.amazonaws.com/amazoncloudwatch-agent-eu-west-2/windows/amd64/latest/amazon-cloudwatch-agent.msi"
-$ec2launchInstallerUrl = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
-$ec2launchInstaller = "AmazonEC2Launch.msi"
+#$ec2launchInstallerUrl = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
+#$ec2launchInstaller = "AmazonEC2Launch.msi"
 
 # website parameters
 $appPool = "DiscoveryAppPool"
@@ -153,20 +153,44 @@ try {
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
     "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
-    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
-    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
-{
-    "SetComputerName":  false,
-    "SetMonitorAlwaysOn":  false,
-    "SetWallpaper":  true,
-    "AddDnsSuffixList":  true,
-    "ExtendBootVolumeSize":  true,
-    "HandleUserData":  true,
-    "AdminPasswordType":  "Random",
-    "AdminPassword":  ""
-}
+    Set-Content -Path "C:\ProgramData\Amazon\EC2-Windows\Launch\Config\agent-config.yml" -Value @"
+version: 1.0
+config:
+- stage: boot
+  tasks:
+  - task: extendRootPartition
+- stage: preReady
+  tasks:
+  - task: activateWindows
+    inputs:
+      activation:
+        type: amazon
+  - task: setAdminAccount
+    inputs:
+      password:
+        type: random
+  - task: executeScript
+    inputs:
+    - frequency: always
+        type: powershell
+        runAs: localSystem
+        content: |-
+            c:\tna-startup\startup.ps1
 "@
-    Import-Module c:\ProgramData\Amazon\EC2-Windows\Launch\Module\Ec2Launch.psm1 ; Add-Routes
+#    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
+#    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
+#{
+#    "SetComputerName":  false,
+#    "SetMonitorAlwaysOn":  false,
+#    "SetWallpaper":  true,
+#    "AddDnsSuffixList":  true,
+#    "ExtendBootVolumeSize":  true,
+#    "HandleUserData":  true,
+#    "AdminPasswordType":  "Random",
+#    "AdminPassword":  ""
+#}
+#"@
+#    Import-Module c:\ProgramData\Amazon\EC2-Windows\Launch\Module\Ec2Launch.psm1 ; Add-Routes
 #    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
     "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
