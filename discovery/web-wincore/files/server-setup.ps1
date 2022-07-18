@@ -173,11 +173,11 @@ config:
         type: random
   - task: executeScript
     inputs:
-    - frequency: always
-        type: powershell
-        runAs: localSystem
-        content: |-
-            c:\tna-startup\startup.ps1
+      frequency: always
+      type: powershell
+      runAs: localSystem
+      content: |
+       c:\tna-startup\startup.ps1
 "@
 #    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
 #    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
