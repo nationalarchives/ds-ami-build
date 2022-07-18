@@ -34,9 +34,9 @@ Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw
 "allow remote desktop" | Out-File -FilePath /initial-debug.txt -Append
 # allow remote desktop
 "allow remote desktop 1-3" | Out-File -FilePath /initial-debug.txt -Append
-Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\" -Name "fDenyTSConnections" -Value $false
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value $false
 "allow remote desktop 2-3" | Out-File -FilePath /initial-debug.txt -Append
-Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\" -Name “UserAuthentication” -Value $true
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name “UserAuthentication” -Value $true
 "allow remote desktop 3-3" | Out-File -FilePath /initial-debug.txt -Append
 Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
 
