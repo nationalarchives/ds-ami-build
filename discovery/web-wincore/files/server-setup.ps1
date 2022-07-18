@@ -11,6 +11,7 @@ param(
 
 "[debug]" | Out-File -FilePath /debug.txt
 
+"set runtime variables" | Out-File -FilePath /debug.txt -Append
 $tmpDir = "c:\temp"
 
 # required packages
@@ -28,6 +29,7 @@ $cloudwatchAgentInstaller = "https://s3.eu-west-2.amazonaws.com/amazoncloudwatch
 #$ec2launchInstallerUrl = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
 #$ec2launchInstaller = "AmazonEC2Launch.msi"
 
+"set discovery variables" | Out-File -FilePath /debug.txt -Append
 # website parameters
 $appPool = "DiscoveryAppPool"
 $webSiteName = "Main"
@@ -47,7 +49,7 @@ $envHash = @{
     "TNA_APP_TIER" = "$tier"
 }
 
-"start server setup script" | Out-File -FilePath /debug.txt -Append
+"start server setup" | Out-File -FilePath /debug.txt -Append
 
 try {
     # Catch non-terminateing errors

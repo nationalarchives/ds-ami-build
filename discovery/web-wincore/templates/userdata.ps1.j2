@@ -1,6 +1,8 @@
 <powershell>
 Set-ExecutionPolicy -ExecutionPolicy bypass -Force
 
+"===> initial setup" > /initial-debug.txt
+"create ansible winrm admin user" | Out-File -FilePath /initial-debug.txt
 # create ansible winrm admin user
 $password = "{{ password }}" | ConvertTo-SecureString -AsPlainText -Force
 $newUserParams = @{
@@ -13,24 +15,29 @@ $null = New-LocalUser @newUserParams
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
 
+"setup winrm authentication" | Out-File -FilePath /initial-debug.txt
 winrm set winrm/config/client/auth @{Basic="true"}
 winrm set winrm/config/service/auth @{Basic="true"}
 winrm set winrm/config/service @{AllowUnencrypted="true"}
 
+"setup ports for coms" | Out-File -FilePath /initial-debug.txt
 New-NetFirewallRule -DisplayName "sshd" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "rdp" -Direction Inbound -LocalPort 3389 -Protocol TCP -Action Allow
 # open firewall for WinRM
 New-NetFirewallRule -DisplayName "Allow WinRM Port 5985" -Direction Inbound -LocalPort 5985 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "Allow WinRM Port 5986" -Direction Inbound -LocalPort 5986 -Protocol TCP -Action Allow
 
+"run ansible config script" | Out-File -FilePath /initial-debug.txt
 # from powershell:
 Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
 
+"allow remote desktop" | Out-File -FilePath /initial-debug.txt
 # allow remote desktop
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\" -Name "fDenyTSConnections" -Value $false
 Set-ItemProperty ‘HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\‘ -Name “UserAuthentication” -Value $true
 Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
 
+"allow remote management" | Out-File -FilePath /initial-debug.txt
 # allow remote management
 Enable-PSRemoting -SkipNetworkProfileCheck -Force
 Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (DCOM-In)"
@@ -40,10 +47,11 @@ Enable-NetFirewallRule -DisplayGroup "Remote Volume Management"
 Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
 Enable-NetFirewallRule -DisplayGroup "Remote Scheduled Tasks Management"
 
+"WSMan authentication" | Out-File -FilePath /initial-debug.txt
 Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
 Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $true
 
 "[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
 </powershell>
-<persist>true</persist>
+<persist>false</persist>
