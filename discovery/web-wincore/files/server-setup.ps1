@@ -155,7 +155,7 @@ try {
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
     "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
-    Set-Content -Path "C:\ProgramData\Amazon\EC2-Windows\Launch\Config\agent-config.yml" -Value @"
+    Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @"
 version: 1.0
 config:
 - stage: boot
