@@ -29,7 +29,7 @@ New-NetFirewallRule -DisplayName "Allow WinRM Port 5986" -Direction Inbound -Loc
 
 "run ansible config script" | Out-File -FilePath /initial-debug.txt -Append
 # from powershell:
-Invoke-Expression ((New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1'))
+Invoke-Expression ((New-Object System.Net.Webclient).DownloadString("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"))
 
 "allow remote desktop" | Out-File -FilePath /initial-debug.txt -Append
 # allow remote desktop
@@ -38,7 +38,8 @@ Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" 
 "allow remote desktop 2-3" | Out-File -FilePath /initial-debug.txt -Append
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name “UserAuthentication” -Value $true
 "allow remote desktop 3-3" | Out-File -FilePath /initial-debug.txt -Append
-Set-NetFirewallRule -Name "RemoteDesktop-In-TCP-WS" -Enabled True
+#Set-NetFirewallRule -Name "RemoteDesktop-In-TCP-WS" -Enabled True
+Set-NetFirewallRule -DisplayGroup "Remote Desktop" -Enabled True
 #Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
 
 "allow remote management" | Out-File -FilePath /initial-debug.txt -Append
@@ -54,6 +55,7 @@ Enable-NetFirewallRule -DisplayGroup "Remote Scheduled Tasks Management"
 "WSMan authentication" | Out-File -FilePath /initial-debug.txt -Append
 Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
 Set-Item -Path "WSMan:\localhost\Service\Auth\Basic" -Value $true
+Set-Item -Path "WSMan:\localhost\Client\TrustedHosts" -Value "*"
 
 "[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
