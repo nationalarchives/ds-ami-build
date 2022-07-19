@@ -166,27 +166,28 @@ version: 1.0
 config:
 - stage: boot
   tasks:
-  - task: extendRootPartition
+    - task: extendRootPartition
 - stage: preReady
   tasks:
-  - task: activateWindows
+    - task: activateWindows
     inputs:
       activation:
         type: amazon
-  - task: setAdminAccount
+    - task: setAdminAccount
     inputs:
       name: Administrator
       password:
         type: random
 - stage: postReady
   tasks:
-  - task: executeScript
-    inputs:
-      frequency: always
-      type: powershell
-      runAs: Administrator
-      content: |
-       c:\tna-startup\startup.ps1
+    - task: startSsm
+    - task: executeScript
+      inputs:
+        frequency: always
+        type: powershell
+        runAs: Administrator
+        content: |
+          c:\tna-startup\startup.ps1
 "@
     #    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
     #    Set-Content -Path "$destination\LaunchConfig.json" -Value @"

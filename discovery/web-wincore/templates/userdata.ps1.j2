@@ -16,9 +16,9 @@ Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
 
 "setup winrm authentication" | Out-File -FilePath /initial-debug.txt -Append
-winrm set winrm/config/client/auth @{Basic="true"}
-winrm set winrm/config/service/auth @{Basic="true"}
-winrm set winrm/config/service @{AllowUnencrypted="true"}
+cmd.exe /c "winrm set winrm/config/client/auth @{Basic=""true""}""
+cms.exe /c "winrm set winrm/config/service/auth @{Basic=""true""}""
+cmd.exe /c "winrm set winrm/config/service @{AllowUnencrypted=""true""}""
 
 "setup ports for coms" | Out-File -FilePath /initial-debug.txt -Append
 New-NetFirewallRule -DisplayName "sshd" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
@@ -38,6 +38,7 @@ Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" 
 "allow remote desktop 2-3" | Out-File -FilePath /initial-debug.txt -Append
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name “UserAuthentication” -Value $true
 "allow remote desktop 3-3" | Out-File -FilePath /initial-debug.txt -Append
+Set-NetFirewallRule -Name "RemoteDesktop-In-TCP-WS" -Enabled True
 Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
 
 "allow remote management" | Out-File -FilePath /initial-debug.txt -Append
