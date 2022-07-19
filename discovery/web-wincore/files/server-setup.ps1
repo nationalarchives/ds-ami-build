@@ -167,7 +167,7 @@ config:
 - stage: boot
   tasks:
   - task: extendRootPartition
-- stage: PreReady
+- stage: preReady
   tasks:
   - task: activateWindows
     inputs:
@@ -178,7 +178,7 @@ config:
       name: Administrator
       password:
         type: random
-- stage: PostReady
+- stage: postReady
   tasks:
   - task: executeScript
     inputs:
