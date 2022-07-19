@@ -2,9 +2,9 @@
 # os and environment setup
 
 param(
-	[string]$application = "",
-	[string]$environment = "",
-	[string]$tier = ""
+    [string]$application = "",
+    [string]$environment = "",
+    [string]$tier = ""
 )
 
 # Set-ExecutionPolicy Bypass -Scope Process
@@ -15,7 +15,7 @@ param(
 $tmpDir = "c:\temp"
 
 # required packages
-$installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
+$installerPackageUrl = "s3://ds-intersite-deployment/discovery/installation-packages"
 
 $wacInstaller = "WindowsAdminCenter2110.2.msi"
 $dotnetInstaller = "ndp48-web.exe"
@@ -37,9 +37,12 @@ $webSiteRoot = "C:\WebSites"
 
 # discovery front-end server setup requires to be based in RDWeb service
 $servicesPath = "$webSiteRoot\Services"
-if ($tier -eq "web") {
+if ($tier -eq "web")
+{
     $webSitePath = "$servicesPath\RDWeb"
-} else {
+}
+else
+{
     $webSitePath = "$webSiteRoot\Main"
 }
 
@@ -51,7 +54,8 @@ $envHash = @{
 
 "start server setup" | Out-File -FilePath /debug.txt -Append
 
-try {
+try
+{
     # Catch non-terminateing errors
     $ErrorActionPreference = "Stop"
 
@@ -64,7 +68,7 @@ try {
     Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:/temp/AWSCLIV2.msi
     Start-Process msiexec.exe -Wait -ArgumentList "/i c:\temp\AWSCLIV2.msi /qn /norestart" -NoNewWindow
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
-    $newpath = $oldpath;$pathAWScli
+    $newpath = $oldpath; $pathAWScli
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
     $env:Path = "$env:Path;$pathAWScli"
 
@@ -78,7 +82,7 @@ try {
     Start-Process -FilePath "C:/Program Files/Microsoft/Web Platform Installer\WebpiCmd.exe" -ArgumentList "/Install /Products:'UrlRewrite2' /AcceptEULA /Log:$logFile" -PassThru -Wait
 
     "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
-    netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
+    netsh advfirewall firewall add rule name = "IIS Remote Management" dir = in action = allow protocol = TCP localport = 8172
     Install-WindowsFeature Web-Mgmt-Service
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
@@ -107,7 +111,8 @@ try {
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
     Start-Process -FilePath $dotnetInstaller -ArgumentList "/q /norestart" -PassThru -Wait
 
-    if ($tier -eq "api") {
+    if ($tier -eq "api")
+    {
         "===> $dotnetCorePackagename" | Out-File -FilePath /debug.txt -Append
         Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetCoreInstaller $tmpDir"
         Start-Process -FilePath $dotnetCoreInstaller -ArgumentList "/q /norestart" -PassThru -Wait
@@ -138,9 +143,10 @@ try {
 
     # set system variables for application
     "===> environment variables" | Out-File -FilePath /debug.txt -Append
-    foreach ($key in $envHash.keys) {
-        $envKey = $($key)
-        $envValue = $($envHash[$key])
+    foreach ($key in $envHash.keys)
+    {
+        $envKey = $( $key )
+        $envValue = $( $envHash[$key] )
         [System.Environment]::SetEnvironmentVariable($envKey, $envValue, "Machine")
     }
 
@@ -149,7 +155,7 @@ try {
     Write-Output $networks
     $interfaceIndex = $networks.InterfaceIndex
     Set-NetConnectionProfile -InterfaceIndex $interfaceIndex -NetworkCategory private
-    Write-Output $(Get-NetConnectionProfile -InterfaceIndex $interfaceIndex)
+    Write-Output $( Get-NetConnectionProfile -InterfaceIndex $interfaceIndex )
 
     "===> enable SMBv2 signing" | Out-File -FilePath /debug.txt -Append
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
@@ -161,7 +167,7 @@ config:
 - stage: boot
   tasks:
   - task: extendRootPartition
-- stage: preReady
+- stage: PreReady
   tasks:
   - task: activateWindows
     inputs:
@@ -172,6 +178,8 @@ config:
       name: Administrator
       password:
         type: random
+- stage: PostReady
+  tasks:
   - task: executeScript
     inputs:
       frequency: always
@@ -180,26 +188,26 @@ config:
       content: |
        c:\tna-startup\startup.ps1
 "@
-#    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
-#    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
-#{
-#    "SetComputerName":  false,
-#    "SetMonitorAlwaysOn":  false,
-#    "SetWallpaper":  true,
-#    "AddDnsSuffixList":  true,
-#    "ExtendBootVolumeSize":  true,
-#    "HandleUserData":  true,
-#    "AdminPasswordType":  "Random",
-#    "AdminPassword":  ""
-#}
-#"@
-#    Import-Module c:\ProgramData\Amazon\EC2-Windows\Launch\Module\Ec2Launch.psm1 ; Add-Routes
-#    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
+    #    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
+    #    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
+    #{
+    #    "SetComputerName":  false,
+    #    "SetMonitorAlwaysOn":  false,
+    #    "SetWallpaper":  true,
+    #    "AddDnsSuffixList":  true,
+    #    "ExtendBootVolumeSize":  true,
+    #    "HandleUserData":  true,
+    #    "AdminPasswordType":  "Random",
+    #    "AdminPassword":  ""
+    #}
+    #"@
+    #    Import-Module c:\ProgramData\Amazon\EC2-Windows\Launch\Module\Ec2Launch.psm1 ; Add-Routes
+    #    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
     "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
-    netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
+    netsh advfirewall firewall add rule name = "WAC" dir = in action = allow protocol = TCP localport = 3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
-    msiexec /i "$tmpDir\$wacInstaller" /norestart /qn /L*v "wac-log.txt" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0
+    msiexec /i "$tmpDir\$wacInstaller" /norestart /qn /L*v "wac-log.txt" SME_PORT = 3390 SSL_CERTIFICATE_OPTION = generate RESTART_WINRM = 0
 
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 
@@ -207,9 +215,11 @@ config:
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
     Restart-Computer
-} catch {
+}
+catch
+{
     "Caught an exception:" | Out-File -FilePath /debug.txt -Append
-    "Exception Type: $($_.Exception.GetType().FullName)" | Out-File -FilePath /debug.txt -Append
-    "Exception Message: $($_.Exception.Message)" | Out-File -FilePath /debug.txt -Append
+    "Exception Type: $( $_.Exception.GetType().FullName )" | Out-File -FilePath /debug.txt -Append
+    "Exception Message: $( $_.Exception.Message )" | Out-File -FilePath /debug.txt -Append
     exit 1
 }
