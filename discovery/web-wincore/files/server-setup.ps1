@@ -207,7 +207,7 @@ config:
     "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
-    Restart-Computer
+#    Restart-Computer
 }
 catch
 {
