@@ -197,15 +197,16 @@ config:
     #    Import-Module c:\ProgramData\Amazon\EC2-Windows\Launch\Module\Ec2Launch.psm1 ; Add-Routes
     #    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
+    # this need to be before WAC installation. The installation will restart winrm and the script won't finish
+    "[status]" | Out-File -FilePath /setup-status.txt
+    "finished = true" | Out-File -FilePath /setup-status.txt -Append
+
     "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
     netsh advfirewall firewall add rule name = "WAC" dir = in action = allow protocol = TCP localport = 3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\$wacInstaller`" /norestart /qn /L*v `"wac-log.txt`" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0"
+    Start-Process msiexec.exe -Wait -ArgumentList "/i ""$tmpDir\$wacInstaller"" /norestart /qn /L*v ""wac-log.txt"" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0"
 
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
-
-    "[status]" | Out-File -FilePath /setup-status.txt
-    "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
     Restart-Computer
 }
