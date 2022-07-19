@@ -173,6 +173,10 @@ config:
       inputs:
         activation:
           type: amazon
+    - task: setAdminAccount
+      inputs:
+       password:
+         type: random
 - stage: postReady
   tasks:
     - task: startSsm
@@ -204,7 +208,6 @@ config:
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
     Restart-Computer
-    exit 0
 }
 catch
 {
