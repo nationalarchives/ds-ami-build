@@ -173,10 +173,6 @@ config:
       inputs:
         activation:
           type: amazon
-    - task: setAdminAccount
-      inputs:
-       password:
-         type: random
 - stage: postReady
   tasks:
     - task: startSsm
