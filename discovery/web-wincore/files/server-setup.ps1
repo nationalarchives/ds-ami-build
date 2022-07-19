@@ -204,6 +204,7 @@ config:
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
 #    Restart-Computer
+    exit 0
 }
 catch
 {
