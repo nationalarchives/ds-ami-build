@@ -39,7 +39,7 @@ Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" 
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name “UserAuthentication” -Value $true
 "allow remote desktop 3-3" | Out-File -FilePath /initial-debug.txt -Append
 Set-NetFirewallRule -Name "RemoteDesktop-In-TCP-WS" -Enabled True
-Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
+#Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
 
 "allow remote management" | Out-File -FilePath /initial-debug.txt -Append
 # allow remote management
