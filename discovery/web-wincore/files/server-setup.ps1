@@ -169,6 +169,7 @@ config:
         type: amazon
   - task: setAdminAccount
     inputs:
+      name: Administrator
       password:
         type: random
   - task: executeScript
@@ -176,7 +177,7 @@ config:
       frequency: always
       type: powershell
       runAs: localSystem
-      content: |
+      content: |-
        c:\tna-startup\startup.ps1
 "@
 #    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
