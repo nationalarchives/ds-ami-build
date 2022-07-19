@@ -170,25 +170,16 @@ config:
 - stage: preReady
   tasks:
     - task: activateWindows
-    inputs:
-      activation:
-        type: amazon
+      inputs:
+        activation:
+          type: amazon
     - task: setAdminAccount
-    inputs:
-      password:
-        type: random
+      inputs:
+       password:
+         type: random
 - stage: postReady
   tasks:
     - task: startSsm
-    - task: executeScript
-      inputs:
-        frequency: always
-        type: powershell
-        runAs: Administrator
-        content: |
-          if (Test-Path -Path 'C:\tna-startup\startup.ps1' -PathType leaf) {
-	        C:\tna-startup\startup.ps1
-          }
 "@
     #    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
     #    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
