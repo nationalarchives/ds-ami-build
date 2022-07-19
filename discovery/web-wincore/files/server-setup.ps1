@@ -176,8 +176,8 @@ config:
     inputs:
       frequency: always
       type: powershell
-      runAs: localSystem
-      content: |-
+      runAs: Administrator
+      content: |
        c:\tna-startup\startup.ps1
 "@
 #    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
