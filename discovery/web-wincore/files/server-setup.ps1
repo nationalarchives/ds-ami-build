@@ -164,22 +164,39 @@ try
     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @"
 version: 1.0
 config:
-- stage: boot
-  tasks:
-    - task: extendRootPartition
-- stage: preReady
-  tasks:
-    - task: activateWindows
-      inputs:
-        activation:
-          type: amazon
-    - task: setAdminAccount
-      inputs:
-       password:
-         type: random
-- stage: postReady
-  tasks:
-    - task: startSsm
+  - stage: boot
+    tasks:
+      - task: extendRootPartition
+  - stage: preReady
+    tasks:
+      - task: activateWindows
+        inputs:
+          activation:
+            type: amazon
+      - task: setDnsSuffix
+        inputs:
+          suffixes:
+            - $REGION.ec2-utilities.amazonaws.com
+      - task: setAdminAccount
+        inputs:
+          password:
+            type: random
+      - task: setWallpaper
+        inputs:
+          path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
+          attributes:
+            - hostName
+            - instanceId
+            - privateIpAddress
+            - publicIpAddress
+            - instanceSize
+            - availabilityZone
+            - architecture
+            - memory
+            - network
+  - stage: postReady
+    tasks:
+      - task: startSsm
 "@
     #    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
     #    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
