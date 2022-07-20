@@ -33,7 +33,7 @@ Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\W
 
 "---  ansible config script" | Out-File -FilePath /initial-debug.txt -Append
 #Invoke-Expression ((New-Object System.Net.Webclient).DownloadString("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1") -SkipNetworkProfileCheck $true -CertValidityDays 90)
-Invoke-Expression -Command c:\temp\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck $true -CertValidityDays 90
+Invoke-Expression -Command "c:\temp\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck $true -CertValidityDays 90"
 
 #"--- enable PSRemoting" | Out-File -FilePath /initial-debug.txt -Append
 #Enable-PSRemoting -SkipNetworkProfileCheck -Force
