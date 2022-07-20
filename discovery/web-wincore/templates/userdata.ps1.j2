@@ -8,7 +8,7 @@ cd \
 
 "--- AWS CLI V2" | Out-File -FilePath /initial-debug.txt -Append
 Invoke-WebRequest -UseBasicParsing -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "$tmpDir/AWSCLIV2.msi"
-Start-Process msiexec.exe -Wait -ArgumentList "/i c:\temp\AWSCLIV2.msi /qn /norestart" -NoNewWindow
+Start-Process msiexec.exe -Wait -ArgumentList "/i $tmpDir\AWSCLIV2.msi /qn /norestart" -NoNewWindow
 $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
 $newpath = $oldpath; $pathAWScli
 Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
@@ -24,7 +24,7 @@ $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
 $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
 
 New-Item -itemtype "directory" "$tmpDir" -Force
-(New-Object System.Net.Webclient).DownloadFile("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1", "$temp\ConfigureRemotingForAnsible.ps1")
+(New-Object System.Net.Webclient).DownloadFile("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1", "$tmpDir\ConfigureRemotingForAnsible.ps1")
 
 "--- create ansible admin user" | Out-File -FilePath /initial-debug.txt -Append
 $password = "{{ password }}" | ConvertTo-SecureString -AsPlainText -Force
