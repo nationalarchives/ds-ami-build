@@ -60,12 +60,13 @@ try
     $ErrorActionPreference = "Stop"
 
     "---- create required directories" | Out-File -FilePath /debug.txt -Append
-    New-Item -itemtype "directory" $webSiteRoot -Force
+    New-Item -itemtype "directory" "$tmpDir" -Force
+    New-Item -itemtype "directory" "$webSiteRoot" -Force
     New-Item -itemtype "directory" "$servicesPath" -Force
     New-Item -itemtype "directory" "$webSitePath" -Force
 
     "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
-    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:/temp/AWSCLIV2.msi
+    Invoke-WebRequest -UseBasicParsing -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "$tmpDir/AWSCLIV2.msi"
     Start-Process msiexec.exe -Wait -ArgumentList "/i c:\temp\AWSCLIV2.msi /qn /norestart" -NoNewWindow
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath; $pathAWScli
@@ -82,7 +83,6 @@ try
     Start-Process -FilePath "C:/Program Files/Microsoft/Web Platform Installer\WebpiCmd.exe" -ArgumentList "/Install /Products:'UrlRewrite2' /AcceptEULA /Log:$logFile" -PassThru -Wait
 
     "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
-    netsh advfirewall firewall add rule name = "IIS Remote Management" dir = in action = allow protocol = TCP localport = 8172
     Install-WindowsFeature Web-Mgmt-Service
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
@@ -202,7 +202,6 @@ config:
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
     "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
-    netsh advfirewall firewall add rule name = "WAC" dir = in action = allow protocol = TCP localport = 3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
     Start-Process msiexec.exe -Wait -ArgumentList "/i ""$tmpDir\$wacInstaller"" /norestart /qn /L*v ""wac-log.txt"" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0"
 
