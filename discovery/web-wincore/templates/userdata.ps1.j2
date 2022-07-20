@@ -6,23 +6,6 @@ $tmpDir = "c:\temp"
 
 cd \
 
-"--- AWS CLI V2" | Out-File -FilePath /initial-debug.txt -Append
-Invoke-WebRequest -UseBasicParsing -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "$tmpDir/AWSCLIV2.msi"
-Start-Process msiexec.exe -Wait -ArgumentList "/i $tmpDir\AWSCLIV2.msi /qn /norestart" -NoNewWindow
-$oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
-$newpath = $oldpath; $pathAWScli
-Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
-$env:Path = "$env:Path;$pathAWScli"
-
-"--- AWS for PowerShell" | Out-File -FilePath /initial-debug.txt -Append
-Import-Module AWSPowerShell
-
-"- aquire AWS credentials" | Out-File -FilePath /initial-debug.txt -Append
-$sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
-$Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
-$Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
-$Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
-
 New-Item -itemtype "directory" "$tmpDir" -Force
 (New-Object System.Net.Webclient).DownloadFile("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1", "$tmpDir\ConfigureRemotingForAnsible.ps1")
 
@@ -41,47 +24,15 @@ Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
 "--- firewall rules" | Out-File -FilePath /initial-debug.txt -Append
 New-NetFirewallRule -DisplayName "sshd" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "rdp" -Direction Inbound -LocalPort 3389 -Protocol TCP -Action Allow
-#New-NetFirewallRule -DisplayName "Allow WinRM HTTP" -Direction Inbound -LocalPort 5985 -Protocol TCP -Action Allow
-#New-NetFirewallRule -DisplayName "Allow WinRM HTTPS" -Direction Inbound -LocalPort 5986 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "Windows Admin Center" -Direction Inbound -LocalPort 3390 -Protocol TCP -Action Allow
 New-NetFirewallRule -DisplayName "IIS Remote Management" -Direction Inbound -LocalPort 8172 -Protocol TCP -Action Allow
-#Set-NetFirewallRule -DisplayGroup "Remote Desktop" -Enabled True
 
 "--- registry settings" | Out-File -FilePath /initial-debug.txt -Append
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value $false
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name “UserAuthentication” -Value $true
 
 "---  ansible config script" | Out-File -FilePath /initial-debug.txt -Append
-#Invoke-Expression ((New-Object System.Net.Webclient).DownloadString("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1") -SkipNetworkProfileCheck $true -CertValidityDays 90)
 Invoke-Expression -Command "$tmpDir\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck $true -CertValidityDays 90 -EnableCredSSP $true"
-
-#"--- enable PSRemoting" | Out-File -FilePath /initial-debug.txt -Append
-#Enable-PSRemoting -SkipNetworkProfileCheck -Force
-
-#"--- setup winrm authentication" | Out-File -FilePath /initial-debug.txt -Append
-#cmd.exe /c "winrm set winrm/config/client/auth @{Basic=""true""}"
-#cms.exe /c "winrm set winrm/config/service/auth @{Basic=""true""}"
-#cmd.exe /c "winrm set winrm/config/service @{AllowUnencrypted=""true""}"
-
-#"allow remote desktop" | Out-File -FilePath /initial-debug.txt -Append
-# allow remote desktop
-#Set-NetFirewallRule -Name "RemoteDesktop-In-TCP-WS" -Enabled True
-#Set-NetFirewallRule -DisplayGroup "Remote Desktop" -Enabled True
-#Enable-NetFirewallRule -DisplayGroup “Remote Desktop”
-
-#"allow remote management" | Out-File -FilePath /initial-debug.txt -Append
-# allow remote management
-#Enable-PSRemoting -SkipNetworkProfileCheck -Force
-#Enable-NetFirewallRule -DisplayName "Windows Management Instrumentation (DCOM-In)"
-#Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
-#Enable-NetFirewallRule -DisplayGroup "Remote Service Management"
-#Enable-NetFirewallRule -DisplayGroup "Remote Volume Management"
-#Enable-NetFirewallRule -DisplayGroup "Remote Event Log Management"
-#Enable-NetFirewallRule -DisplayGroup "Remote Scheduled Tasks Management"
-
-#"WSMan authentication" | Out-File -FilePath /initial-debug.txt -Append
-#Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value $true
-#Set-Item -Path "WSMan:\localhost\Service\Auth\Basic" -Value $true
 
 "[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append

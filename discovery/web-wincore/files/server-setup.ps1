@@ -177,10 +177,6 @@ config:
         inputs:
           suffixes:
             - $REGION.ec2-utilities.amazonaws.com
-      - task: setAdminAccount
-        inputs:
-          password:
-            type: random
       - task: setWallpaper
         inputs:
           path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
@@ -198,21 +194,6 @@ config:
     tasks:
       - task: startSsm
 "@
-    #    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
-    #    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
-    #{
-    #    "SetComputerName":  false,
-    #    "SetMonitorAlwaysOn":  false,
-    #    "SetWallpaper":  true,
-    #    "AddDnsSuffixList":  true,
-    #    "ExtendBootVolumeSize":  true,
-    #    "HandleUserData":  true,
-    #    "AdminPasswordType":  "Random",
-    #    "AdminPassword":  ""
-    #}
-    #"@
-    #    Import-Module c:\ProgramData\Amazon\EC2-Windows\Launch\Module\Ec2Launch.psm1 ; Add-Routes
-    #    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
@@ -233,3 +214,8 @@ catch
     "Exception Message: $( $_.Exception.Message )" | Out-File -FilePath /debug.txt -Append
     exit 1
 }
+
+#      - task: setAdminAccount
+#        inputs:
+#          password:
+#            type: random
