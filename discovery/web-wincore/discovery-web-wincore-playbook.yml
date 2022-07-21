@@ -311,7 +311,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      instance-ids:
+      instance_ids:
         - "{{ instance_id }}"
     register: ec2_info
   - ansible.builtin.debug:
@@ -325,7 +325,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      instance-ids:
+      instance_ids:
         - "{{ instance_id }}"
     register: ec2_info
     until: ec2_info.instances[0].state.name == "Stopped"
