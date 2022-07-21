@@ -205,7 +205,7 @@ config:
 
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 
-    "c:\Program Files\Amazon\EC2Launch\EC2Launch.exe" sysprep --shutdown=true
+    & "c:\Program Files\Amazon\EC2Launch\EC2Launch.exe" sysprep --shutdown=true
 }
 catch
 {
