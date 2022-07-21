@@ -289,7 +289,10 @@
     delay: 20
 
   - name: shut down instance to create AMI
-    ansible.windows.win_command: Invoke-Expression -Command "'c:\Program Files\Amazon\EC2Launch\EC2Launch.exe' sysprep --shutdown=true"
+    ansible.windows.win_powershell:
+      script: |
+        Invoke-Expression -Command "'c:\Program Files\Amazon\EC2Launch\EC2Launch.exe' sysprep --shutdown=true"
+    ignore_errors: yes
 
 - name: switch to localhost
   hosts: localhost
