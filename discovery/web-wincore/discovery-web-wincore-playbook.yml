@@ -288,6 +288,9 @@
     retries: 15
     delay: 20
 
+  - name: shut down instance to create AMI
+    ansible.windows.win_command: & "c:\Program Files\Amazon\EC2Launch\EC2Launch.exe" sysprep --shutdown=true
+
 - name: switch to localhost
   hosts: localhost
   gather_facts: true
