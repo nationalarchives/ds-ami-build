@@ -313,10 +313,10 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance-ids:
         - "{{ instance_id }}"
-      register: instance
-      until: instance.state.name == "Stopped"
-      retries: 12
-      delay: 10
+    register: instance
+    until: instance.state.name == "Stopped"
+    retries: 12
+    delay: 10
 
   - name: create AMI
     amazon.aws.ec2_ami:
