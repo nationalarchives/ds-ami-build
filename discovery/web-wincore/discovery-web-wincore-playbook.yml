@@ -313,8 +313,8 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance-ids:
         - "{{ instance_id }}"
-    register: instance
-    until: instance.state.name == "Stopped"
+    register: ec2_info
+    until: ec2_info.instance.state.name == "Stopped"
     retries: 12
     delay: 10
 
