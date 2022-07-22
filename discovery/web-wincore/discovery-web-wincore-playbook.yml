@@ -314,7 +314,7 @@
       instance_ids:
         - "{{ instance_id }}"
     register: ec2_info
-    until: {{ ec2_info.instances[0].state.name | lower }} == "stopped"
+    until: "{{ ec2_info.instances[0].state.name | lower }}" == "stopped"
     retries: 12
     delay: 10
 
