@@ -60,9 +60,9 @@ try {
     Invoke-WebRequest -UseBasicParsing -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "$tmpDir/AWSCLIV2.msi"
     Start-Process msiexec.exe -Wait -ArgumentList '/i $tmpDir\AWSCLIV2.msi /qn /norestart' -NoNewWindow
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
-    $newpath = $oldpath;$pathAWScli
+    $newpath = "$oldpath;$pathAWScli;"
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
-    $env:Path = "$env:Path;$pathAWScli"
+    $env:Path = "$env:Path;$pathAWScli;"
 
     "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
     Import-Module AWSPowerShell
