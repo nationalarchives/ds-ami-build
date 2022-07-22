@@ -78,13 +78,14 @@
 
   - name: generate admin password
     set_fact:
-      password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+      password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=24') }}"
 
-  - ansible.builtin.debug:
-      msg:
-        - "====================================================================="
-        - "{{ password }}"
-        - "====================================================================="
+# enable only for debugging purposes and never for live
+#  - ansible.builtin.debug:
+#      msg:
+#        - "====================================================================="
+#        - "{{ password }}"
+#        - "====================================================================="
 
   - name: template userdata
     template:

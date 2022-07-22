@@ -25,10 +25,8 @@ $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 
 $cloudwatchAgentInstaller = "https://s3.eu-west-2.amazonaws.com/amazoncloudwatch-agent-eu-west-2/windows/amd64/latest/amazon-cloudwatch-agent.msi"
-$ec2launchInstallerUrl = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest"
-$ec2launchInstaller = "AmazonEC2Launch.msi"
 
-# website parameters
+"set discovery variables" | Out-File -FilePath /debug.txt -Append
 $appPool = "DiscoveryAppPool"
 $webSiteName = "Main"
 $webSiteRoot = "C:\WebSites"
@@ -47,20 +45,20 @@ $envHash = @{
     "TNA_APP_TIER" = "$tier"
 }
 
-"start server setup script" | Out-File -FilePath /debug.txt -Append
+"start server setup" | Out-File -FilePath /debug.txt -Append
 
 try {
     # Catch non-terminateing errors
     $ErrorActionPreference = "Stop"
 
     "---- create required directories" | Out-File -FilePath /debug.txt -Append
-    New-Item -itemtype "directory" $webSiteRoot -Force
+    New-Item -itemtype "directory" "$webSiteRoot" -Force
     New-Item -itemtype "directory" "$servicesPath" -Force
     New-Item -itemtype "directory" "$webSitePath" -Force
 
     "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
-    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:/temp/AWSCLIV2.msi
-    Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\AWSCLIV2.msi /qn /norestart' -NoNewWindow
+    Invoke-WebRequest -UseBasicParsing -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "$tmpDir/AWSCLIV2.msi"
+    Start-Process msiexec.exe -Wait -ArgumentList '/i $tmpDir\AWSCLIV2.msi /qn /norestart' -NoNewWindow
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
@@ -76,7 +74,6 @@ try {
     Start-Process -FilePath "C:/Program Files/Microsoft/Web Platform Installer\WebpiCmd.exe" -ArgumentList "/Install /Products:'UrlRewrite2' /AcceptEULA /Log:$logFile" -PassThru -Wait
 
     "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
-    netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
     Install-WindowsFeature Web-Mgmt-Service
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
@@ -153,31 +150,53 @@ try {
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
     "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
-    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
-    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
-{
-    "SetComputerName":  false,
-    "SetMonitorAlwaysOn":  false,
-    "SetWallpaper":  true,
-    "AddDnsSuffixList":  true,
-    "ExtendBootVolumeSize":  true,
-    "HandleUserData":  true,
-    "AdminPasswordType":  "Random",
-    "AdminPassword":  ""
-}
+    Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @"
+version: 1.0
+config:
+  - stage: boot
+    tasks:
+      - task: extendRootPartition
+  - stage: preReady
+    tasks:
+      - task: activateWindows
+        inputs:
+          activation:
+            type: amazon
+      - task: setDnsSuffix
+        inputs:
+          suffixes:
+            - $REGION.ec2-utilities.amazonaws.com
+      - task: setAdminAccount
+        inputs:
+          password:
+            type: random
+      - task: setWallpaper
+        inputs:
+          path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
+          attributes:
+            - hostName
+            - instanceId
+            - privateIpAddress
+            - publicIpAddress
+            - instanceSize
+            - availabilityZone
+            - architecture
+            - memory
+            - network
+  - stage: postReady
+    tasks:
+      - task: startSsm
 "@
 
-    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
-
-    "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
-    netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
-    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
-    msiexec /i "$tmpDir\$wacInstaller" /norestart /qn /L*v "wac-log.txt" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0
-
-    "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
-
+    # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
+
+    "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
+    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
+    Start-Process msiexec.exe -Wait -ArgumentList "/i ""$tmpDir\$wacInstaller"" /norestart /qn /L*v ""wac-log.txt"" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0"
+
+    "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 
     Restart-Computer
 } catch {

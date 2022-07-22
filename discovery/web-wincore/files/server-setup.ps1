@@ -11,7 +11,6 @@ param(
 
 "[debug]" | Out-File -FilePath /debug.txt
 
-"set runtime variables" | Out-File -FilePath /debug.txt -Append
 $tmpDir = "c:\temp"
 
 # required packages
@@ -26,23 +25,17 @@ $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 
 $cloudwatchAgentInstaller = "https://s3.eu-west-2.amazonaws.com/amazoncloudwatch-agent-eu-west-2/windows/amd64/latest/amazon-cloudwatch-agent.msi"
-#$ec2launchInstallerUrl = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
-#$ec2launchInstaller = "AmazonEC2Launch.msi"
 
 "set discovery variables" | Out-File -FilePath /debug.txt -Append
-# website parameters
 $appPool = "DiscoveryAppPool"
 $webSiteName = "Main"
 $webSiteRoot = "C:\WebSites"
 
 # discovery front-end server setup requires to be based in RDWeb service
 $servicesPath = "$webSiteRoot\Services"
-if ($tier -eq "web")
-{
+if ($tier -eq "web") {
     $webSitePath = "$servicesPath\RDWeb"
-}
-else
-{
+} else {
     $webSitePath = "$webSiteRoot\Main"
 }
 
@@ -54,22 +47,20 @@ $envHash = @{
 
 "start server setup" | Out-File -FilePath /debug.txt -Append
 
-try
-{
+try {
     # Catch non-terminateing errors
     $ErrorActionPreference = "Stop"
 
     "---- create required directories" | Out-File -FilePath /debug.txt -Append
-    New-Item -itemtype "directory" "$tmpDir" -Force
     New-Item -itemtype "directory" "$webSiteRoot" -Force
     New-Item -itemtype "directory" "$servicesPath" -Force
     New-Item -itemtype "directory" "$webSitePath" -Force
 
     "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -UseBasicParsing -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "$tmpDir/AWSCLIV2.msi"
-    Start-Process msiexec.exe -Wait -ArgumentList "/i c:\temp\AWSCLIV2.msi /qn /norestart" -NoNewWindow
+    Start-Process msiexec.exe -Wait -ArgumentList "/i $tmpDir\AWSCLIV2.msi /qn /norestart" -NoNewWindow
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
-    $newpath = $oldpath; $pathAWScli
+    $newpath = $oldpath;$pathAWScli
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
     $env:Path = "$env:Path;$pathAWScli"
 
@@ -111,8 +102,7 @@ try
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
     Start-Process -FilePath $dotnetInstaller -ArgumentList "/q /norestart" -PassThru -Wait
 
-    if ($tier -eq "api")
-    {
+    if ($tier -eq "api") {
         "===> $dotnetCorePackagename" | Out-File -FilePath /debug.txt -Append
         Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetCoreInstaller $tmpDir"
         Start-Process -FilePath $dotnetCoreInstaller -ArgumentList "/q /norestart" -PassThru -Wait
@@ -143,10 +133,9 @@ try
 
     # set system variables for application
     "===> environment variables" | Out-File -FilePath /debug.txt -Append
-    foreach ($key in $envHash.keys)
-    {
-        $envKey = $( $key )
-        $envValue = $( $envHash[$key] )
+    foreach ($key in $envHash.keys) {
+        $envKey = $($key)
+        $envValue = $($envHash[$key])
         [System.Environment]::SetEnvironmentVariable($envKey, $envValue, "Machine")
     }
 
@@ -210,11 +199,9 @@ config:
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 
     Restart-Computer
-}
-catch
-{
+}  catch {
     "Caught an exception:" | Out-File -FilePath /debug.txt -Append
-    "Exception Type: $( $_.Exception.GetType().FullName )" | Out-File -FilePath /debug.txt -Append
-    "Exception Message: $( $_.Exception.Message )" | Out-File -FilePath /debug.txt -Append
+    "Exception Type: $($_.Exception.GetType().FullName)" | Out-File -FilePath /debug.txt -Append
+    "Exception Message: $($_.Exception.Message)" | Out-File -FilePath /debug.txt -Append
     exit 1
 }
