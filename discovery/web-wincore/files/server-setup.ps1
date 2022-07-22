@@ -177,6 +177,10 @@ config:
         inputs:
           suffixes:
             - $REGION.ec2-utilities.amazonaws.com
+      - task: setAdminAccount
+        inputs:
+          password:
+            type: random
       - task: setWallpaper
         inputs:
           path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
@@ -214,8 +218,3 @@ catch
     "Exception Message: $( $_.Exception.Message )" | Out-File -FilePath /debug.txt -Append
     exit 1
 }
-
-#      - task: setAdminAccount
-#        inputs:
-#          password:
-#            type: random
