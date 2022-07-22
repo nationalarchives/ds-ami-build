@@ -198,7 +198,7 @@ config:
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 
     Restart-Computer
-}  catch {
+} catch {
     "Caught an exception:" | Out-File -FilePath /debug.txt -Append
     "Exception Type: $($_.Exception.GetType().FullName)" | Out-File -FilePath /debug.txt -Append
     "Exception Message: $($_.Exception.Message)" | Out-File -FilePath /debug.txt -Append

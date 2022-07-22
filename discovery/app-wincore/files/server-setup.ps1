@@ -2,9 +2,9 @@
 # os and environment setup
 
 param(
-	[string]$application = "",
-	[string]$environment = "",
-	[string]$tier = ""
+    [string]$application = "",
+    [string]$environment = "",
+    [string]$tier = ""
 )
 
 # Set-ExecutionPolicy Bypass -Scope Process
@@ -14,7 +14,7 @@ param(
 $tmpDir = "c:\temp"
 
 # required packages
-$installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
+$installerPackageUrl = "s3://ds-intersite-deployment/discovery/installation-packages"
 
 $wacInstaller = "WindowsAdminCenter2110.2.msi"
 $dotnetInstaller = "ndp48-web.exe"
@@ -58,11 +58,11 @@ try {
 
     "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -UseBasicParsing -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "$tmpDir/AWSCLIV2.msi"
-    Start-Process msiexec.exe -Wait -ArgumentList '/i $tmpDir\AWSCLIV2.msi /qn /norestart' -NoNewWindow
+    Start-Process msiexec.exe -Wait -ArgumentList "/i $tmpDir\AWSCLIV2.msi /qn /norestart" -NoNewWindow
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
-    $newpath = "$oldpath;$pathAWScli;"
+    $newpath = "$oldpath;$pathAWScli"
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
-    $env:Path = "$env:Path;$pathAWScli;"
+    $env:Path = "$env:Path;$pathAWScli"
 
     "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
     Import-Module AWSPowerShell
@@ -110,8 +110,8 @@ try {
     "===> create AppPool" | Out-File -FilePath /debug.txt -Append
     Import-Module WebAdministration
     New-WebAppPool -name $appPool  -force
-    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value 'v4.0'
-    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value 'True'
+    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value "v4.0"
+    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value $true
 
     "===> create website" | Out-File -FilePath /debug.txt -Append
     Stop-Website -Name "Default Web Site"
@@ -143,7 +143,7 @@ try {
     Write-Output $networks
     $interfaceIndex = $networks.InterfaceIndex
     Set-NetConnectionProfile -InterfaceIndex $interfaceIndex -NetworkCategory private
-    Write-Output $(Get-NetConnectionProfile -InterfaceIndex $interfaceIndex)
+    Write-Output $( Get-NetConnectionProfile -InterfaceIndex $interfaceIndex )
 
     "===> enable SMBv2 signing" | Out-File -FilePath /debug.txt -Append
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
