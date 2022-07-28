@@ -191,14 +191,21 @@
     retries: 30
     delay: 20
 
+  - name: Install IIS Web-Server with sub features and management tools
+    win_feature:
+      name: Web-Server
+      state: present
+      include_management_tools: yes
+    register: win_feature
+
   - name: IIS and ASP.NET features part 1 - 4 || Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging
     ansible.windows.win_feature:
       name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging
     register: iis_install_1
 
-  - name: IIS and ASP.NET features part 2 - 4 || Web-Asp-Net,Web-Basic-Auth,Web-Windows-Auth,Web-WebSockets,Web-WebServerManagementTools
+  - name: IIS and ASP.NET features part 2 - 4 || Web-Asp-Net,Web-Basic-Auth,Web-Windows-Auth,Web-WebSockets
     ansible.windows.win_feature:
-      name: Web-Asp-Net,Web-Basic-Auth,Web-Windows-Auth,Web-WebSockets,Web-WebServerManagementTools
+      name: Web-Asp-Net,Web-Basic-Auth,Web-Windows-Auth,Web-WebSockets
     register: iis_install_2
 
   - name: IIS and ASP.NET features part 3 - 4 || Web-Stat-Compression,Web-Filtering,Web-Url-Auth,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Mgmt-Console
@@ -213,7 +220,7 @@
 
   - name: reboot instance after installing Web-Server feature
     ansible.windows.win_reboot:
-    when: iis_install_1.reboot_required or iis_install_2.reboot_required or iis_install_3.reboot_required or iis_install_4.reboot_required
+    when: win_feature.reboot_required or iis_install_1.reboot_required or iis_install_2.reboot_required or iis_install_3.reboot_required or iis_install_4.reboot_required
 
   - name: ensure temp dir exists
     ansible.windows.win_file:
