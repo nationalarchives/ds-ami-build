@@ -191,9 +191,9 @@
     retries: 30
     delay: 20
 
-  - name: IIS and ASP.NET features part 1 - 4 || Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging,Web-Asp-Net,Web-Basic-Authentication
+  - name: IIS and ASP.NET features part 1 - 4 || Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging
     ansible.windows.win_feature:
-      name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging,Web-Asp-Net,Web-Basic-Authentication,Web-Windows-Authentication
+      name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging
     register: iis_install_1
 
   - name: IIS and ASP.NET features part 2 - 4 || Web-Asp-Net,Web-Basic-Auth,Web-Windows-Auth,Web-Sockets,Web-Management-Scripting-Tools
