@@ -217,9 +217,9 @@
       name: Web-Filtering,Web-Basic-Auth,Web-Url-Auth,Web-Windows-Auth
     register: web_security
 
-  - name: Application Development || Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSocket
+  - name: Application Development || Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSockets
     ansible.windows.win_feature:
-      name: Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSocket
+      name: Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSockets
     register: web_development
 
   - name: Management Tools || Web-Mgmt-Console,Web-Scripting-Tools,Web-Mgmt-Service
