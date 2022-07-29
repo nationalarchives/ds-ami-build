@@ -192,9 +192,9 @@
     retries: 30
     delay: 20
 
-  - name: web-server
+  - name: web-server || Web-Server,Web-WebServer
     ansible.windows.win_feature:
-      name: Web-Server
+      name: Web-Server,Web-WebServer
     register: web_server
 
   - name: Common HTTP Features || Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect
