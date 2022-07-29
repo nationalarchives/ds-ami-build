@@ -244,7 +244,7 @@
 
   - name: reboot instance if required after installing Web-Server feature
     ansible.windows.win_reboot:
-    when: win_server.reboot_required or web_common.reboot_required or web_health.reboot_required or web_performance.reboot_required or web_security.reboot_required or web_development.reboot_required or web_mgmt.reboot_required or web_frame35.reboot_required or web_frame48.reboot_required or web_winrm.reboot_required
+    when: web_server.reboot_required or web_common.reboot_required or web_health.reboot_required or web_performance.reboot_required or web_security.reboot_required or web_development.reboot_required or web_mgmt.reboot_required or web_frame35.reboot_required or web_frame48.reboot_required or web_winrm.reboot_required
 
   - name: ensure temp dir exists
     ansible.windows.win_file:
