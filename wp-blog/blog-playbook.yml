@@ -89,7 +89,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-blog-wp-role"
       region: "{{ region }}"
-      assume_role_policy_document: "{{ lookup('file', './media-role-policy.json') }}"
+      assume_role_policy_document: "{{ lookup('file', './blog-role-policy.json') }}"
       managed_policies: ["{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"]
       create_instance_profile: yes
       purge_policies: yes
