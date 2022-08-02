@@ -1,7 +1,7 @@
-# Blog webserver playbook
+# Media webserver playbook
 ---
 
-- name: create Blog AMI
+- name: create Media AMI
   hosts: localhost
   gather_facts: false
 
@@ -43,7 +43,7 @@
 
   - name: set secrets
     vars:
-      secret_data: "{{ lookup('amazon.aws.aws_secret', env + '/WordPress/Blog', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
+      secret_data: "{{ lookup('amazon.aws.aws_secret', env + '/WordPress/Media', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
     set_fact:
         db_user: "{{ secret_data.db_username }}"
         db_pass: "{{ secret_data.db_password }}"
@@ -64,7 +64,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       filters:
         group-name:
-          - "blog-wp-{{ env }}-app-sg"
+          - "media-wp-{{ env }}-app-sg"
     register: db_sg
   - ansible.builtin.debug:
       msg:
@@ -77,31 +77,31 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-blog-wp-s3-policy"
+      policy_name: "ansible-ami-media-wp-s3-policy"
       policy: "{{ lookup('file', './instance-role-policy.json') }}"
       state: "present"
     register: s3_policy
 
-  - name: create blog IAM role
+  - name: create media IAM role
     community.aws.iam_role:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-blog-wp-role"
+      name: "ansible-ami-media-wp-role"
       region: "{{ region }}"
       assume_role_policy_document: "{{ lookup('file', './media-role-policy.json') }}"
       managed_policies: ["{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"]
       create_instance_profile: yes
       purge_policies: yes
       state: "present"
-    register: blog_iam_role
+    register: media_iam_role
 
   - name: create security group - allowing updates and downloads
     amazon.aws.ec2_group:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-blog-wp-sg"
+      name: "ansible-ami-media-wp-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
       vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
@@ -151,7 +151,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
-      instance_role: "ansible-ami-blog-wp-role"
+      instance_role: "ansible-ami-media-wp-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
@@ -260,7 +260,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance_id: "{{ instance_id }}"
       name: "{{ service }}-wp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
-      description: "Blog webserver - ready for deployment"
+      description: "Media webserver - ready for deployment"
       region: "{{ region }}"
       state: "present"
       wait: yes
@@ -286,7 +286,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-blog-wp-sg"
+      name: "ansible-ami-media-wp-sg"
       region: "{{ region }}"
       state: "absent"
 
@@ -295,7 +295,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-blog-wp-role"
+      name: "ansible-ami-media-wp-role"
       region: "{{ region }}"
       delete_instance_profile: yes
       state: "absent"
@@ -305,6 +305,6 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-blog-wp-s3-policy"
+      policy_name: "ansible-ami-media-wp-s3-policy"
       state: "absent"
 ...
