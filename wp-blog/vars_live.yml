@@ -1,5 +1,5 @@
 ---
-key_name: "media-app-live-eu-west-2"
+key_name: "blog-app-live-eu-west-2"
 region: "eu-west-2"
 service: "blog"
 env: "live"
@@ -13,9 +13,9 @@ ses_secure: "tls"
 ses_from_email: "no-reply@nationalarchives.gov.uk"
 ses_from_name: "The National Archives"
 
-domain: "media.nationalarchives.gov.uk"
+domain: "blog.nationalarchives.gov.uk"
 cdn_bucket_name: "ds-cdn"
 cdn_aws_region: "eu-west-2"
 cdn_cloudfront_url: "cdn.nationalarchives.gov.uk"
-cdn_dir: "media"
+cdn_dir: "blog"
 ...

@@ -1,7 +1,7 @@
 ---
-key_name: "media-app-staging-eu-west-2"
+key_name: "blog-app-staging-eu-west-2"
 region: "eu-west-2"
-service: "media"
+service: "blog"
 env: "staging"
 volume_size: 100
 s3_deployment_bucket: "ds-staging-wp-deployment"
@@ -13,9 +13,9 @@ ses_secure: "tls"
 ses_from_email: "no-reply@nationalarchives.gov.uk"
 ses_from_name: "The National Archives"
 
-domain: "staging-media.nationalarchives.gov.uk"
+domain: "staging-blog.nationalarchives.gov.uk"
 cdn_bucket_name: "ds-staging-cdn"
 cdn_aws_region: "eu-west-2"
 cdn_cloudfront_url: "staging-cdn.nationalarchives.gov.uk"
-cdn_dir: "media"
+cdn_dir: "blog"
 ...
