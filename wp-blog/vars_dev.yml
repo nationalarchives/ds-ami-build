@@ -1,7 +1,7 @@
 ---
-key_name: "blog-app-dev-eu-west-2"
+key_name: "media-app-dev-eu-west-2"
 region: "eu-west-2"
-service: "blog"
+service: "media"
 env: "dev"
 volume_size: 100
 s3_deployment_bucket: "ds-dev-wp-deployment-v2"
@@ -13,9 +13,9 @@ ses_secure: "tls"
 ses_from_email: "no-reply@nationalarchives.gov.uk"
 ses_from_name: "The National Archives"
 
-domain: "dev-blog.nationalarchives.gov.uk"
+domain: "dev-media.nationalarchives.gov.uk"
 cdn_bucket_name: "ds-dev-cdn"
 cdn_aws_region: "eu-west-2"
 cdn_cloudfront_url: "dev-cdn-v2.nationalarchives.gov.uk"
-cdn_dir: "blog"
+cdn_dir: "media"
 ...
