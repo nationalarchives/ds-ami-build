@@ -192,64 +192,64 @@
     retries: 30
     delay: 20
 
-  - name: IIS || IIS-WebServerRole,IIS-WebServer
+  - name old IIS modules
     ansible.windows.win_feature:
-      name: IIS-WebServerRole,IIS-WebServer
-    register: iis_server
+      name: Web-Server,Web-WebServer,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Url-Auth,Web-Asp-Net45,Web-Net-Ext45,NET-WCF-HTTP-Activation45
+    register: iis_install
 
-  - name: web-server || Web-Server,Web-WebServer
-    ansible.windows.win_feature:
-      name: Web-Server,Web-WebServer
-    register: web_server
-
-  - name: Common HTTP Features || Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect
-    ansible.windows.win_feature:
-      name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect
-    register: web_common
-
-  - name: Health and Diagnostics || Web-Http-Logging,Web-Request-Monitor,Web-Http-Tracing
-    ansible.windows.win_feature:
-      name: Web-Http-Logging,Web-Request-Monitor,Web-Http-Tracing
-    register: web_health
-
-  - name: Performance || Web-Stat-Compression
-    ansible.windows.win_feature:
-      name: Web-Stat-Compression
-    register: web_performance
-
-  - name: Security || Web-Filtering,Web-Basic-Auth,Web-Url-Auth,Web-Windows-Auth
-    ansible.windows.win_feature:
-      name: Web-Filtering,Web-Basic-Auth,Web-Url-Auth,Web-Windows-Auth
-    register: web_security
-
-  - name: Application Development || Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSockets
-    ansible.windows.win_feature:
-      name: Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSockets
-    register: web_development
-
-  - name: Management Tools || Web-Mgmt-Console,Web-Scripting-Tools,Web-Mgmt-Service
-    ansible.windows.win_feature:
-      name: Web-Mgmt-Console,Web-Scripting-Tools,Web-Mgmt-Service
-    register: web_mgmt
-
-  - name: .NET Framework 3.5 || NET-Framework-Core
-    ansible.windows.win_feature:
-      name: NET-Framework-Core
-    register: web_frame35
-
-  - name: .NET Framework 4.8 || NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
-    ansible.windows.win_feature:
-      name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
-    register: web_frame48
-
-  - name: WinRM IIS Extension || WinRM-IIS-Ext
-    ansible.windows.win_feature:
-      name: WinRM-IIS-Ext
-    register: web_winrm
-
-  - name: reboot instance if required after installing Web-Server feature
-    ansible.windows.win_reboot:
-    when: web_server.reboot_required or web_common.reboot_required or web_health.reboot_required or web_performance.reboot_required or web_security.reboot_required or web_development.reboot_required or web_mgmt.reboot_required or web_frame35.reboot_required or web_frame48.reboot_required or web_winrm.reboot_required
+#  - name: web-server || Web-Server,Web-WebServer
+#    ansible.windows.win_feature:
+#      name: Web-Server,Web-WebServer
+#    register: web_server
+#
+#  - name: Common HTTP Features || Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect
+#    ansible.windows.win_feature:
+#      name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect
+#    register: web_common
+#
+#  - name: Health and Diagnostics || Web-Http-Logging,Web-Request-Monitor,Web-Http-Tracing
+#    ansible.windows.win_feature:
+#      name: Web-Http-Logging,Web-Request-Monitor,Web-Http-Tracing
+#    register: web_health
+#
+#  - name: Performance || Web-Stat-Compression
+#    ansible.windows.win_feature:
+#      name: Web-Stat-Compression
+#    register: web_performance
+#
+#  - name: Security || Web-Filtering,Web-Basic-Auth,Web-Url-Auth,Web-Windows-Auth
+#    ansible.windows.win_feature:
+#      name: Web-Filtering,Web-Basic-Auth,Web-Url-Auth,Web-Windows-Auth
+#    register: web_security
+#
+#  - name: Application Development || Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSockets
+#    ansible.windows.win_feature:
+#      name: Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSockets
+#    register: web_development
+#
+#  - name: Management Tools || Web-Mgmt-Console,Web-Scripting-Tools,Web-Mgmt-Service
+#    ansible.windows.win_feature:
+#      name: Web-Mgmt-Console,Web-Scripting-Tools,Web-Mgmt-Service
+#    register: web_mgmt
+#
+#  - name: .NET Framework 3.5 || NET-Framework-Core
+#    ansible.windows.win_feature:
+#      name: NET-Framework-Core
+#    register: web_frame35
+#
+#  - name: .NET Framework 4.8 || NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
+#    ansible.windows.win_feature:
+#      name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
+#    register: web_frame48
+#
+#  - name: WinRM IIS Extension || WinRM-IIS-Ext
+#    ansible.windows.win_feature:
+#      name: WinRM-IIS-Ext
+#    register: web_winrm
+#
+#  - name: reboot instance if required after installing Web-Server feature
+#    ansible.windows.win_reboot:
+#    when: web_server.reboot_required or web_common.reboot_required or web_health.reboot_required or web_performance.reboot_required or web_security.reboot_required or web_development.reboot_required or web_mgmt.reboot_required or web_frame35.reboot_required or web_frame48.reboot_required or web_winrm.reboot_required
 
   - name: ensure temp dir exists
     ansible.windows.win_file:
