@@ -192,6 +192,11 @@
     retries: 30
     delay: 20
 
+  - name: IIS || IIS-WebServerRole,IIS-WebServer
+    ansible.windows.win_feature:
+      name: IIS-WebServerRole,IIS-WebServer
+    register: iis_server
+
   - name: web-server || Web-Server,Web-WebServer
     ansible.windows.win_feature:
       name: Web-Server,Web-WebServer
