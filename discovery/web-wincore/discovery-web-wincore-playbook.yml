@@ -192,10 +192,10 @@
     retries: 30
     delay: 20
 
-  - name: old IIS modules
-    ansible.windows.win_feature:
-      name: Web-Server,Web-WebServer,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Url-Auth,Web-Asp-Net45,Web-Net-Ext45,NET-WCF-HTTP-Activation45
-    register: iis_install
+#  - name: old IIS modules
+#    ansible.windows.win_feature:
+#      name: Web-Server,Web-WebServer,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Url-Auth,Web-Asp-Net45,Web-Net-Ext45,NET-WCF-HTTP-Activation45
+#    register: iis_install
 
 #  - name: web-server || Web-Server,Web-WebServer
 #    ansible.windows.win_feature:

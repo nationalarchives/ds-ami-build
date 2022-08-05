@@ -67,17 +67,6 @@ try {
     "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
     Import-Module AWSPowerShell
 
-    "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
-    (new-object System.Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?LinkId=287166", "$tmpDir/WebPlatformInstaller_x64_en-US.msi")
-    Start-Process -FilePath "$tmpDir/WebPlatformInstaller_x64_en-US.msi" -ArgumentList "/qn" -PassThru -Wait
-    $logFile = "$tmpDir/WebpiCmd.log"
-    Start-Process -FilePath "C:/Program Files/Microsoft/Web Platform Installer\WebpiCmd.exe" -ArgumentList "/Install /Products:'UrlRewrite2' /AcceptEULA /Log:$logFile" -PassThru -Wait
-
-    "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
-    Install-WindowsFeature Web-Mgmt-Service
-    Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
-    Set-Service -Name WMSVC -StartupType Automatic
-
     "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
     Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
@@ -97,7 +86,19 @@ try {
     Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet /l `"$tmpDir\cloudwatch-log.txt`""
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
 
-    "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
+    "===> Windows features for IIS" | Out-File -FilePath /debug.txt -Append
+    "---- IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-ASPNET45, IIS-NetFxExtensibility45" | Out-File -FilePath /debug.txt -Append
+    Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-NetFxExtensibility45 -All
+    if ($tier -eq "api") {
+        "---- IIS-HttpRedirect for application server" | Out-File -FilePath /debug.txt -Append
+        Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpRedirect
+    }
+    "---- NetFx4Extended-ASPNET45" | Out-File -FilePath /debug.txt -Append
+    Enable-WindowsOptionalFeature -Online -FeatureName NetFx4Extended-ASPNET45
+    "---- WCF-HTTP-Activation45" | Out-File -FilePath /debug.txt -Append
+    Enable-WindowsOptionalFeature -Online -FeatureName WCF-HTTP-Activation45 -All
+
+     "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
     Start-Process -FilePath $dotnetInstaller -ArgumentList "/q /norestart" -PassThru -Wait
 
@@ -106,6 +107,17 @@ try {
         Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetCoreInstaller $tmpDir"
         Start-Process -FilePath $dotnetCoreInstaller -ArgumentList "/q /norestart" -PassThru -Wait
     }
+
+    "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
+    (new-object System.Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?LinkId=287166", "$tmpDir/WebPlatformInstaller_x64_en-US.msi")
+    Start-Process -FilePath "$tmpDir/WebPlatformInstaller_x64_en-US.msi" -ArgumentList "/qn" -PassThru -Wait
+    $logFile = "$tmpDir/WebpiCmd.log"
+    Start-Process -FilePath "C:/Program Files/Microsoft/Web Platform Installer\WebpiCmd.exe" -ArgumentList "/Install /Products:'UrlRewrite2' /AcceptEULA /Log:$logFile" -PassThru -Wait
+
+    "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
+    Install-WindowsFeature Web-Mgmt-Service
+    Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
+    Set-Service -Name WMSVC -StartupType Automatic
 
     "===> create AppPool" | Out-File -FilePath /debug.txt -Append
     Import-Module WebAdministration
