@@ -33,8 +33,8 @@ Invoke-Expression -Command "$tmpDir\ConfigureRemotingForAnsible.ps1 -SkipNetwork
 #New-NetFirewallRule -DisplayName "IIS Remote Management" -Direction Inbound -LocalPort 8172 -Protocol TCP -Action Allow
 
 #"--- registry settings" | Out-File -FilePath /initial-debug.txt -Append
-#Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value $false
-#Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name “UserAuthentication” -Value $true
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value $false
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name “UserAuthentication” -Value $true
 
 #"--- disables weak ciphers and TLS at OS level; enable TLS 1.2" | Out-File -FilePath /initial-debug.txt -Append
 #New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Server' -Force | Out-Null
@@ -69,11 +69,6 @@ Invoke-Expression -Command "$tmpDir\ConfigureRemotingForAnsible.ps1 -SkipNetwork
 ## End cipher and TLS protocol changes section
 
 #Restart-Computer
-
-
-# set the Windows Firewall to allow 3389 (RDP) and set the registry key to enable Remote Desktop connections
-cmd.exe /c netsh advfirewall firewall add rule name="Open RDP Port 3389" dir=in action=allow protocol=TCP localport=3389
-cmd.exe /c reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
 
 "[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
