@@ -23,6 +23,9 @@
       role_session_name: "s-devops"
     register: assumed_role
 
+  # ----------------------------------------------------------------------------
+  # The base AMI has the EC2Launch version 2 installed by default
+  # ----------------------------------------------------------------------------
   - name: get Windows 2019 Core AMI
     amazon.aws.ec2_ami_info:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
@@ -31,7 +34,7 @@
       owners: amazon
       region: "{{ region }}"
       filters:
-        name: "Windows_Server-2019-English-Core-Base*"
+        name: "EC2LaunchV2-Windows_Server-2019-English-Core-Base*"
     register: findami
 
   - name: set latest AMI
@@ -75,13 +78,14 @@
 
   - name: generate admin password
     set_fact:
-      password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+      password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=24') }}"
 
-  - ansible.builtin.debug:
-      msg:
-        - "====================================================================="
-        - "{{ password }}"
-        - "====================================================================="
+# enable only for debugging purposes and never for live
+#  - ansible.builtin.debug:
+#      msg:
+#        - "====================================================================="
+#        - "{{ password }}"
+#        - "====================================================================="
 
   - name: template userdata
     template:
@@ -285,10 +289,35 @@
     retries: 15
     delay: 20
 
+  - name: shut down instance to create AMI
+    ansible.windows.win_powershell:
+      script: |
+        Invoke-Expression -Command "& 'c:\Program Files\Amazon\EC2Launch\EC2Launch.exe' sysprep --shutdown"
+    ignore_errors: yes
+
 - name: switch to localhost
   hosts: localhost
   gather_facts: true
   tasks:
+
+  - ansible.builtin.debug:
+      msg:
+        - "====================================================================="
+        - "checking status of instance"
+        - "need to achieve status 'stopped' in less than 2 minutes"
+        - "====================================================================="
+
+  - name: wait until instance is in stopped condition
+    ansible.builtin.ec2_instance_info:
+      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      instance_ids:
+        - "{{ instance_id }}"
+    register: ec2_info
+    until: ec2_info.instances[0].state.name == "stopped"
+    retries: 12
+    delay: 10
 
   - name: create AMI
     amazon.aws.ec2_ami:
