@@ -7,6 +7,8 @@ $tmpDir = "c:\temp"
 cd \
 
 New-Item -itemtype "directory" "$tmpDir" -Force
+
+"--- download ConfigureRemotingForAnsible.ps1" | Out-File -FilePath /initial-debug.txt -Append
 (New-Object System.Net.Webclient).DownloadFile("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1", "$tmpDir\ConfigureRemotingForAnsible.ps1")
 
 "--- create ansible admin user" | Out-File -FilePath /initial-debug.txt -Append
@@ -70,6 +72,6 @@ Invoke-Expression -Command "$tmpDir\ConfigureRemotingForAnsible.ps1 -SkipNetwork
 "[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
 
-Restart-Computer
+#Restart-Computer
 </powershell>
 <persist>false</persist>
