@@ -16,11 +16,13 @@ $tmpDir = "c:\temp"
 # required packages
 $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
 
-$wacInstaller = "WindowsAdminCenter2103.msi"
+$wacInstaller = "WindowsAdminCenter2110.2.msi"
 $dotnetInstaller = "ndp48-web.exe"
 $dotnetPackagename = ".NET Framework 4.8 Platform (web installer)"
-$dotnetCoreInstaller = "dotnet-hosting-3.1.7-win.exe"
-$dotnetCorePackagename = ".NET Core 3.1.7"
+#$dotnetCoreInstaller = "dotnet-hosting-3.1.7-win.exe"
+#$dotnetCorePackagename = ".NET Core 3.1.7"
+$dotnetCoreInstaller = "dotnet-hosting-6.0.5-win.exe"
+$dotnetCorePackagename = ".NET Core 6.0.5"
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 
@@ -69,18 +71,18 @@ try {
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
     $env:Path = "$env:Path;$pathAWScli"
 
-    "===> Windows features for IIS" | Out-File -FilePath /debug.txt -Append
-    "---- IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-ASPNET45, IIS-NetFxExtensibility45" | Out-File -FilePath /debug.txt -Append
-    Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-NetFxExtensibility45 -All
-    if ($tier -eq "api") {
-        "---- IIS-HttpRedirect for application server" | Out-File -FilePath /debug.txt -Append
-        Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpRedirect
-    }
-    "---- NetFx4Extended-ASPNET45" | Out-File -FilePath /debug.txt -Append
-    Enable-WindowsOptionalFeature -Online -FeatureName NetFx4Extended-ASPNET45
-    "---- WCF-HTTP-Activation45" | Out-File -FilePath /debug.txt -Append
-    Enable-WindowsOptionalFeature -Online -FeatureName WCF-HTTP-Activation45 -All
-
+#    "===> Windows features for IIS" | Out-File -FilePath /debug.txt -Append
+#    "---- IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-ASPNET45, IIS-NetFxExtensibility45" | Out-File -FilePath /debug.txt -Append
+#    Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-NetFxExtensibility45 -All
+#    if ($tier -eq "api") {
+#        "---- IIS-HttpRedirect for application server" | Out-File -FilePath /debug.txt -Append
+#        Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpRedirect
+#    }
+#    "---- NetFx4Extended-ASPNET45" | Out-File -FilePath /debug.txt -Append
+#    Enable-WindowsOptionalFeature -Online -FeatureName NetFx4Extended-ASPNET45
+#    "---- WCF-HTTP-Activation45" | Out-File -FilePath /debug.txt -Append
+#    Enable-WindowsOptionalFeature -Online -FeatureName WCF-HTTP-Activation45 -All
+#
     "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?LinkId=287166", "$tmpDir/WebPlatformInstaller_amd64_en-US.msi")
     Start-Process -FilePath "$tmpDir/WebPlatformInstaller_amd64_en-US.msi" -ArgumentList "/qn" -PassThru -Wait
@@ -211,61 +213,22 @@ try {
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
     "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
-    Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @"
-version: 1.0
-config:
-  - stage: boot
-    tasks:
-      - task: extendRootPartition
-  - stage: preReady
-    tasks:
-      - task: activateWindows
-        inputs:
-          activation:
-            type: amazon
-      - task: setDnsSuffix
-        inputs:
-          suffixes:
-            - $REGION.ec2-utilities.amazonaws.com
-      - task: setAdminAccount
-        inputs:
-          password:
-            type: random
-      - task: setWallpaper
-        inputs:
-          path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
-          attributes:
-            - hostName
-            - instanceId
-            - privateIpAddress
-            - publicIpAddress
-            - instanceSize
-            - availabilityZone
-            - architecture
-            - memory
-            - network
-  - stage: postReady
-    tasks:
-      - task: startSsm
+    "---> set instance to generate a new password for next start and run user script" | Out-File -FilePath /debug.txt -Append
+    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
+    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
+{
+    "SetComputerName":  false,
+    "SetMonitorAlwaysOn":  false,
+    "SetWallpaper":  true,
+    "AddDnsSuffixList":  true,
+    "ExtendBootVolumeSize":  true,
+    "HandleUserData":  true,
+    "AdminPasswordType":  "Random",
+    "AdminPassword":  ""
+}
 "@
-
-#    "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
-#    "---> set instance to generate a new password for next start and run user script" | Out-File -FilePath /debug.txt -Append
-#    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
-#    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
-#{
-#    "SetComputerName":  false,
-#    "SetMonitorAlwaysOn":  false,
-#    "SetWallpaper":  true,
-#    "AddDnsSuffixList":  true,
-#    "ExtendBootVolumeSize":  true,
-#    "HandleUserData":  true,
-#    "AdminPasswordType":  "Random",
-#    "AdminPassword":  ""
-#}
-#"@
-#    "---- schedule EC2Launch for next start" | Out-File -FilePath /debug.txt -Append
-#    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
+    "---- schedule EC2Launch for next start" | Out-File -FilePath /debug.txt -Append
+    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
