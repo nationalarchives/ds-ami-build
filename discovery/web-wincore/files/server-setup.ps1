@@ -71,18 +71,6 @@ try {
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
     $env:Path = "$env:Path;$pathAWScli"
 
-#    "===> Windows features for IIS" | Out-File -FilePath /debug.txt -Append
-#    "---- IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-ASPNET45, IIS-NetFxExtensibility45" | Out-File -FilePath /debug.txt -Append
-#    Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole, IIS-WebServer, IIS-ISAPIExtensions, IIS-ISAPIFilter, IIS-URLAuthorization, IIS-NetFxExtensibility45 -All
-#    if ($tier -eq "api") {
-#        "---- IIS-HttpRedirect for application server" | Out-File -FilePath /debug.txt -Append
-#        Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpRedirect
-#    }
-#    "---- NetFx4Extended-ASPNET45" | Out-File -FilePath /debug.txt -Append
-#    Enable-WindowsOptionalFeature -Online -FeatureName NetFx4Extended-ASPNET45
-#    "---- WCF-HTTP-Activation45" | Out-File -FilePath /debug.txt -Append
-#    Enable-WindowsOptionalFeature -Online -FeatureName WCF-HTTP-Activation45 -All
-#
     "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?LinkId=287166", "$tmpDir/WebPlatformInstaller_amd64_en-US.msi")
     Start-Process -FilePath "$tmpDir/WebPlatformInstaller_amd64_en-US.msi" -ArgumentList "/qn" -PassThru -Wait

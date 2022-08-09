@@ -3,9 +3,7 @@ Set-ExecutionPolicy -ExecutionPolicy bypass -Force
 
 "===> initial setup" | Out-File -FilePath /initial-debug.txt
 $tmpDir = "c:\temp"
-
 cd \
-
 New-Item -itemtype "directory" "$tmpDir" -Force
 
 "--- download ConfigureRemotingForAnsible.ps1" | Out-File -FilePath /initial-debug.txt -Append
@@ -26,13 +24,7 @@ Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
 "---  ansible config script" | Out-File -FilePath /initial-debug.txt -Append
 Invoke-Expression -Command "$tmpDir\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck $true -CertValidityDays 90 -EnableCredSSP $true"
 
-#"--- firewall rules" | Out-File -FilePath /initial-debug.txt -Append
-#New-NetFirewallRule -DisplayName "sshd" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
-#New-NetFirewallRule -DisplayName "rdp" -Direction Inbound -LocalPort 3389 -Protocol TCP -Action Allow
-#New-NetFirewallRule -DisplayName "Windows Admin Center" -Direction Inbound -LocalPort 3390 -Protocol TCP -Action Allow
-#New-NetFirewallRule -DisplayName "IIS Remote Management" -Direction Inbound -LocalPort 8172 -Protocol TCP -Action Allow
-
-#"--- registry settings" | Out-File -FilePath /initial-debug.txt -Append
+"--- registry settings" | Out-File -FilePath /initial-debug.txt -Append
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value $false
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name “UserAuthentication” -Value $true
 
@@ -67,8 +59,6 @@ New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciph
 New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\Triple DES 168' -Force | Out-Null
 New-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Ciphers\Triple DES 168' -name 'Enabled' -value '0' -PropertyType 'DWord'
 # End cipher and TLS protocol changes section
-
-#Restart-Computer
 
 "[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
