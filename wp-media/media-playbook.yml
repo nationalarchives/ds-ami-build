@@ -248,63 +248,63 @@
         - "{{ wpconfig_finished.stat.exists }}"
         - "====================================================================="
 
-- name: switch to localhost
-  hosts: localhost
-  gather_facts: true
-
-  tasks:
-  - name: create AMI
-    amazon.aws.ec2_ami:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      instance_id: "{{ instance_id }}"
-      name: "{{ service }}-wp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
-      description: "Media webserver - ready for deployment"
-      region: "{{ region }}"
-      state: "present"
-      wait: yes
-      tags:
-        Name: "{{ service }}-wp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
-        Service: "{{ service }}"
-        Owner: "Digital Services"
-        CreatedBy: "ansible"
-        CostCentre: 53
-        Terraform: false
-
-  - name: terminate instance
-    ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      instance_ids: "{{ instance_id }}"
-      region: "{{ region }}"
-      state: "absent"
-
-  - name: remove security group
-    amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-media-wp-sg"
-      region: "{{ region }}"
-      state: "absent"
-
-  - name: remove IAM role
-    community.aws.iam_role:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-media-wp-role"
-      region: "{{ region }}"
-      delete_instance_profile: yes
-      state: "absent"
-
-  - name: remove deployment policy
-    community.aws.iam_managed_policy:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-media-wp-s3-policy"
-      state: "absent"
+#- name: switch to localhost
+#  hosts: localhost
+#  gather_facts: true
+#
+#  tasks:
+#  - name: create AMI
+#    amazon.aws.ec2_ami:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      instance_id: "{{ instance_id }}"
+#      name: "{{ service }}-wp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+#      description: "Media webserver - ready for deployment"
+#      region: "{{ region }}"
+#      state: "present"
+#      wait: yes
+#      tags:
+#        Name: "{{ service }}-wp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+#        Service: "{{ service }}"
+#        Owner: "Digital Services"
+#        CreatedBy: "ansible"
+#        CostCentre: 53
+#        Terraform: false
+#
+#  - name: terminate instance
+#    ec2_instance:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      instance_ids: "{{ instance_id }}"
+#      region: "{{ region }}"
+#      state: "absent"
+#
+#  - name: remove security group
+#    amazon.aws.ec2_group:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      name: "ansible-ami-media-wp-sg"
+#      region: "{{ region }}"
+#      state: "absent"
+#
+#  - name: remove IAM role
+#    community.aws.iam_role:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      name: "ansible-ami-media-wp-role"
+#      region: "{{ region }}"
+#      delete_instance_profile: yes
+#      state: "absent"
+#
+#  - name: remove deployment policy
+#    community.aws.iam_managed_policy:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      policy_name: "ansible-ami-media-wp-s3-policy"
+#      state: "absent"
 ...
