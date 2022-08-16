@@ -64,7 +64,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       filters:
         group-name:
-          - "media-wp-{{ env }}-app-sg"
+          - "media_db_sg"
     register: db_sg
   - ansible.builtin.debug:
       msg:
