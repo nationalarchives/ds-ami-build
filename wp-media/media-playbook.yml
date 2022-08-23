@@ -272,14 +272,14 @@
         CostCentre: 53
         Terraform: false
 
-  - name: terminate instance
-    ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      instance_ids: "{{ instance_id }}"
-      region: "{{ region }}"
-      state: "absent"
+#  - name: terminate instance
+#    ec2_instance:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      instance_ids: "{{ instance_id }}"
+#      region: "{{ region }}"
+#      state: "absent"
 
   - name: remove security group
     amazon.aws.ec2_group:
