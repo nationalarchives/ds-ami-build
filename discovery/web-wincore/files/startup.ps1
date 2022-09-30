@@ -14,15 +14,6 @@ function write-log
    Add-content $logFile -value "$Time - $Severity - $Message"
 }
 
-#function retrieve-security-creds
-#{
-#	$sts = aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access | ConvertFrom-Json
-#	$Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
-#	$Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
-#	$Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
-#	$Env:AWS_ACCESS_EXPIRATION = $sts.Credentials.Expiration
-#}
-
 try {
 	if (Test-Path -Path "$runFlag" -PathType leaf) {
 		write-log -Message "script is already active" -Severity "Warning"
@@ -31,18 +22,6 @@ try {
 		$Time = (Get-Date -f g)
 		Add-content $runFlag -value "$Time - startup script is activated"
 	}
-
-#	if (Test-Path "env:\AWS_ACCESS_KEY_ID") {
-#		$now = Get-Date
-#		$endToken = Get-Date $Env:AWS_ACCESS_EXPIRATION
-#		if ($now -gt $endToken) {
-#			write-log -Message "security token renewal" -Severity "Information"
-#			retrieve-security-creds
-#		}
-#	} else {
-#		write-log -Message "security token requested" -Severity "Information"
-#		retrieve-security-creds
-#	}
 
 	$sysEnv = $Env:TNA_APP_ENVIRONMENT
 	$sysTier = $Env:TNA_APP_TIER
