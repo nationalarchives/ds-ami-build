@@ -76,7 +76,7 @@ try {
 	}
 
     $baseS3Path = "s3://ds-$sysEnv-deployment-source/discovery/builds"
-	$resourcePath = "$baseS3Path/$sysEnv/"
+	$resourcePath = "$baseS3Path/"
 	$resourceFile = "TNA.Discovery.$sysTier.zip"
     $dependencyFile = "TNA.Discovery.api.dependencies.zip"
 	$resource = $resourcePath + $resourceFile
