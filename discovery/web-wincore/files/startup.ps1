@@ -14,15 +14,6 @@ function write-log
    Add-content $logFile -value "$Time - $Severity - $Message"
 }
 
-function retrieve-security-creds
-{
-	$sts = aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access | ConvertFrom-Json
-	$Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
-	$Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
-	$Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
-	$Env:AWS_ACCESS_EXPIRATION = $sts.Credentials.Expiration
-}
-
 try {
 	if (Test-Path -Path "$runFlag" -PathType leaf) {
 		write-log -Message "script is already active" -Severity "Warning"
@@ -32,25 +23,13 @@ try {
 		Add-content $runFlag -value "$Time - startup script is activated"
 	}
 
-	if (Test-Path "env:\AWS_ACCESS_KEY_ID") {
-		$now = Get-Date
-		$endToken = Get-Date $Env:AWS_ACCESS_EXPIRATION
-		if ($now -gt $endToken) {
-			write-log -Message "security token renewal" -Severity "Information"
-			retrieve-security-creds
-		}
-	} else {
-		write-log -Message "security token requested" -Severity "Information"
-		retrieve-security-creds
-	}
-
 	$sysEnv = $Env:TNA_APP_ENVIRONMENT
 	$sysTier = $Env:TNA_APP_TIER
 
 	$ecommercePath = ""
 
 	# check if environment is set correctly
-	if (-not ($sysEnv -eq "dev" -or $sysEnv -eq "test" -or $sysEnv -eq "live")) {
+	if (-not ($sysEnv -eq "dev" -or $sysEnv -eq "staging" -or $sysEnv -eq "live")) {
 		write-log -Message "environment variable not set" -Severity "Error"
 		exit 1
 	}
@@ -61,7 +40,7 @@ try {
 	}
 
 	write-log -Message "read environment variables from system manager"
-	$smData = aws ssm get-parameter --name Discovery.Environment.$Env:TNA_APP_ENVIRONMENT.$Env:TNA_APP_TIER --region eu-west-2 | ConvertFrom-Json
+	$smData = aws ssm get-parameter --name /devops/deployment/discovery.environment.$Env:TNA_APP_TIER --region eu-west-2 | ConvertFrom-Json
 	$smValues = $smData.Parameter.Value | ConvertFrom-Json
 	# iterate over json content
 	$smValues | Get-Member -MemberType NoteProperty | ForEach-Object {
@@ -75,8 +54,8 @@ try {
 		}
 	}
 
-    $baseS3Path = "s3://ds-intersite-deployment/discovery/builds"
-	$resourcePath = "$baseS3Path/$sysEnv/"
+    $baseS3Path = "s3://ds-$sysEnv-deployment-source/discovery/builds"
+	$resourcePath = "$baseS3Path/"
 	$resourceFile = "TNA.Discovery.$sysTier.zip"
     $dependencyFile = "TNA.Discovery.api.dependencies.zip"
 	$resource = $resourcePath + $resourceFile
