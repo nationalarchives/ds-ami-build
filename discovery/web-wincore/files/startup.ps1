@@ -54,6 +54,32 @@ try {
 		}
 	}
 
+    if ($sysTier -eq "api")
+    {
+        write-log -Message "read secret arn"
+        $arnData = aws ssm get-parameter --name /devops/deployment/discovery.environment.mongodb.secrets-arn --region eu-west-2 | ConvertFrom-Json
+        $secrets_arn = $arnData.Parameter.Value
+
+        write-log -Message "read environment variables from secrets manager"
+        $mongoSecrets = aws secretsmanager get-secret-value --secret-id $secrets_arn | ConvertFrom-Json
+        $userList = $mongoSecrets.SecretString | ConvertFrom-Json
+        foreach ($line in $userList.PSObject.Properties)
+        {
+            if ($line.Name -Match "^DISC_MONGO_")
+            {
+                $envVarNameUser = $line.Value.username + "_USR"
+                $envVarNamePassword = $line.Value.username + "_PWD"
+                $envPosition = $line.Name
+
+                write-log -Message "set: $envVarNameUser - $userList.$envPosition.username" -Severity "Information"
+                [System.Environment]::SetEnvironmentVariable($envVarNameUser.trim(),$userList.$envPosition.username.trim(), "Machine")
+
+                write-log -Message "set: $envVarNamePassword - $userList.$envPosition.password" -Severity "Information"
+                [System.Environment]::SetEnvironmentVariable($envVarNamePassword.trim(),$userList.$envPosition.password.trim(), "Machine")
+            }
+        }
+    }
+
     $baseS3Path = "s3://ds-$sysEnv-deployment-source/discovery/builds"
 	$resourcePath = "$baseS3Path/"
 	$resourceFile = "TNA.Discovery.$sysTier.zip"
