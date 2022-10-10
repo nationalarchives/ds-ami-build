@@ -71,6 +71,13 @@ try {
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
     $env:Path = "$env:Path;$pathAWScli"
 
+    "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
+    Import-Module AWSPowerShell
+
+    "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
+    Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
+    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
+
     "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?LinkId=287166", "$tmpDir/WebPlatformInstaller_amd64_en-US.msi")
     Start-Process -FilePath "$tmpDir/WebPlatformInstaller_amd64_en-US.msi" -ArgumentList "/qn" -PassThru -Wait
