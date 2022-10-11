@@ -71,6 +71,13 @@ try {
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
     $env:Path = "$env:Path;$pathAWScli"
 
+    "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
+    Import-Module AWSPowerShell
+
+    "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
+    Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
+    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
+
     "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?LinkId=287166", "$tmpDir/WebPlatformInstaller_amd64_en-US.msi")
     Start-Process -FilePath "$tmpDir/WebPlatformInstaller_amd64_en-US.msi" -ArgumentList "/qn" -PassThru -Wait
@@ -83,36 +90,6 @@ try {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
 
-    "===> AWS X-Ray" | Out-File -FilePath /debug.txt -Append
-    "---- Daemon" | Out-File -FilePath /debug.txt -Append
-    if ( Get-Service "AWSXRayDaemon" -ErrorAction SilentlyContinue ) {
-        sc.exe stop AWSXRayDaemon
-        sc.exe delete AWSXRayDaemon
-    }
-    $targetLocation = "C:\Program Files\Amazon\XRay"
-    if ((Test-Path $targetLocation) -eq 0) {
-        mkdir $targetLocation
-    }
-    "---- AWS XRay" | Out-File -FilePath /debug.txt -Append
-    $zipFileName = "aws-xray-daemon-windows-service-3.x.zip"
-    $zipPath = "$targetLocation\$zipFileName"
-    $destPath = "$targetLocation\aws-xray-daemon"
-    if ((Test-Path $destPath) -eq 1) {
-        Remove-Item -Recurse -Force $destPath
-    }
-    "---- downloading AWS X-Ray daemon" | Out-File -FilePath /debug.txt -Append
-    $daemonPath = "$destPath\xray.exe"
-    $daemonLogPath = "$targetLocation\xray-daemon.log"
-    $url = "https://s3.dualstack.us-west-2.amazonaws.com/aws-xray-assets.us-west-2/xray-daemon/aws-xray-daemon-windows-service-3.x.zip"
-    Invoke-WebRequest -Uri $url -OutFile $zipPath
-
-    "---- expanding AWS X-Ray zip file" | Out-File -FilePath /debug.txt -Append
-    Add-Type -Assembly "System.IO.Compression.Filesystem"
-    [io.compression.zipfile]::ExtractToDirectory($zipPath, $destPath)
-
-    "---- installing AWS X-Ray daemon" | Out-File -FilePath /debug.txt -Append
-    New-Service -Name "AWSXRayDaemon" -StartupType Automatic -BinaryPathName "`"$daemonPath`" -f `"$daemonLogPath`""
-    sc.exe start AWSXRayDaemon
 
     "===> aquire AWS credentials" | Out-File -FilePath /debug.txt -Append
     $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
@@ -122,9 +99,6 @@ try {
 
     "===> download and install required packages and config files" | Out-File -FilePath /debug.txt -Append
     Set-Location -Path $tmpDir
-
-    "---- AWS X-Ray config file" | Out-File -FilePath /debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/xray-cfg.yaml `"$targetLocation`""
 
     "===> install CloudWatch Agent" | Out-File -FilePath /debug.txt -Append
     "---- download agent" | Out-File -FilePath /debug.txt -Append
@@ -171,13 +145,6 @@ try {
 
     # remove unwanted IIS headers
     Clear-WebConfiguration "/system.webServer/httpProtocol/customHeaders/add[@name='X-Powered-By']"
-
-    "===> AWS XRay .NET Agent" | Out-File -FilePath /debug.txt -Append
-    "---- download installer" | Out-File -FilePath /debug.txt -Append
-    Invoke-WebRequest -Uri https://s3.amazonaws.com/aws-xray-assets.us-east-1/xray-agent-installer/aws-xray-dotnet-agent-installer-beta-X64.msi -OutFile c:/temp/aws-xray-dotnet-agent-installer-beta-X64.msi
-    "---- installing XRay .NET Agent" | Out-File -FilePath /debug.txt -Append
-    #Start-Process msiexec.exe -Wait -ArgumentList '/i c:/temp/aws-xray-dotnet-agent-installer-beta-X64.msi /qn /norestart' -NoNewWindow
-    Invoke-Expression -Command "c:/temp/aws-xray-dotnet-agent-installer-beta-X64.msi"
 
     Start-WebSite -Name $webSiteName
 
