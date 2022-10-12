@@ -19,10 +19,8 @@ $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-pac
 $wacInstaller = "WindowsAdminCenter2110.2.msi"
 $dotnetInstaller = "ndp48-web.exe"
 $dotnetPackagename = ".NET Framework 4.8 Platform (web installer)"
-#$dotnetCoreInstaller = "dotnet-hosting-3.1.7-win.exe"
-#$dotnetCorePackagename = ".NET Core 3.1.7"
-$dotnetCoreInstaller = "dotnet-hosting-6.0.5-win.exe"
-$dotnetCorePackagename = ".NET Core 6.0.5"
+$dotnetCoreInstaller = "dotnet-hosting-2.1.30-win.exe"
+$dotnetCorePackagename = ".NET Core 2.1.30"
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 

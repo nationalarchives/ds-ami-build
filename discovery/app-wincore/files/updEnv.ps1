@@ -45,7 +45,7 @@ try {
     {
         write-log -Message "read secret arn"
         $arnData = aws ssm get-parameter --name /devops/deployment/discovery.environment.mongodb.secrets-arn --region eu-west-2 | ConvertFrom-Json
-        $secrets_arn = $arnData.Parameter.Value | ConvertFrom-Json
+        $secrets_arn = $arnData.Parameter.Value
 
         write-log -Message "read environment variables from secrets manager"
         $mongoSecrets = aws secretsmanager get-secret-value --secret-id $secrets_arn | ConvertFrom-Json
@@ -56,12 +56,13 @@ try {
             {
                 $envVarNameUser = $line.Value.username + "_USR"
                 $envVarNamePassword = $line.Value.username + "_PWD"
+                $envPosition = $line.Name
 
-                write-log -Message "set: $envVarNameUser - $line.Value.username" -Severity "Information"
-                [System.Environment]::SetEnvironmentVariable($envVarNameUser.trim(),$line.Value.username.trim(), "Machine")
+                write-log -Message "set: $envVarNameUser - $userList.$envPosition.username" -Severity "Information"
+                [System.Environment]::SetEnvironmentVariable($envVarNameUser.trim(),$userList.$envPosition.username.trim(), "Machine")
 
-                write-log -Message "set: $envVarNamePassword - $line.Value.password" -Severity "Information"
-                [System.Environment]::SetEnvironmentVariable($envVarNamePassword.trim(),$line.Value.password.trim(), "Machine")
+                write-log -Message "set: $envVarNamePassword - $userList.$envPosition.password" -Severity "Information"
+                [System.Environment]::SetEnvironmentVariable($envVarNamePassword.trim(),$userList.$envPosition.password.trim(), "Machine")
             }
         }
     }
