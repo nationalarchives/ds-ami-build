@@ -117,8 +117,8 @@ jobs:
 
       - run: pip install -r ${{ github.workspace }}/.github/workflows/requirements-staging.txt
 
-      - name: show env
-        run: ls
+#      - name: show env
+#        run: ls
 #      - name: load pip requirements
 #        run: pip install -r ${{ github.workspace }}/.github/workflows/requirements-staging.txt
 #      - name: upgrade pip
