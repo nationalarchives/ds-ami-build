@@ -26,7 +26,7 @@ jobs:
     environment: discovery-dev
     steps:
       - name: checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: "${{ github.event.inputs.branch }}"
 
@@ -48,9 +48,9 @@ jobs:
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3
+          python-version: '3.10'
       - name: upgrade pip
         run: pip install --upgrade pip
       - name: install boto3
