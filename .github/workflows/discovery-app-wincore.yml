@@ -114,7 +114,7 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
       - name: load pip requirements
-        run: pip install -r requirements-staging.txt
+        run: pip install -r ${{ github.workspace }}/.github/workflows/requirements-staging.txt
 #      - name: upgrade pip
 #        run: pip install --upgrade pip
 #      - name: install boto3
