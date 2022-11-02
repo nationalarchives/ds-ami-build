@@ -152,7 +152,6 @@ PHP
 /usr/local/bin/wp theme install https://github.com/nationalarchives/tna-child-blog/archive/refs/heads/master.zip --force --allow-root 2>/var/www/html/wp-cli.log
 
 # Install plugins
-#/usr/local/bin/wp plugin install amazon-s3-and-cloudfront --force --allow-root 2>/var/www/html/wp-cli.log
 
 ## Co-Author Plus
 /usr/local/bin/wp plugin install co-authors-plus --force --allow-root 2>/var/www/html/wp-cli.log
@@ -160,39 +159,23 @@ PHP
 ## Yoast SEO
 /usr/local/bin/wp plugin install wordpress-seo --force --allow-root 2>/var/www/html/wp-cli.log
 
-#/usr/local/bin/wp plugin install jquery-colorbox --force --allow-root 2>/var/www/html/wp-cli.log
-
 ## Simple Footnotes
 /usr/local/bin/wp plugin install simple-footnotes --force --allow-root 2>/var/www/html/wp-cli.log
 
-#/usr/local/bin/wp plugin install https://github.com/wp-sync-db/wp-sync-db/archive/master.zip --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://github.com/nationalarchives/tna-editorial-review/archive/master.zip --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://github.com/nationalarchives/tna-wp-aws/archive/master.zip --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://github.com/nationalarchives/tna-password-message/archive/master.zip --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://github.com/nationalarchives/ds-tna-wp-ses/archive/refs/heads/main.zip --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://github.com/nationalarchives/ds-cookie-consent/archive/refs/heads/master.zip --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://downloads.wordpress.org/plugin/advanced-custom-fields.5.12.3.zip --force --allow-root 2>/var/www/html/wp-cli.log
-
 ## Akismet Anti-Spam
 /usr/local/bin/wp plugin install akismet --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://downloads.wordpress.org/plugin/akismet.5.0.zip --force --allow-root 2>/var/www/html/wp-cli.log
-
 
 ## Classic Editor
 /usr/local/bin/wp plugin install classic-editor --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://downloads.wordpress.org/plugin/classic-editor.1.6.2.zip --force --allow-root 2>/var/www/html/wp-cli.log
 
 ## Term Management Tools
 /usr/local/bin/wp plugin install term-management-tools --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://downloads.wordpress.org/plugin/term-management-tools.2.0.1.zip --force --allow-root 2>/var/www/html/wp-cli.log
 
 ## WordPress Importer
 /usr/local/bin/wp plugin install wordpress-importer --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://downloads.wordpress.org/plugin/wordpress-importer.0.8.zip --force --allow-root 2>/var/www/html/wp-cli.log
 
 ## Export All URLS
 /usr/local/bin/wp plugin install export-all-urls --force --allow-root 2>/var/www/html/wp-cli.log
-#/usr/local/bin/wp plugin install https://downloads.wordpress.org/plugin/export-all-urls.4.4.zip --force --allow-root 2>/var/www/html/wp-cli.log
 
 # Set file permissions for apache
 sudo usermod -a -G apache ec2-user
