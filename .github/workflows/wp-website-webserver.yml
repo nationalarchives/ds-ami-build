@@ -48,17 +48,11 @@ jobs:
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3
-      - name: upgrade pip
-        run: pip install --upgrade pip
-      - name: install boto3
-        run: pip3 install boto3 requests pyjwt
-      - name: install wheel
-        run: pip3 install wheel requests pyjwt
-      - name: install ansible
-        run: pip3 install ansible
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/wp-website-req.txt'
 
       - name: run ansible playbook
         env:
@@ -105,17 +99,11 @@ jobs:
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3
-      - name: upgrade pip
-        run: pip install --upgrade pip
-      - name: install boto3
-        run: pip3 install boto3 requests pyjwt
-      - name: install wheel
-        run: pip3 install wheel requests pyjwt
-      - name: install ansible
-        run: pip3 install ansible
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/wp-website-req.txt'
 
       - name: run ansible playbook
         env:
@@ -162,17 +150,11 @@ jobs:
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3
-      - name: upgrade pip
-        run: pip install --upgrade pip
-      - name: install boto3
-        run: pip3 install boto3 requests pyjwt
-      - name: install wheel
-        run: pip3 install wheel requests pyjwt
-      - name: install ansible
-        run: pip3 install ansible
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/wp-website-req.txt'
 
       - name: run ansible playbook
         env:
