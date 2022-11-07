@@ -178,8 +178,7 @@ PHP
 /usr/local/bin/wp plugin install export-all-urls --force --allow-root 2>/var/www/html/wp-cli.log
 
 ## Advanced Custom Fields
-/usr/local/bin/wp plugin install advanced-custom-fields --force --allow-root 2>/var/www/html/wp-cli.log
-/usr/local/bin/wp plugin activate advanced-custom-fields
+/usr/local/bin/wp plugin install advanced-custom-fields --activate --force --allow-root 2>/var/www/html/wp-cli.log
 
 # Set file permissions for apache
 sudo usermod -a -G apache ec2-user
