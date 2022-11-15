@@ -140,6 +140,7 @@ try {
     "---- create .NET v6.0 AppPool" | Out-File -FilePath /debug.txt -Append
     $net6_app_pool_name = 'dotNET v6.0 AppPool'
     New-WebAppPool -name "$net6_app_pool_name" -force
+    Set-ItemProperty -Path "IIS:\AppPools\"$net6_app_pool_name" managedRuntimeVersion "v4.0"
     New-WebApplication -name 'DigitalMetadataAPI' -Site $webSiteName -PhysicalPath $webSitePath/DigitalMetadataAPI -ApplicationPool "$net6_app_pool_name" -force
     New-WebApplication -name 'IAdataAPI' -Site $webSiteName -PhysicalPath $webSitePath/IAdataAPI -ApplicationPool "$net6_app_pool_name" -force
 
