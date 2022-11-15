@@ -57,6 +57,8 @@ try {
     New-Item -itemtype "directory" $webSiteRoot -Force
     New-Item -itemtype "directory" "$servicesPath" -Force
     New-Item -itemtype "directory" "$webSitePath" -Force
+    New-Item -itemtype "directory" "$webSitePath/DigitalMetadataAPI" -Force
+    New-Item -itemtype "directory" "$webSitePath/IAdataAPI" -Force
 
     "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
     "---- downloading AWS CLI" | Out-File -FilePath /debug.txt -Append
