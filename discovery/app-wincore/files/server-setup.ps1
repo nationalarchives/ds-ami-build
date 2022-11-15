@@ -19,8 +19,8 @@ $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-pac
 $wacInstaller = "WindowsAdminCenter2110.2.msi"
 $dotnetInstaller = "ndp48-web.exe"
 $dotnetPackagename = ".NET Framework 4.8 Platform (web installer)"
-$dotnetCoreInstaller = "dotnet-hosting-6.0.5-win.exe"
-$dotnetCorePackagename = ".NET Core 6.0.5"
+$dotnetCoreInstaller = "dotnet-hosting-6.0.11-win.exe"
+$dotnetCorePackagename = ".NET Core 6.0.11"
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 
@@ -134,6 +134,12 @@ try {
     Set-ItemProperty "IIS:\Sites\Default Web Site" serverAutoStart False
     Remove-WebSite -Name "Default Web Site"
     $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
+
+    "---- create .NET v6.0 AppPool" | Out-File -FilePath /debug.txt -Append
+    $net6_app_pool_name = '.NET v6.0 AppPool'
+    New-WebAppPool -name $net6_app_pool_name -force
+    New-WebApplication -name 'DigitalMetadataAPI' -Site $webSiteName -PhysicalPath $webSitePath/DigitalMetadataAPI -ApplicationPool "$net6_app_pool_name" -force
+    New-WebApplication -name 'IAdataAPI' -Site $webSiteName -PhysicalPath $webSitePath/IAdataAPI -ApplicationPool "$net6_app_pool_name" -force
 
     "---- give IIS_USRS permissions" | Out-File -FilePath /debug.txt -Append
     $acl = Get-ACL $webSiteRoot
