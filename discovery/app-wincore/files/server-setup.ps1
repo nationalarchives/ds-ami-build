@@ -137,7 +137,7 @@ try {
 
     "---- create .NET v6.0 AppPool" | Out-File -FilePath /debug.txt -Append
     $net6_app_pool_name = '.NET v6.0 AppPool'
-    New-WebAppPool -name $net6_app_pool_name -force
+    New-WebAppPool -name "$net6_app_pool_name" -force
     New-WebApplication -name 'DigitalMetadataAPI' -Site $webSiteName -PhysicalPath $webSitePath/DigitalMetadataAPI -ApplicationPool "$net6_app_pool_name" -force
     New-WebApplication -name 'IAdataAPI' -Site $webSiteName -PhysicalPath $webSitePath/IAdataAPI -ApplicationPool "$net6_app_pool_name" -force
 
