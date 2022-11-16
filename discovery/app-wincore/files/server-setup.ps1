@@ -122,24 +122,31 @@ try {
         "---- end installation process" | Out-File -FilePath /debug.txt -Append
     }
 
-    "---- create AppPool" | Out-File -FilePath /debug.txt -Append
+    "---- import WebAdministration" | Out-File -FilePath /debug.txt -Append
     Import-Module WebAdministration
+
+    "---- create AppPool" | Out-File -FilePath /debug.txt -Append
     New-WebAppPool -name $appPool  -force
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value "v4.0"
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value "True"
+
+    "---- create .NET v6.0 AppPool" | Out-File -FilePath /debug.txt -Append
+    $net6_app_pool_name = ".NET v6.0 AppPool"
+    #New-WebAppPool -Name "$net6_app_pool_name" -force
+    [system.reflection.assembly]::Loadwithpartialname("Microsoft.Web.Administration")
+    $servermgr = New-Object Microsoft.web.administration.servermanager
+    $servermgr.ApplicationPools.Add("$net6_app_pool_name")
+    $servermgr.CommitChanges()
+
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name managedRuntimeVersion ""
+    New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
+    New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
 
     "---- create website" | Out-File -FilePath /debug.txt -Append
     Stop-Website -Name "Default Web Site"
     Set-ItemProperty "IIS:\Sites\Default Web Site" serverAutoStart False
     Remove-WebSite -Name "Default Web Site"
     $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
-
-    "---- create .NET v6.0 AppPool" | Out-File -FilePath /debug.txt -Append
-    $net6_app_pool_name = "dotNET v6.0 AppPool"
-    New-WebAppPool -name "$net6_app_pool_name" -force
-    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" managedRuntimeVersion "v4.0"
-    New-WebApplication -name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
-    New-WebApplication -name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
 
     "---- give IIS_USRS permissions" | Out-File -FilePath /debug.txt -Append
     $acl = Get-ACL $webSiteRoot
