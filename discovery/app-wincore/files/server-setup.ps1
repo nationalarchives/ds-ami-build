@@ -125,6 +125,12 @@ try {
     "---- import WebAdministration" | Out-File -FilePath /debug.txt -Append
     Import-Module WebAdministration
 
+    "---- create website" | Out-File -FilePath /debug.txt -Append
+    Stop-Website -Name "Default Web Site"
+    Set-ItemProperty "IIS:\Sites\Default Web Site" serverAutoStart False
+    Remove-WebSite -Name "Default Web Site"
+    $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
+
     "---- create AppPool" | Out-File -FilePath /debug.txt -Append
     New-WebAppPool -name $appPool  -force
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value "v4.0"
@@ -142,12 +148,6 @@ try {
     Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name processModel.loadUserProfile -Value "True"
     New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
     New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
-
-    "---- create website" | Out-File -FilePath /debug.txt -Append
-    Stop-Website -Name "Default Web Site"
-    Set-ItemProperty "IIS:\Sites\Default Web Site" serverAutoStart False
-    Remove-WebSite -Name "Default Web Site"
-    $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
 
     "---- give IIS_USRS permissions" | Out-File -FilePath /debug.txt -Append
     $acl = Get-ACL $webSiteRoot
