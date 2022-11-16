@@ -139,6 +139,7 @@ try {
     $servermgr.CommitChanges()
 
     Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name managedRuntimeVersion ""
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name processModel.loadUserProfile -Value "True"
     New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
     New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
 
