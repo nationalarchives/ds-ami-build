@@ -62,7 +62,7 @@ try {
     "---- downloading AWS CLI" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:/temp/AWSCLIV2.msi
     "---- installing AWS CLI" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\AWSCLIV2.msi /qn /norestart' -NoNewWindow
+    Start-Process msiexec.exe -Wait -ArgumentList "/i c:\temp\AWSCLIV2.msi /qn /norestart" -NoNewWindow
     "---- set path to AWS CLI" | Out-File -FilePath /debug.txt -Append
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
@@ -87,7 +87,6 @@ try {
     Install-WindowsFeature Web-Mgmt-Service
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
-
 
     "===> aquire AWS credentials" | Out-File -FilePath /debug.txt -Append
     $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
@@ -126,8 +125,8 @@ try {
     "---- create AppPool" | Out-File -FilePath /debug.txt -Append
     Import-Module WebAdministration
     New-WebAppPool -name $appPool  -force
-    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value 'v4.0'
-    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value 'True'
+    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value "v4.0"
+    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value "True"
 
     "---- create website" | Out-File -FilePath /debug.txt -Append
     Stop-Website -Name "Default Web Site"
@@ -136,11 +135,11 @@ try {
     $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
 
     "---- create .NET v6.0 AppPool" | Out-File -FilePath /debug.txt -Append
-    $net6_app_pool_name = 'dotNET v6.0 AppPool'
+    $net6_app_pool_name = "dotNET v6.0 AppPool"
     New-WebAppPool -name "$net6_app_pool_name" -force
-    Set-ItemProperty -Path "IIS:\AppPools\"$net6_app_pool_name" managedRuntimeVersion "v4.0"
-    New-WebApplication -name 'DigitalMetadataAPI' -Site $webSiteName -PhysicalPath $webSitePath/Services/DigitalMetadataAPI -ApplicationPool "$net6_app_pool_name" -force
-    New-WebApplication -name 'IAdataAPI' -Site $webSiteName -PhysicalPath $webSitePath/Services/IAdataAPI -ApplicationPool "$net6_app_pool_name" -force
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" managedRuntimeVersion "v4.0"
+    New-WebApplication -name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
+    New-WebApplication -name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
 
     "---- give IIS_USRS permissions" | Out-File -FilePath /debug.txt -Append
     $acl = Get-ACL $webSiteRoot
