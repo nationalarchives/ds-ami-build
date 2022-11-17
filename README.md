@@ -65,7 +65,7 @@ To see all AMIs including if they were launched use command\
 
 
 >!!! Dangerzone !!!\
->Using above loop to deregister AMIs might removes images are in use. Use with caution!\
+>Using above loop to deregister AMIs might remove images which are in use. Use the following command with caution!\
 >
 >aws ec2 describe-images --filter "Name=name,Values=discovery-web-*" --query "reverse(sort_by(Images, &CreationDate))[3:].ImageId" --output json | jq -r -c '.[]' | while read id; do aws ec2 deregister-image --image-id $id; done
 
