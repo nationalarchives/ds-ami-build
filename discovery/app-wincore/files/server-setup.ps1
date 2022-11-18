@@ -19,8 +19,8 @@ $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-pac
 $wacInstaller = "WindowsAdminCenter2110.2.msi"
 $dotnetInstaller = "ndp48-web.exe"
 $dotnetPackagename = ".NET Framework 4.8 Platform (web installer)"
-$dotnetCoreInstaller = "dotnet-hosting-2.1.30-win.exe"
-$dotnetCorePackagename = ".NET Core 2.1.30"
+$dotnetCoreInstaller = "dotnet-hosting-6.0.11-win.exe"
+$dotnetCorePackagename = ".NET Core 6.0.11"
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 
@@ -62,7 +62,7 @@ try {
     "---- downloading AWS CLI" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:/temp/AWSCLIV2.msi
     "---- installing AWS CLI" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\AWSCLIV2.msi /qn /norestart' -NoNewWindow
+    Start-Process msiexec.exe -Wait -ArgumentList "/i c:\temp\AWSCLIV2.msi /qn /norestart" -NoNewWindow
     "---- set path to AWS CLI" | Out-File -FilePath /debug.txt -Append
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
@@ -87,7 +87,6 @@ try {
     Install-WindowsFeature Web-Mgmt-Service
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
-
 
     "===> aquire AWS credentials" | Out-File -FilePath /debug.txt -Append
     $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
@@ -123,17 +122,32 @@ try {
         "---- end installation process" | Out-File -FilePath /debug.txt -Append
     }
 
-    "---- create AppPool" | Out-File -FilePath /debug.txt -Append
+    "---- import WebAdministration" | Out-File -FilePath /debug.txt -Append
     Import-Module WebAdministration
-    New-WebAppPool -name $appPool  -force
-    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value 'v4.0'
-    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value 'True'
 
     "---- create website" | Out-File -FilePath /debug.txt -Append
     Stop-Website -Name "Default Web Site"
     Set-ItemProperty "IIS:\Sites\Default Web Site" serverAutoStart False
     Remove-WebSite -Name "Default Web Site"
     $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
+
+    "---- create AppPool" | Out-File -FilePath /debug.txt -Append
+    New-WebAppPool -name $appPool  -force
+    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value "v4.0"
+    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value "True"
+
+    "---- create .NET v6.0 AppPool" | Out-File -FilePath /debug.txt -Append
+    $net6_app_pool_name = ".NET v6.0 AppPool"
+    #New-WebAppPool -Name "$net6_app_pool_name" -force
+    [system.reflection.assembly]::Loadwithpartialname("Microsoft.Web.Administration")
+    $servermgr = New-Object Microsoft.web.administration.servermanager
+    $servermgr.ApplicationPools.Add("$net6_app_pool_name")
+    $servermgr.CommitChanges()
+
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name managedRuntimeVersion ""
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name processModel.loadUserProfile -Value "True"
+    New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
+    New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
 
     "---- give IIS_USRS permissions" | Out-File -FilePath /debug.txt -Append
     $acl = Get-ACL $webSiteRoot
