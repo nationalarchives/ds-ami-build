@@ -54,7 +54,7 @@ jobs:
           cache: 'pip'
           cache-dependency-path: '**/wp-website-req.txt'
 
-#      - run: pip install -r ${{ github.workspace }}/.github/workflows/wp-website-req.txt
+      - run: pip install -r ${{ github.workspace }}/.github/workflows/wp-website-req.txt
 
       - name: run ansible playbook
         env:
