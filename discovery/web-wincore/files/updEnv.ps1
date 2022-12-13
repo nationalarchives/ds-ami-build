@@ -17,7 +17,7 @@ try {
     $sysTier = $Env:TNA_APP_TIER
 
     # check if environment is set correctly
-    if (-not ($sysEnv -eq "dev" -or $sysEnv -eq "test" -or $sysEnv -eq "live")) {
+    if (-not ($sysEnv -eq "dev" -or $sysEnv -eq "staging" -or $sysEnv -eq "live")) {
         write-log -Message "environment variable not set" -Severity "Error"
         exit 1
     }
