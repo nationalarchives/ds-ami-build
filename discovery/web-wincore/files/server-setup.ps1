@@ -97,7 +97,7 @@ try {
 
     "===> URLRewrite2" | Out-File -FilePath /debug.txt -Append
     "---- download from S3" | Out-File -FilePath /debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp s3://ds-dev-deployment-source/discovery/install/rewrite_amd64_en-US.msi $tmpDir/rewrite_amd64_en-US.msi"
+    Invoke-Expression -Command "aws s3 cp s3://ds-intersite-deployment/discovery/install-packages/rewrite_amd64_en-US.msi $tmpDir/rewrite_amd64_en-US.msi"
     "---- run installer" | Out-File -FilePath /debug.txt -Append
     Start-Process -FilePath "$tmpDir/rewrite_amd64_en-US.msi" -ArgumentList "/quiet /norestart" -PassThru -Wait
 
