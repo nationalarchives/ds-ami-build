@@ -74,12 +74,6 @@ try {
     Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
     Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
 
-    "===> WebPlatformInstaller and URLRewrite2" | Out-File -FilePath /debug.txt -Append
-    (new-object System.Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?LinkId=287166", "$tmpDir/WebPlatformInstaller_amd64_en-US.msi")
-    Start-Process -FilePath "$tmpDir/WebPlatformInstaller_amd64_en-US.msi" -ArgumentList "/qn" -PassThru -Wait
-    $logFile = "$tmpDir/WebpiCmd.log"
-    Start-Process -FilePath "C:/Program Files/Microsoft/Web Platform Installer\WebpiCmd.exe" -ArgumentList "/Install /Products:'UrlRewrite2' /AcceptEULA /Log:$logFile" -PassThru -Wait
-
     "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
     netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
     Install-WindowsFeature Web-Mgmt-Service
@@ -94,6 +88,12 @@ try {
 
     "===> download and install required packages and config files" | Out-File -FilePath /debug.txt -Append
     Set-Location -Path $tmpDir
+
+    "===> URLRewrite2" | Out-File -FilePath /debug.txt -Append
+    "---- download from S3" | Out-File -FilePath /debug.txt -Append
+    Invoke-Expression -Command "aws s3 cp s3://ds-intersite-deployment/discovery/installation-packages/rewrite_amd64_en-US.msi $tmpDir/rewrite_amd64_en-US.msi"
+    "---- run installer" | Out-File -FilePath /debug.txt -Append
+    Start-Process -FilePath "$tmpDir/rewrite_amd64_en-US.msi" -ArgumentList "/quiet /norestart" -PassThru -Wait
 
     "===> install CloudWatch Agent" | Out-File -FilePath /debug.txt -Append
     "---- download agent" | Out-File -FilePath /debug.txt -Append
