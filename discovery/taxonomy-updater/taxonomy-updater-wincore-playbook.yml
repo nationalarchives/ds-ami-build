@@ -12,9 +12,9 @@
   - name: Configure AWS Credentials
     uses: aws-actions/configure-aws-credentials@v1
     with:
-        aws-region: eu-west-2
-        role-to-assume: arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL
-        role-session-name: MySessionName
+        aws-region: "eu-west-2"
+        role-to-assume: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
+        role-session-name: "MySessionName"
 
   # ----------------------------------------------------------------------------
   # The base AMI has the EC2Launch version 2 installed by default
