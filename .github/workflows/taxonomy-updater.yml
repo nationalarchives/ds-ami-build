@@ -43,10 +43,10 @@ jobs:
 
       - name: aws variable settings
         run: |
-      #    echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=env.AWS_REGION >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=${{ env.AWS_REGION }} >> $GITHUB_ENV
           echo AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
           echo AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+      #    echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
 
       - name: write ssh key file
         run: |
