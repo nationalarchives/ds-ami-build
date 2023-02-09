@@ -41,12 +41,12 @@ jobs:
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
           echo "SSH_KEY_FILE=taxonomy-updater-dev-eu-west-2" >> $GITHUB_ENV
 
-      #- name: aws variable settings
-      #  run: |
+      - name: aws variable settings
+        run: |
       #    echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
-      #    echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
-      #    echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
-      #    echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=env.AWS_REGION >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
 
       - name: write ssh key file
         run: |
