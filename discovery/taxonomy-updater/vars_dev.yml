@@ -5,4 +5,4 @@ service: "taxonomy"
 volume_size: 30
 
 s3_deployment_bucket: "ds-intersite-deployment"
-s3_deployment_root: "taxonomy/installation-packages"
+s3_deployment_root: "discovery/installation-packages"
