@@ -10,8 +10,16 @@
       ansible.builtin.include_vars:
         file: "{{ ansible_var_file }}"
 
+    - name: get AWS session token
+      community.aws.sts_session_token:
+        duration_seconds: 3600
+      register: session_credentials
+
     - name: get Windows 2022 Core AMI
       amazon.aws.ec2_ami_info:
+        aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+        aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+        security_token: "{{ session_credentials.sts_creds.session_token }}"
         owners: amazon
         region: "{{ region }}"
         filters:
