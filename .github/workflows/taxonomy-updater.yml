@@ -12,18 +12,25 @@ on:
         description: Environment
         required: true
         options:
-        - dev
-        - staging
+          - dev
+          - staging
 
 jobs:
-# ------------------------------------------------------------------------------
-# dev deployment
-# ------------------------------------------------------------------------------
+  # ------------------------------------------------------------------------------
+  # dev deployment
+  # ------------------------------------------------------------------------------
   taxonomy-updater-ami-dev:
     if: github.event.inputs.deploy-environment == 'dev'
     runs-on: ubuntu-latest
     environment: taxonomy-dev
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: "eu-west-2"
+          role-to-assume: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
+          role-session-name: "MySessionName"
+
       - name: checkout repo
         uses: actions/checkout@v3
         with:
