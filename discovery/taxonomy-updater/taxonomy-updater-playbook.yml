@@ -43,6 +43,9 @@
 
     - name: create security group - allowing updates and downloads
       amazon.aws.ec2_group:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
         name: "ansible-ami-taxonomy-update-sg"
         description: "security group allowing updates and downloads"
         region: "{{ region }}"
@@ -84,6 +87,9 @@
 
     - name: provisioning instance
       amazon.aws.ec2_instance:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
         key_name: "{{ key_name }}"
         image_id: "{{ latest_ami.image_id }}"#
         instance_role: "ansible-github-discovery-deployment-role"
@@ -260,14 +266,14 @@
     - ansible.builtin.debug:
         msg:
           - "====================================================================="
-          - "setup for {{ hostvars['localhost']['env'] }} - web tier"
+          - "setup for {{ hostvars['localhost']['env'] }}"
           - "====================================================================="
 
     - name: run server-setup script
       ansible.windows.win_powershell:
         chdir: "c:\\temp"
         script: |
-          ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery"
+          ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -application "taxonomy"
       ignore_errors: yes
 
 - name: switch to localhost
@@ -315,9 +321,12 @@
   tasks:
     - name: create AMI
       amazon.aws.ec2_ami:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
         instance_id: "{{ instance_id }}"
         name: "{{ service }}-web-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
-        description: "Discovery Frontend server - wincore - ready for deployment"
+        description: "Taxonomy Updater - ready for deployment"
         region: "{{ region }}"
         state: "present"
         wait: yes
@@ -331,12 +340,18 @@
 
     - name: terminate instance
       ec2_instance:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
         instance_ids: "{{ instance_id }}"
         region: "{{ region }}"
         state: "absent"
 
     - name: remove security group
       amazon.aws.ec2_group:
-        name: "ansible-ami-discovery-web-sg"
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
+        name: "ansible-ami-taxonomy-web-sg"
         region: "{{ region }}"
         state: "absent"
