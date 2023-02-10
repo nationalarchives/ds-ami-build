@@ -46,7 +46,7 @@ jobs:
           echo "AWS_DEFAULT_REGION=${{ env.AWS_REGION }}" >> $GITHUB_ENV
           echo "AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo AWS_ROLE_ARN="arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL" >> $GITHUB_ENV
+          echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_DEV" >> $GITHUB_ENV
 
       - name: write ssh key file
         run: |
@@ -101,15 +101,15 @@ jobs:
 
       - name: set ansible var file for dev
         run: |
-          echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=taxonomy-updater-dev-eu-west-2" >> $GITHUB_ENV
+          echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=taxonomy-updater-staging-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
           echo "AWS_DEFAULT_REGION=${{ env.AWS_REGION }}" >> $GITHUB_ENV
           echo "AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo AWS_ROLE_ARN="arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL" >> $GITHUB_ENV
+          echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_STAGING }} >> $GITHUB_ENV
 
       - name: write ssh key file
         run: |
