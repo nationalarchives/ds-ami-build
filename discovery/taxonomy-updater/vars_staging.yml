@@ -2,6 +2,7 @@
 key_name: "taxonomy-update-staging-eu-west-2"
 region: "eu-west-2"
 service: "taxonomy"
+env: "staging"
 volume_size: 30
 
 s3_deployment_bucket: "ds-intersite-deployment"
