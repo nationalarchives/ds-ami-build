@@ -46,7 +46,7 @@ jobs:
           echo "AWS_DEFAULT_REGION=${{ env.AWS_REGION }}" >> $GITHUB_ENV
           echo "AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_DEV" >> $GITHUB_ENV
+          echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_DEV }}" >> $GITHUB_ENV
 
       - name: write ssh key file
         run: |
