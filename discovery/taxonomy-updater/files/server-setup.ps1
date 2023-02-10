@@ -221,11 +221,11 @@ config:
     "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
-    "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
-    netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
-    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
-    "---- start installation process" | Out-File -FilePath /debug.txt -Append
-    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
+#    "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
+#    netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
+#    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
+#    "---- start installation process" | Out-File -FilePath /debug.txt -Append
+#    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 } catch {
