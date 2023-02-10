@@ -33,7 +33,7 @@
         region: "{{ region }}"
         filters:
           #name: "Windows_Server-2022-English-Core-Base*"
-          name: "EC2LaunchV2-Windows_Server-2022-English-Core-Base*"
+          name: "Windows_Server-2022-English-Full-Bas*"
       register: findami
 
     - name: set latest AMI
