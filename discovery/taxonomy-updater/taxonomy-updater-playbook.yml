@@ -24,7 +24,7 @@
         role_session_name: "s-devops"
       register: assumed_role
 
-    - name: get Windows 2022 Core AMI
+    - name: get Windows 2022 AMI
       amazon.aws.ec2_ami_info:
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
