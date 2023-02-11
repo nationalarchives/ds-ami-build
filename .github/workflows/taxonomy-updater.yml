@@ -32,7 +32,7 @@ jobs:
       - name: aws variable settings
         run: |
           echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=${{ env.AWS_REGION }} >> $GITHUB_ENV
           echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
           echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
 
@@ -43,9 +43,9 @@ jobs:
 
       - name: aws variable settings
         run: |
-          echo "AWS_DEFAULT_REGION=${{ env.AWS_REGION }}" >> $GITHUB_ENV
-          echo "AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_DEFAULT_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
           echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_DEV }}" >> $GITHUB_ENV
 
       - name: write ssh key file
@@ -74,9 +74,9 @@ jobs:
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/discovery/taxonomy-updater
-          export AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
-          export AWS_DEFAULT_REGION=eu-west-2
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=${{ env.AWS_REGION }}
           ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} taxonomy-updater-playbook.yml
 
   # ------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ jobs:
       - name: aws variable settings
         run: |
           echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=${{ env.AWS_REGION }} >> $GITHUB_ENV
           echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
           echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
 
@@ -107,8 +107,8 @@ jobs:
       - name: aws variable settings
         run: |
           echo "AWS_DEFAULT_REGION=${{ env.AWS_REGION }}" >> $GITHUB_ENV
-          echo "AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
           echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_STAGING }} >> $GITHUB_ENV
 
       - name: write ssh key file
@@ -137,7 +137,7 @@ jobs:
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/discovery/taxonomy-updater
-          export AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
-          export AWS_DEFAULT_REGION=eu-west-2
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=${{ env.AWS_REGION }}
           ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} taxonomy-updater-playbook.yml
