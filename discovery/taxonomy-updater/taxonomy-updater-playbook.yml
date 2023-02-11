@@ -97,7 +97,7 @@
         metadata_options:
           http_endpoint: "enabled"
           http_tokens: "optional"
-        name: "taxonomy-update-wincore-primer-{{ env }}"
+        name: "taxonomy-update-primer"
         network:
           assign_public_ip: yes
           delete_on_termination: yes
@@ -325,13 +325,13 @@
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
         security_token: "{{ assumed_role.sts_creds.session_token }}"
         instance_id: "{{ instance_id }}"
-        name: "{{ service }}-web-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+        name: "{{ service }}-updater-primer-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
         description: "Taxonomy Updater - ready for deployment"
         region: "{{ region }}"
         state: "present"
         wait: yes
         tags:
-          Name: "{{ service }}-web-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+          Name: "{{ service }}-updater-primer-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
           Service: "{{ service }}"
           Owner: "Digital Services"
           CreatedBy: "ansible"
