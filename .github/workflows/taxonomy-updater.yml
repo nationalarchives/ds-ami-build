@@ -12,17 +12,19 @@ on:
         description: Environment
         required: true
         options:
-        - dev
-        - staging
+          - staging
+          - dev
 
 jobs:
-# ------------------------------------------------------------------------------
-# dev deployment
-# ------------------------------------------------------------------------------
+  # ------------------------------------------------------------------------------
+  # dev deployment
+  # ------------------------------------------------------------------------------
   taxonomy-updater-ami-dev:
     if: github.event.inputs.deploy-environment == 'dev'
     runs-on: ubuntu-latest
-    environment: discovery-dev
+    environment: taxonomy-dev
+    env:
+      aws_region: "eu-west-2"
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -34,12 +36,19 @@ jobs:
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
           echo "SSH_KEY_FILE=taxonomy-updater-dev-eu-west-2" >> $GITHUB_ENV
 
-      #- name: aws variable settings
-      #  run: |
-      #    echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
-      #    echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
-      #    echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
-      #    echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+      - name: aws variable settings
+        run: |
+          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=${{ env.aws_region }} >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo "AWS_DEFAULT_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_DEV }}" >> $GITHUB_ENV
 
       - name: write ssh key file
         run: |
@@ -51,9 +60,9 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-          cache-dependency-path: '**/discovery-req.txt'
+          cache-dependency-path: '**/taxonomy-req.txt'
 
-      - run: pip install -r ${{ github.workspace }}/.github/workflows/discovery-req.txt
+      - run: pip install -r ${{ github.workspace }}/.github/workflows/taxonomy-req.txt
 
       - name: install ansible.windows
         run: ansible-galaxy collection install ansible.windows
@@ -67,18 +76,20 @@ jobs:
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/discovery/taxonomy-updater
-          # export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          # export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          # export AWS_DEFAULT_REGION=eu-west-2
-          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} taxonomy-updater-wincore-playbook.yml
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=${{ env.aws_region }}
+          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} taxonomy-updater-playbook.yml
 
-# ------------------------------------------------------------------------------
-# staging deployment
-# ------------------------------------------------------------------------------
-  discovery-web-wincore-ami-staging:
+  # ------------------------------------------------------------------------------
+  # staging deployment
+  # ------------------------------------------------------------------------------
+  taxonomy-updater-ami-staging:
     if: github.event.inputs.deploy-environment == 'staging'
     runs-on: ubuntu-latest
-    environment: discovery-staging
+    environment: taxonomy-staging
+    env:
+      aws_region: "eu-west-2"
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -88,14 +99,21 @@ jobs:
       - name: set ansible var file for staging
         run: |
           echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=discovery-web-staging-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=taxonomy-updater-staging-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
           echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=${{ env.aws_region }} >> $GITHUB_ENV
           echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
           echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo "AWS_DEFAULT_REGION=${{ env.aws_region }}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_STAGING }} >> $GITHUB_ENV
 
       - name: write ssh key file
         run: |
@@ -107,9 +125,9 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-          cache-dependency-path: '**/discovery-req.txt'
+          cache-dependency-path: '**/taxonomy-req.txt'
 
-      - run: pip install -r ${{ github.workspace }}/.github/workflows/discovery-req.txt
+      - run: pip install -r ${{ github.workspace }}/.github/workflows/taxonomy-req.txt
 
       - name: install ansible.windows
         run: ansible-galaxy collection install ansible.windows
@@ -122,8 +140,8 @@ jobs:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
           cur_dir=$(pwd)
-          cd $cur_dir/discovery/web-wincore
+          cd $cur_dir/discovery/taxonomy-updater
           export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
           export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          export AWS_DEFAULT_REGION=eu-west-2
-          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} discovery-web-wincore-playbook.yml
+          export AWS_DEFAULT_REGION=${{ env.aws_region }}
+          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} taxonomy-updater-playbook.yml
