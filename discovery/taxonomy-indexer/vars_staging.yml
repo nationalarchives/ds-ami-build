@@ -1,5 +1,5 @@
 ---
-key_name: "taxonomy-updater-staging-eu-west-2"
+key_name: "taxonomy-indexer-staging-eu-west-2"
 region: "eu-west-2"
 service: "taxonomy"
 env: "staging"
