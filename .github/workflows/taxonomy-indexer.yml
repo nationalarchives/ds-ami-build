@@ -1,0 +1,147 @@
+name: Taxonomy Indexer AMI
+
+permissions:
+  id-token: write
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy-environment:
+        type: choice
+        description: Environment
+        required: true
+        options:
+          - staging
+          - dev
+
+jobs:
+  # ------------------------------------------------------------------------------
+  # dev deployment
+  # ------------------------------------------------------------------------------
+  taxonomy-indexer-ami-dev:
+    if: github.event.inputs.deploy-environment == 'dev'
+    runs-on: ubuntu-latest
+    environment: taxonomy-dev
+    env:
+      aws_region: "eu-west-2"
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ github.event.inputs.branch }}"
+
+      - name: set ansible var file for dev
+        run: |
+          echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=taxonomy-indexer-dev-eu-west-2" >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=${{ env.aws_region }} >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo "AWS_DEFAULT_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_DEV }}" >> $GITHUB_ENV
+
+      - name: write ssh key file
+        run: |
+          echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          chmod 0600 ${{ env.SSH_KEY_FILE }}
+
+      - name: install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/taxonomy-req.txt'
+
+      - run: pip install -r ${{ github.workspace }}/.github/workflows/taxonomy-req.txt
+
+      - name: install ansible.windows
+        run: ansible-galaxy collection install ansible.windows
+
+      - name: run ansible playbook
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          VPC_ID: ${{ secrets.VPC_ID }}
+          SUBNET_ID: ${{ secrets.SUBNET_ID }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          cur_dir=$(pwd)
+          cd $cur_dir/discovery/taxonomy-indexer
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=${{ env.aws_region }}
+          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} taxonomy-indexer-playbook.yml
+
+  # ------------------------------------------------------------------------------
+  # staging deployment
+  # ------------------------------------------------------------------------------
+  taxonomy-indexer-ami-staging:
+    if: github.event.inputs.deploy-environment == 'staging'
+    runs-on: ubuntu-latest
+    environment: taxonomy-staging
+    env:
+      aws_region: "eu-west-2"
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ github.event.inputs.branch }}"
+
+      - name: set ansible var file for staging
+        run: |
+          echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=taxonomy-indexer-staging-eu-west-2" >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=${{ env.aws_region }} >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo "AWS_DEFAULT_REGION=${{ env.aws_region }}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo AWS_ROLE_ARN=${{ secrets.OIDC_ROLE_ARN_STAGING }} >> $GITHUB_ENV
+
+      - name: write ssh key file
+        run: |
+          echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          chmod 0600 ${{ env.SSH_KEY_FILE }}
+
+      - name: install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/taxonomy-req.txt'
+
+      - run: pip install -r ${{ github.workspace }}/.github/workflows/taxonomy-req.txt
+
+      - name: install ansible.windows
+        run: ansible-galaxy collection install ansible.windows
+
+      - name: run ansible playbook
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          VPC_ID: ${{ secrets.VPC_ID }}
+          SUBNET_ID: ${{ secrets.SUBNET_ID }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          cur_dir=$(pwd)
+          cd $cur_dir/discovery/taxonomy-indexer
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=${{ env.aws_region }}
+          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} taxonomy-indexer-playbook.yml
