@@ -199,7 +199,7 @@ config:
     tasks:
       - task: startSsm
 '@
-    ec2launch reset -c
+    "C:\Program Files\Amazon\EC2Launch\ec2launch.exe" reset -c
 
 ##    "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
 ##    "---> set instance to generate a new password for next start and run user script" | Out-File -FilePath /debug.txt -Append
