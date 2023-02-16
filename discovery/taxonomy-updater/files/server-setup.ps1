@@ -161,39 +161,45 @@ try {
     "===> enable SMBv2 signing" | Out-File -FilePath /debug.txt -Append
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
-##     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
-## version: 1.0
-## config:
-##   - stage: boot
-##     tasks:
-##       - task: extendRootPartition
-##   - stage: preReady
-##     tasks:
-##       - task: activateWindows
-##         inputs:
-##           activation:
-##             type: amazon
-##       - task: setDnsSuffix
-##         inputs:
-##           suffixes:
-##             - $REGION.ec2-utilities.amazonaws.com
-##       - task: setWallpaper
-##         inputs:
-##           path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
-##           attributes:
-##             - hostName
-##             - instanceId
-##             - privateIpAddress
-##             - publicIpAddress
-##             - instanceSize
-##             - availabilityZone
-##             - architecture
-##             - memory
-##             - network
-##   - stage: postReady
-##     tasks:
-##       - task: startSsm
-## '@
+    Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
+version: 1.0
+config:
+  - stage: boot
+    tasks:
+      - task: extendRootPartition
+  - stage: preReady
+    tasks:
+      - task: activateWindows
+        inputs:
+          activation:
+            type: amazon
+      - task: setDnsSuffix
+        inputs:
+          suffixes:
+            - $REGION.ec2-utilities.amazonaws.com
+      - task: setAdminAccount
+        inputs:
+          name: Administrator
+          password:
+            type: random
+      - task: setWallpaper
+        inputs:
+          path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
+          attributes:
+            - hostName
+            - instanceId
+            - privateIpAddress
+            - publicIpAddress
+            - instanceSize
+            - availabilityZone
+            - architecture
+            - memory
+            - network
+  - stage: postReady
+    tasks:
+      - task: startSsm
+'@
+    ec2launch reset -c
 
 ##    "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
 ##    "---> set instance to generate a new password for next start and run user script" | Out-File -FilePath /debug.txt -Append
