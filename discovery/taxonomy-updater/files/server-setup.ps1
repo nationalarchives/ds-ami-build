@@ -181,7 +181,7 @@ config:
         inputs:
           name: Administrator
           password:
-            type: static
+            type: random
       - task: setWallpaper
         inputs:
           path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
