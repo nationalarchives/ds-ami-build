@@ -177,11 +177,6 @@ config:
         inputs:
           suffixes:
             - $REGION.ec2-utilities.amazonaws.com
-      - task: setAdminAccount
-        inputs:
-          name: Administrator
-          password:
-            type: random
       - task: setWallpaper
         inputs:
           path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
