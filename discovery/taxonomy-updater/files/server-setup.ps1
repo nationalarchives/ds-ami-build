@@ -194,12 +194,12 @@ config:
             - availabilityZone
             - architecture
             - memory
-            - network
+            - network``````````````````
   - stage: postReady
     tasks:
       - task: startSsm
 '@
-    "C:\Program Files\Amazon\EC2Launch\ec2launch.exe" reset -c
+##    "C:\Program Files\Amazon\EC2Launch\ec2launch.exe" reset -c
 
 ##    "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
 ##    "---> set instance to generate a new password for next start and run user script" | Out-File -FilePath /debug.txt -Append
@@ -222,6 +222,8 @@ config:
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
+
+    "%programfiles%\amazon\ec2launch\ec2launch.exe" sysprep --shutdown=true
 
 #    "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
 #    netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
