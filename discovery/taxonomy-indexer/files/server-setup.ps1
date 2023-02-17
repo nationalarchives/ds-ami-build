@@ -168,11 +168,12 @@ try {
         https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
         -OutFile $tmpDir\SSMAgent_latest.exe
     "run installer" | Out-File -FilePath /debug.txt -Append
+    cd $tmpDir
     Start-Process `
-        -FilePath $tmpDir\SSMAgent_latest.exe `
+        -FilePath .\SSMAgent_latest.exe `
         -ArgumentList "/S"
     "remove installer" | Out-File -FilePath /debug.txt -Append
-    rm -Force $tmpDir\SSMAgent_latest.exe
+    rm -Force .\SSMAgent_latest.exe
 
     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
 version: 1.0
@@ -217,7 +218,8 @@ config:
            runAs: localSystem
            detach: true
            content: |-
-           & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' reset --clean --block
+           cd 'C:\Program Files\Amazon\EC2Launch'
+           & .\EC2Launch.exe reset --clean --block
 
 '@
 
