@@ -161,6 +161,16 @@ try {
     "===> enable SMBv2 signing" | Out-File -FilePath /debug.txt -Append
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
+    "===> install SSM" | Out-File -FilePath /debug.txt -Append
+#    $progressPreference = 'silentlyContinue'
+    Invoke-WebRequest `
+        https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
+        -OutFile $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+    Start-Process `
+        -FilePath $env:USERPROFILE\Desktop\SSMAgent_latest.exe `
+        -ArgumentList "/S"
+    rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+
     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
 version: 1.0
 config:
@@ -198,24 +208,6 @@ config:
     tasks:
       - task: startSsm
 '@
-
-##    "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
-##    "---> set instance to generate a new password for next start and run user script" | Out-File -FilePath /debug.txt -Append
-##    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
-##    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
-##{
-##    "SetComputerName":  false,
-##    "SetMonitorAlwaysOn":  false,
-##    "SetWallpaper":  true,
-##    "AddDnsSuffixList":  true,
-##    "ExtendBootVolumeSize":  true,
-##    "HandleUserData":  true,
-##    "AdminPasswordType":  "Random",
-##    "AdminPassword":  ""
-##}
-##"@
-##    "---- schedule EC2Launch for next start" | Out-File -FilePath /debug.txt -Append
-##    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
