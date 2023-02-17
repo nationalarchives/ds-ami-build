@@ -162,7 +162,7 @@ try {
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
     "===> install SSM" | Out-File -FilePath /debug.txt -Append
-    $progressPreference = 'silentlyContinue'
+#    $progressPreference = 'silentlyContinue'
     Invoke-WebRequest `
         https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
         -OutFile $env:USERPROFILE\Desktop\SSMAgent_latest.exe
@@ -171,59 +171,59 @@ try {
         -ArgumentList "/S"
     rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
 
-    "===> install EC2Lauch - v2" | Out-File -FilePath /debug.txt -Append
-    mkdir $env:USERPROFILE\Desktop\EC2Launchv2
-    $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
-    $DownloadFile = "$env:USERPROFILE\Desktop\EC2Launchv2\" + $(Split-Path -Path $Url -Leaf)
-    Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
-    msiexec /i "$DownloadFile"
-
-    Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
-version: 1.0
-config:
-  - stage: boot
-    tasks:
-      - task: extendRootPartition
-  - stage: preReady
-    tasks:
-      - task: activateWindows
-        inputs:
-          activation:
-            type: amazon
-      - task: setDnsSuffix
-        inputs:
-          suffixes:
-            - $REGION.ec2-utilities.amazonaws.com
-      - task: setAdminAccount
-        inputs:
-          name: Administrator
-          password:
-            type: random
-      - task: setWallpaper
-        inputs:
-          path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
-          attributes:
-            - hostName
-            - instanceId
-            - privateIpAddress
-            - publicIpAddress
-            - instanceSize
-            - availabilityZone
-            - architecture
-            - memory
-            - network
-  - stage: postReady
-    tasks:
-      - task: startSsm
-      - task: executeScript
-        inputs:
-          - frequency: once
-            type: powershell
-            runAs: localSystem
-            detach: true
-            content: |-
-            & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' reset --clean --block
-'@
+##     "===> install EC2Lauch - v2" | Out-File -FilePath /debug.txt -Append
+##     mkdir $env:USERPROFILE\Desktop\EC2Launchv2
+##     $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
+##     $DownloadFile = "$env:USERPROFILE\Desktop\EC2Launchv2\" + $(Split-Path -Path $Url -Leaf)
+##     Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
+##     msiexec /i "$DownloadFile"
+##
+##     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
+## version: 1.0
+## config:
+##   - stage: boot
+##     tasks:
+##       - task: extendRootPartition
+##   - stage: preReady
+##     tasks:
+##       - task: activateWindows
+##         inputs:
+##           activation:
+##             type: amazon
+##       - task: setDnsSuffix
+##         inputs:
+##           suffixes:
+##             - $REGION.ec2-utilities.amazonaws.com
+##       - task: setAdminAccount
+##         inputs:
+##           name: Administrator
+##           password:
+##             type: random
+##       - task: setWallpaper
+##         inputs:
+##           path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
+##           attributes:
+##             - hostName
+##             - instanceId
+##             - privateIpAddress
+##             - publicIpAddress
+##             - instanceSize
+##             - availabilityZone
+##             - architecture
+##             - memory
+##             - network
+##   - stage: postReady
+##     tasks:
+##       - task: startSsm
+##       - task: executeScript
+##         inputs:
+##           - frequency: once
+##             type: powershell
+##             runAs: localSystem
+##             detach: true
+##             content: |-
+##             & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' reset --clean --block
+## '@
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
