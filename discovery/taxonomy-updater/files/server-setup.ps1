@@ -213,7 +213,6 @@ config:
             detach: true
             content: |-
             & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' reset --clean --block
-            & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' sysprep --clean
 '@
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
