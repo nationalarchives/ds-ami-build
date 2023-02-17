@@ -165,11 +165,11 @@ try {
 #    $progressPreference = 'silentlyContinue'
     Invoke-WebRequest `
         https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
-        -OutFile $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+        -OutFile $tmpDir\SSMAgent_latest.exe
     Start-Process `
-        -FilePath $env:USERPROFILE\Desktop\SSMAgent_latest.exe `
+        -FilePath C:\temp\SSMAgent_latest.exe `
         -ArgumentList "/S"
-    rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+    rm -Force $tmpDir\SSMAgent_latest.exe
 
     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
 version: 1.0
@@ -207,6 +207,15 @@ config:
   - stage: postReady
     tasks:
       - task: startSsm
+      - task: executeScript
+         inputs:
+           frequency: once
+           type: powershell
+           runAs: localSystem
+           detach: true
+           content: |-
+           & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' reset --clean --block
+
 '@
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
