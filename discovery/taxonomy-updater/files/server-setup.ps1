@@ -142,13 +142,13 @@ try {
 ##
 ##     Start-WebSite -Name $webSiteName
 
-    # set system variables for application
-    "===> environment variables" | Out-File -FilePath /debug.txt -Append
-    foreach ($key in $envHash.keys) {
-        $envKey = $($key)
-        $envValue = $($envHash[$key])
-        [System.Environment]::SetEnvironmentVariable($envKey, $envValue, "Machine")
-    }
+##     # set system variables for application
+##     "===> environment variables" | Out-File -FilePath /debug.txt -Append
+##     foreach ($key in $envHash.keys) {
+##         $envKey = $($key)
+##         $envValue = $($envHash[$key])
+##         [System.Environment]::SetEnvironmentVariable($envKey, $envValue, "Machine")
+##     }
 
     "===> set network interface profile to private" | Out-File -FilePath /debug.txt -Append
     $networks = Get-NetConnectionProfile
@@ -161,87 +161,57 @@ try {
     "===> enable SMBv2 signing" | Out-File -FilePath /debug.txt -Append
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
-    Set-Content -Path "C:\ProgramData\Amazon\EC2-Windows\Launch\Config\LaunchConfig.json" -Value @'
-{
-  "setComputerName": false,
-  "setMonitorAlwaysOn": true,
-  "setWallpaper": true,
-  "addDnsSuffixList": true,
-  "extendBootVolumeSize": true,
-  "handleUserData": true,
-  "adminPasswordType": "Random"
-}
+    Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
+version: 1.0
+config:
+  - stage: boot
+    tasks:
+      - task: extendRootPartition
+  - stage: preReady
+    tasks:
+      - task: activateWindows
+        inputs:
+          activation:
+            type: amazon
+      - task: setDnsSuffix
+        inputs:
+          suffixes:
+            - $REGION.ec2-utilities.amazonaws.com
+      - task: setAdminAccount
+        inputs:
+          name: Administrator
+          password:
+            type: random
+      - task: setWallpaper
+        inputs:
+          path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
+          attributes:
+            - hostName
+            - instanceId
+            - privateIpAddress
+            - publicIpAddress
+            - instanceSize
+            - availabilityZone
+            - architecture
+            - memory
+            - network
+  - stage: postReady
+    tasks:
+      - task: startSsm
+      - task: executeScript
+        inputs:
+          - frequency: once
+            type: powershell
+            runAs: localSystem
+            detach: true
+            content: |-
+            & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' reset --clean --block
+            & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' sysprep --clean --shutdown
 '@
-
-##     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
-## version: 1.0
-## config:
-##   - stage: boot
-##     tasks:
-##       - task: extendRootPartition
-##   - stage: preReady
-##     tasks:
-##       - task: activateWindows
-##         inputs:
-##           activation:
-##             type: amazon
-##       - task: setDnsSuffix
-##         inputs:
-##           suffixes:
-##             - $REGION.ec2-utilities.amazonaws.com
-##       - task: setAdminAccount
-##         inputs:
-##           name: Administrator
-##           password:
-##             type: random
-##       - task: setWallpaper
-##         inputs:
-##           path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
-##           attributes:
-##             - hostName
-##             - instanceId
-##             - privateIpAddress
-##             - publicIpAddress
-##             - instanceSize
-##             - availabilityZone
-##             - architecture
-##             - memory
-##             - network``````````````````
-##   - stage: postReady
-##     tasks:
-##       - task: startSsm
-## '@
-##    "C:\Program Files\Amazon\EC2Launch\ec2launch.exe" reset -c
-
-##    "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
-##    "---> set instance to generate a new password for next start and run user script" | Out-File -FilePath /debug.txt -Append
-##    $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
-##    Set-Content -Path "$destination\LaunchConfig.json" -Value @"
-##{
-##    "SetComputerName":  false,
-##    "SetMonitorAlwaysOn":  false,
-##    "SetWallpaper":  true,
-##    "AddDnsSuffixList":  true,
-##    "ExtendBootVolumeSize":  true,
-##    "HandleUserData":  true,
-##    "AdminPasswordType":  "Random",
-##    "AdminPassword":  ""
-##}
-##"@
-##    "---- schedule EC2Launch for next start" | Out-File -FilePath /debug.txt -Append
-##    C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
-
-    "%programfiles%\amazon\ec2launch\ec2launch.exe" sysprep --shutdown=true
-
-#    "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
-#    netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
-#    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
-#    "---- start installation process" | Out-File -FilePath /debug.txt -Append
-#    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 } catch {
