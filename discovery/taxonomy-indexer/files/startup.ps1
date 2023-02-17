@@ -23,6 +23,8 @@ try {
 		Add-content $runFlag -value "$Time - startup script is activated"
 	}
 
+	Restart-Service AmazonSSMAgent
+
 	$sysEnv = $Env:TNA_APP_ENVIRONMENT
 
 	# check if environment is set correctly

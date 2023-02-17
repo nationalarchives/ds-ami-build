@@ -163,12 +163,15 @@ try {
 
     "===> install SSM" | Out-File -FilePath /debug.txt -Append
 #    $progressPreference = 'silentlyContinue'
+    "download installer" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest `
         https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
         -OutFile $tmpDir\SSMAgent_latest.exe
+    "run installer" | Out-File -FilePath /debug.txt -Append
     Start-Process `
-        -FilePath C:\temp\SSMAgent_latest.exe `
+        -FilePath $tmpDir\SSMAgent_latest.exe `
         -ArgumentList "/S"
+    "remove installer" | Out-File -FilePath /debug.txt -Append
     rm -Force $tmpDir\SSMAgent_latest.exe
 
     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
