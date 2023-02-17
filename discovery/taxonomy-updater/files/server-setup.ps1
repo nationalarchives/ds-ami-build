@@ -161,6 +161,13 @@ try {
     "===> enable SMBv2 signing" | Out-File -FilePath /debug.txt -Append
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
+    "===> install EC2Lauch - v2" | Out-File -FilePath /debug.txt -Append
+    mkdir $env:USERPROFILE\Desktop\EC2Launchv2
+    $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
+    $DownloadFile = "$env:USERPROFILE\Desktop\EC2Launchv2\" + $(Split-Path -Path $Url -Leaf)
+    Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
+    msiexec /i "$DownloadFile"
+
     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
 version: 1.0
 config:
@@ -206,7 +213,7 @@ config:
             detach: true
             content: |-
             & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' reset --clean --block
-            & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' sysprep --clean --shutdown
+            & 'C:\Program Files\Amazon\EC2Launch\ec2launch.exe' sysprep --clean
 '@
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
