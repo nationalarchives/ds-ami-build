@@ -172,9 +172,9 @@ try {
     Start-Process `
         -FilePath .\SSMAgent_latest.exe `
         -ArgumentList "/S"
-    "remove installer" | Out-File -FilePath /debug.txt -Append
-    rm -Force .\SSMAgent_latest.exe
 
+    "===> prepare EC2Launch" | Out-File -FilePath /debug.txt -Append
+    "write agent-config.yml" | Out-File -FilePath /debug.txt -Append
     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
 version: 1.0
 config:
@@ -211,16 +211,6 @@ config:
   - stage: postReady
     tasks:
       - task: startSsm
-      - task: executeScript
-         inputs:
-           frequency: once
-           type: powershell
-           runAs: localSystem
-           detach: true
-           content: |-
-           cd 'C:\Program Files\Amazon\EC2Launch'
-           & .\EC2Launch.exe reset --clean --block
-
 '@
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
