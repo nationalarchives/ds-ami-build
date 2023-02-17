@@ -161,6 +161,16 @@ try {
     "===> enable SMBv2 signing" | Out-File -FilePath /debug.txt -Append
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
+    "===> install SSM" | Out-File -FilePath /debug.txt -Append
+    $progressPreference = 'silentlyContinue'
+    Invoke-WebRequest `
+        https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
+        -OutFile $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+    Start-Process `
+        -FilePath $env:USERPROFILE\Desktop\SSMAgent_latest.exe `
+        -ArgumentList "/S"
+    rm -Force $env:USERPROFILE\Desktop\SSMAgent_latest.exe
+
     "===> install EC2Lauch - v2" | Out-File -FilePath /debug.txt -Append
     mkdir $env:USERPROFILE\Desktop\EC2Launchv2
     $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest/AmazonEC2Launch.msi"
