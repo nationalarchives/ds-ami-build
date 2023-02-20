@@ -173,7 +173,13 @@ try {
         -FilePath .\SSMAgent_latest.exe `
         -ArgumentList "/S"
 
-    "===> prepare EC2Launch" | Out-File -FilePath /debug.txt -Append
+    "===> install EC2Launch" | Out-File -FilePath /debug.txt -Append
+    $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/386/latest/AmazonEC2Launch.msi"
+    $DownloadFile = "c:\temp\" + $(Split-Path -Path $Url -Leaf)
+    "download package" | Out-File -FilePath /debug.txt -Append
+    Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
+    "install EC2Launch v2" | Out-File -FilePath /debug.txt -Append
+    Start-Process -Wait -FilePath msiexec -ArgumentList /i, "$DownloadFile", /qn
     "write agent-config.yml" | Out-File -FilePath /debug.txt -Append
     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
 version: 1.0
@@ -212,7 +218,7 @@ config:
     tasks:
       - task: startSsm
 '@
-
+    "reset EC2Launch" | Out-File -FilePath /debug.txt -Append
     ec2launch reset -c
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
