@@ -200,7 +200,7 @@ config:
       - task: setAdminAccount
         inputs:
           password:
-            type: doNothing
+            type: random
       - task: setWallpaper
         inputs:
           path: C:\ProgramData\Amazon\EC2Launch\wallpaper\Ec2Wallpaper.jpg
