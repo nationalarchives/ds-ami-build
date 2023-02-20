@@ -302,7 +302,7 @@
         msg:
           - "====================================================================="
           - "checking setup script has finished"
-          - "20 second interval with max duration of 5 minutes"
+          - "20 second interval with max duration of 2 minutes"
           - "====================================================================="
 
     - name: check if ec2 instance is ready
@@ -310,7 +310,7 @@
         path: "C:\\setup-status.txt"
       register: setup_status
       until: "setup_status.stat.exists"
-      retries: 15
+      retries: 6
       delay: 20
 
 - name: switch to localhost

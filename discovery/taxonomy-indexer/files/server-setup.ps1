@@ -219,7 +219,7 @@ config:
       - task: startSsm
 '@
     "reset EC2Launch" | Out-File -FilePath /debug.txt -Append
-    ec2launch reset -c
+    "C:\Program Files\Amazon\EC2Launch\ec2launch" reset -c
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
