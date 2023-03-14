@@ -16,7 +16,8 @@
                 "s3:GetObject"
             ],
             "Resource": [
-                "arn:aws:s3:::{{s3_deployment_bucket}}/{{s3_deployment_root}}/*"
+                "arn:aws:s3:::{{s3_deployment_bucket}}/{{s3_deployment_root}}/*",
+                "arn:aws:s3:::{{s3_deployment_bucket}}/installation-packages/*"
             ]
         },
         {
