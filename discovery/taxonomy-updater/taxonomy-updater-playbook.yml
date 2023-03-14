@@ -330,3 +330,20 @@
         name: "ansible-ami-taxonomy-web-sg"
         region: "{{ region }}"
         state: "absent"
+
+    - name: create updater IAM role
+      community.aws.iam_role:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
+        name: "ansible-ami-taxonomy-updater-role"
+        region: "{{ region }}"
+        state: "absent"
+
+    - name: create deployment policy
+      community.aws.iam_managed_policy:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
+        policy_name: "ansible-ami-taxonomy-updater-s3-policy"
+        state: "absent"
