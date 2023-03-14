@@ -13,7 +13,7 @@ $tmpDir = "c:\temp"
 "[debug]" | Out-File -FilePath /debug.txt
 
 # required packages
-$installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
+$installerPackageUrl =  "s3://ds-$environment-deployment/installation-packages/discovery"
 
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
@@ -50,12 +50,6 @@ try {
     Install-WindowsFeature Web-Mgmt-Service
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
-
-##    "===> aquire AWS credentials" | Out-File -FilePath /debug.txt -Append
-##    $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
-##    $Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
-##    $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
-##    $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
 
     "===> download and install required packages and config files" | Out-File -FilePath /debug.txt -Append
     Set-Location -Path $tmpDir
