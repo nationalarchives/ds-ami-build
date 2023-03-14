@@ -90,7 +90,7 @@
         dest: "./instance-role-policy.json"
         force: yes
 
-    - name: create deployment policy
+§    - name: create deployment policy
       community.aws.iam_managed_policy:
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
