@@ -25,14 +25,9 @@ try {
 
 	Restart-Service AmazonSSMAgent
 
-	$sysEnv = $Env:TNA_APP_ENVIRONMENT
-
-	# check if environment is set correctly
-	if (-not ($sysEnv -eq "dev" -or $sysEnv -eq "staging" -or $sysEnv -eq "live")) {
-		write-log -Message "environment variable not set" -Severity "Error"
-		exit 1
-	}
-
+	write-log -Message "starting updater"
+	Set-Location -Path "c://Elastic-Taxonomy//batch-update"
+	Start-Process NationalArchives.Taxonomy.Batch.Update.Elastic.exe -WindowStyle "Hidden"
 } catch {
 	write-log -Message "Caught an exception:" -Severity "Error"
 	write-log -Message "Exception Type: $($_.Exception.GetType().FullName)" -Severity "Error"

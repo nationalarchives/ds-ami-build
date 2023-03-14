@@ -15,45 +15,17 @@ $tmpDir = "c:\temp"
 # required packages
 $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
 
-$wacInstaller = "WindowsAdminCenter2110.2.msi"
-$dotnetInstaller = "ndp48-web.exe"
-$dotnetPackagename = ".NET Framework 4.8 Platform (web installer)"
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
-
+$dotnetSDK6 = "https://download.visualstudio.microsoft.com/download/pr/4a725ea4-cd2c-4383-9b63-263156d5f042/d973777b32563272b85617105a06d272/dotnet-sdk-6.0.406-win-x64.exe"
 $cloudwatchAgentInstaller = "https://s3.eu-west-1.amazonaws.com/amazoncloudwatch-agent-eu-west-1/windows/amd64/latest/amazon-cloudwatch-agent.msi"
-$ec2launchInstallerUrl = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/amd64/latest"
-$ec2launchInstaller = "AmazonEC2Launch.msi"
-
-## # website parameters
-## $appPool = "TaxonomyAppPool"
-## $webSiteName = "Main"
-## $webSiteRoot = "C:\WebSites"
-##
-## # discovery front-end server setup requires to be based in RDWeb service
-## $servicesPath = "$webSiteRoot\Services"
-## if ($tier -eq "web") {
-##     $webSitePath = "$servicesPath\RDWeb"
-## } else {
-##     $webSitePath = "$webSiteRoot\Main"
-## }
-##
-## # environment variables for target system
-## $envHash = @{
-##     "TNA_APP_ENVIRONMENT" = "$environment"
-##     "TNA_APP_TIER" = "$tier"
-## }
+$codeTarget = "c://Elastic-Taxonomy//batch-update"
 
 "=================> start server setup script" | Out-File -FilePath /debug.txt -Append
 
 try {
     # Catch non-terminateing errors
     $ErrorActionPreference = "Stop"
-
-##     "---- create required directories" | Out-File -FilePath /debug.txt -Append
-##     New-Item -itemtype "directory" $webSiteRoot -Force
-##     New-Item -itemtype "directory" "$servicesPath" -Force
-##     New-Item -itemtype "directory" "$webSitePath" -Force
 
     "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
     "---- downloading AWS CLI" | Out-File -FilePath /debug.txt -Append
@@ -88,12 +60,6 @@ try {
     "===> download and install required packages and config files" | Out-File -FilePath /debug.txt -Append
     Set-Location -Path $tmpDir
 
-    "===> URLRewrite2" | Out-File -FilePath /debug.txt -Append
-    "---- download from S3" | Out-File -FilePath /debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp s3://ds-intersite-deployment/discovery/installation-packages/rewrite_amd64_en-US.msi $tmpDir/rewrite_amd64_en-US.msi"
-    "---- run installer" | Out-File -FilePath /debug.txt -Append
-    Start-Process -FilePath "$tmpDir/rewrite_amd64_en-US.msi" -ArgumentList "/quiet /norestart" -PassThru -Wait
-
     "===> install CloudWatch Agent" | Out-File -FilePath /debug.txt -Append
     "---- download agent" | Out-File -FilePath /debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile($cloudwatchAgentInstaller, "$tmpDir\amazon-cloudwatch-agent.msi")
@@ -105,50 +71,18 @@ try {
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
     "---- end cloudwatch installation process" | Out-File -FilePath /debug.txt -Append
 
-    "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
-    "---- start installation process" | Out-File -FilePath /debug.txt -Append
-    Start-Process -FilePath $dotnetInstaller -ArgumentList "/q /norestart" -PassThru -Wait
-    "---- end installation process" | Out-File -FilePath /debug.txt -Append
+    "===> download and install dotnet sdk 6" | Out-File -FilePath /debug.txt -Append
+    "download" | Out-File -FilePath /debug.txt -Append
+    (new-object System.Net.WebClient).DownloadFile($dotnetSDK6, "$tmpDir\dotnet-sdk-6.0.406-win-x64.exe")
+    "install" | Out-File -FilePath /debug.txt -Append
+    & "$tmpDir\dotnet-sdk-6.0.406-win-x64.exe" /install /passive /norestart
 
-##     if ($tier -eq "api") {
-##         "===> $dotnetCorePackagename" | Out-File -FilePath /debug.txt -Append
-##         Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetCoreInstaller $tmpDir"
-##         "---- start installation process" | Out-File -FilePath /debug.txt -Append
-##         Start-Process -FilePath $dotnetCoreInstaller -ArgumentList "/q /norestart" -PassThru -Wait
-##         "---- end installation process" | Out-File -FilePath /debug.txt -Append
-##     }
-##
-##     "---- create AppPool" | Out-File -FilePath /debug.txt -Append
-##     Import-Module WebAdministration
-##     New-WebAppPool -name $appPool  -force
-##     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value 'v4.0'
-##     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value 'True'
-##
-##     "---- create website" | Out-File -FilePath /debug.txt -Append
-##     Stop-Website -Name "Default Web Site"
-##     Set-ItemProperty "IIS:\Sites\Default Web Site" serverAutoStart False
-##     Remove-WebSite -Name "Default Web Site"
-##     $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
-##
-##     "---- give IIS_USRS permissions" | Out-File -FilePath /debug.txt -Append
-##     $acl = Get-ACL $webSiteRoot
-##     $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("IIS_IUSRS", "FullControl", "ContainerInherit,ObjectInherit", "None", "Allow")
-##     $acl.AddAccessRule($accessRule)
-##     Set-ACL -Path "$webSiteRoot" -ACLObject $acl
-##
-##     # remove unwanted IIS headers
-##     Clear-WebConfiguration "/system.webServer/httpProtocol/customHeaders/add[@name='X-Powered-By']"
-##
-##     Start-WebSite -Name $webSiteName
-
-    # set system variables for application
-    "===> environment variables" | Out-File -FilePath /debug.txt -Append
-    foreach ($key in $envHash.keys) {
-        $envKey = $($key)
-        $envValue = $($envHash[$key])
-        [System.Environment]::SetEnvironmentVariable($envKey, $envValue, "Machine")
-    }
+    "===> download and install updater code" | Out-File -FilePath /debug.txt -Append
+    "---- download code" | Out-File -FilePath /debug.txt -Append
+    Invoke-Expression -Command "aws s3 cp s3://ds-$environment-deployment-source/taxonomy/taxonomy-indexer.zip $tmpDir/taxonomy-indexer.zip"
+    "---- install code" | Out-File -FilePath /debug.txt -Append
+    New-Item -Path "$codeTarget" -ItemType "directory" -Force
+    Expand-Archive -LiteralPath "$tmpDir/taxonomy-indexer.zip" -DestinationPath "$codeTarget"
 
     "===> set network interface profile to private" | Out-File -FilePath /debug.txt -Append
     $networks = Get-NetConnectionProfile
@@ -172,6 +106,7 @@ try {
     Start-Process `
         -FilePath .\SSMAgent_latest.exe `
         -ArgumentList "/S"
+    Restart-Service AmazonSSMAgent
 
     "===> install EC2Launch" | Out-File -FilePath /debug.txt -Append
     $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/386/latest/AmazonEC2Launch.msi"
@@ -224,12 +159,6 @@ config:
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
-
-#    "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
-#    netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
-#    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
-#    "---- start installation process" | Out-File -FilePath /debug.txt -Append
-#    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 } catch {
