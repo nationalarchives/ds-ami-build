@@ -2,6 +2,7 @@
 
 $logFile = "startup.log"
 $runFlag = "startupActive.txt"
+$codeTarget = "c://taxonomy-daily-index"
 
 function write-log
 {
@@ -26,8 +27,12 @@ try {
 	Restart-Service AmazonSSMAgent
 
 	write-log -Message "starting updater"
-	Set-Location -Path "c://Elastic-Taxonomy//batch-update"
-	Start-Process NationalArchives.Taxonomy.Batch.Update.Elastic.exe -WindowStyle "Hidden"
+	Set-Location -Path "$codeTarget"
+
+	Start-Process "$codeTarget\live\process\NationalArchives.Taxonomy.Batch.exe" -WindowStyle "Hidden"
+	Start-Process "$codeTarget\live\update\NationalArchives.Taxonomy.Batch.Update.Elastic.exe" -WindowStyle "Hidden"
+	Start-Process "$codeTarget\staging\process\NationalArchives.Taxonomy.Batch.exe" -WindowStyle "Hidden"
+	Start-Process "$codeTarget\staging\update\NationalArchives.Taxonomy.Batch.Update.Elastic.exe" -WindowStyle "Hidden"
 } catch {
 	write-log -Message "Caught an exception:" -Severity "Error"
 	write-log -Message "Exception Type: $($_.Exception.GetType().FullName)" -Severity "Error"

@@ -19,7 +19,7 @@ $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 $dotnetSDK6 = "https://download.visualstudio.microsoft.com/download/pr/4a725ea4-cd2c-4383-9b63-263156d5f042/d973777b32563272b85617105a06d272/dotnet-sdk-6.0.406-win-x64.exe"
 $cloudwatchAgentInstaller = "https://s3.eu-west-2.amazonaws.com/amazoncloudwatch-agent-eu-west-2/windows/amd64/latest/amazon-cloudwatch-agent.msi"
-$codeTarget = "c://Elastic-Taxonomy//batch-update"
+$codeTarget = "c://taxonomy-daily-index"
 
 "=================> start server setup script" | Out-File -FilePath /debug.txt -Append
 
@@ -73,10 +73,10 @@ try {
 
     "===> download and install updater code" | Out-File -FilePath /debug.txt -Append
     "---- download code" | Out-File -FilePath /debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp s3://ds-$environment-deployment-source/taxonomy/taxonomy-updater.zip $tmpDir/taxonomy-updater.zip"
+    Invoke-Expression -Command "aws s3 cp s3://ds-$environment-deployment-source/taxonomy/taxonomy-updater.zip $tmpDir/taxonomy-daily-index.zip"
     "---- install code" | Out-File -FilePath /debug.txt -Append
     New-Item -Path "$codeTarget" -ItemType "directory" -Force
-    Expand-Archive -LiteralPath "$tmpDir/taxonomy-updater.zip" -DestinationPath "$codeTarget"
+    Expand-Archive -LiteralPath "$tmpDir/taxonomy-daily-index.zip" -DestinationPath "$codeTarget"
 
     "===> set network interface profile to private" | Out-File -FilePath /debug.txt -Append
     $networks = Get-NetConnectionProfile

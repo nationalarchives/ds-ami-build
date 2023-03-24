@@ -32,7 +32,7 @@
         owners: amazon
         region: "{{ region }}"
         filters:
-          name: "Windows_Server-2022-English-Full-Base*"
+          name: "Windows_Server-2022-English-Core-Base*"
       register: findami
 
     - name: set latest AMI
