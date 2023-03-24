@@ -84,6 +84,36 @@
         dest: "./userdata.ps1"
         force: yes
 
+    - name: template deployment policy
+      template:
+        src: "./templates/instance-role-policy.json.j2"
+        dest: "./instance-role-policy.json"
+        force: yes
+
+    - name: create deployment policy
+      community.aws.iam_managed_policy:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
+        policy_name: "ansible-ami-taxonomy-updater-s3-policy"
+        policy: "{{ lookup('file', './instance-role-policy.json') }}"
+        state: "present"
+      register: s3_policy
+
+    - name: create updater IAM role
+      community.aws.iam_role:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
+        name: "ansible-ami-taxonomy-updater-role"
+        region: "{{ region }}"
+        assume_role_policy_document: "{{ lookup('file', './updater-role-policy.json') }}"
+        managed_policies: ["{{ s3_policy.policy.arn }}"]
+        create_instance_profile: yes
+        purge_policies: yes
+        state: "present"
+      register: updater_iam_role
+
     - name: provisioning instance
       amazon.aws.ec2_instance:
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
@@ -182,60 +212,6 @@
       until: init_finished.stat.exists
       retries: 15
       delay: 20
-
-##    - name: web-server || Web-Server,Web-WebServer
-##      ansible.windows.win_feature:
-##        name: Web-Server,Web-WebServer
-##      register: web_server
-##
-##    - name: Common HTTP Features || Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect
-##      ansible.windows.win_feature:
-##        name: Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect
-##      register: web_common
-##
-##    - name: Health and Diagnostics || Web-Http-Logging,Web-Request-Monitor,Web-Http-Tracing
-##      ansible.windows.win_feature:
-##        name: Web-Http-Logging,Web-Request-Monitor,Web-Http-Tracing
-##      register: web_health
-##
-##    - name: Performance || Web-Stat-Compression
-##      ansible.windows.win_feature:
-##        name: Web-Stat-Compression
-##      register: web_performance
-##
-##    - name: Security || Web-Filtering,Web-Basic-Auth,Web-Url-Auth,Web-Windows-Auth
-##      ansible.windows.win_feature:
-##        name: Web-Filtering,Web-Basic-Auth,Web-Url-Auth,Web-Windows-Auth
-##      register: web_security
-##
-##    - name: Application Development || Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSockets
-##      ansible.windows.win_feature:
-##        name: Web-Net-Ext,Web-Net-Ext45,Web-Asp-Net,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-WebSockets
-##      register: web_development
-##
-##    - name: Management Tools || Web-Mgmt-Console,Web-Scripting-Tools,Web-Mgmt-Service
-##      ansible.windows.win_feature:
-##        name: Web-Mgmt-Console,Web-Scripting-Tools,Web-Mgmt-Service
-##      register: web_mgmt
-##
-##    - name: .NET Framework 3.5 || NET-Framework-Core
-##      ansible.windows.win_feature:
-##        name: NET-Framework-Core
-##      register: web_frame35
-##
-##    - name: .NET Framework 4.8 || NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
-##      ansible.windows.win_feature:
-##        name: NET-Framework-45-Core,NET-WCF-HTTP-Activation45,NET-WCF-TCP-PortSharing45
-##      register: web_frame48
-##
-##    - name: WinRM IIS Extension || WinRM-IIS-Ext
-##      ansible.windows.win_feature:
-##        name: WinRM-IIS-Ext
-##      register: web_winrm
-##
-##    - name: reboot instance if required after installing Web-Server feature
-##      ansible.windows.win_reboot:
-##      when: web_server.reboot_required or web_common.reboot_required or web_health.reboot_required or web_performance.reboot_required or web_security.reboot_required or web_development.reboot_required or web_mgmt.reboot_required or web_frame35.reboot_required or web_frame48.reboot_required or web_winrm.reboot_required
 
     - name: ensure temp dir exists
       ansible.windows.win_file:
@@ -353,4 +329,21 @@
         security_token: "{{ assumed_role.sts_creds.session_token }}"
         name: "ansible-ami-taxonomy-web-sg"
         region: "{{ region }}"
+        state: "absent"
+
+    - name: remove updater IAM role
+      community.aws.iam_role:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
+        name: "ansible-ami-taxonomy-updater-role"
+        region: "{{ region }}"
+        state: "absent"
+
+    - name: remove deployment policy
+      community.aws.iam_managed_policy:
+        aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+        aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+        security_token: "{{ assumed_role.sts_creds.session_token }}"
+        policy_name: "ansible-ami-taxonomy-updater-s3-policy"
         state: "absent"

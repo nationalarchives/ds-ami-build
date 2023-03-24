@@ -331,7 +331,7 @@
         region: "{{ region }}"
         state: "absent"
 
-    - name: create updater IAM role
+    - name: remove updater IAM role
       community.aws.iam_role:
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
@@ -340,7 +340,7 @@
         region: "{{ region }}"
         state: "absent"
 
-    - name: create deployment policy
+    - name: remove deployment policy
       community.aws.iam_managed_policy:
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"

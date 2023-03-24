@@ -41,10 +41,6 @@ try {
     "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
     Import-Module AWSPowerShell
 
-    "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
-
     "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
     netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
     Install-WindowsFeature Web-Mgmt-Service
