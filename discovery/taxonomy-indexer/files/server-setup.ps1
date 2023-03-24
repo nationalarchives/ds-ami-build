@@ -62,9 +62,9 @@ try {
     "---- end cloudwatch installation process" | Out-File -FilePath /debug.txt -Append
 
     "===> download and install dotnet sdk 6" | Out-File -FilePath /debug.txt -Append
-    "download" | Out-File -FilePath /debug.txt -Append
+    "---- download" | Out-File -FilePath /debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile($dotnetSDK6, "$tmpDir\dotnet-sdk-6.0.406-win-x64.exe")
-    "install" | Out-File -FilePath /debug.txt -Append
+    "---- install" | Out-File -FilePath /debug.txt -Append
     & "$tmpDir\dotnet-sdk-6.0.406-win-x64.exe" /install /passive /norestart
 
     "===> download and install updater code" | Out-File -FilePath /debug.txt -Append
@@ -72,13 +72,13 @@ try {
     Invoke-Expression -Command "aws s3 cp s3://ds-$environment-deployment-source/taxonomy/taxonomy-full-index.zip $tmpDir/taxonomy-full-index.zip"
     "---- install code" | Out-File -FilePath /debug.txt -Append
     New-Item -Path "$codeTarget" -ItemType "directory" -Force
-    Expand-Archive -LiteralPath "$tmpDir/taxonomy-indexer.zip" -DestinationPath "$codeTarget"
+    Expand-Archive -LiteralPath "$tmpDir/taxonomy-full-index.zip" -DestinationPath "$codeTarget"
 
     "===> set network interface profile to private" | Out-File -FilePath /debug.txt -Append
     $networks = Get-NetConnectionProfile
     Write-Output $networks
     $interfaceIndex = $networks.InterfaceIndex
-    "change interface index $interfaceIndex" | Out-File -FilePath /debug.txt -Append
+    "---- change interface index $interfaceIndex" | Out-File -FilePath /debug.txt -Append
     Set-NetConnectionProfile -InterfaceIndex $interfaceIndex -NetworkCategory private
     Write-Output $(Get-NetConnectionProfile -InterfaceIndex $interfaceIndex)
 
@@ -87,11 +87,11 @@ try {
 
     "===> install SSM" | Out-File -FilePath /debug.txt -Append
 #    $progressPreference = 'silentlyContinue'
-    "download installer" | Out-File -FilePath /debug.txt -Append
+    "---- download installer" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest `
         https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
         -OutFile $tmpDir\SSMAgent_latest.exe
-    "run installer" | Out-File -FilePath /debug.txt -Append
+    "---- run installer" | Out-File -FilePath /debug.txt -Append
     cd $tmpDir
     Start-Process `
         -FilePath .\SSMAgent_latest.exe `
@@ -101,11 +101,11 @@ try {
     "===> install EC2Launch" | Out-File -FilePath /debug.txt -Append
     $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/386/latest/AmazonEC2Launch.msi"
     $DownloadFile = "c:\temp\" + $(Split-Path -Path $Url -Leaf)
-    "download package" | Out-File -FilePath /debug.txt -Append
+    "---- download package" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
-    "install EC2Launch v2" | Out-File -FilePath /debug.txt -Append
+    "---- install EC2Launch v2" | Out-File -FilePath /debug.txt -Append
     Start-Process -Wait -FilePath msiexec -ArgumentList /i, "$DownloadFile", /qn
-    "write agent-config.yml" | Out-File -FilePath /debug.txt -Append
+    "---- write agent-config.yml" | Out-File -FilePath /debug.txt -Append
     Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
 version: 1.0
 config:
@@ -143,7 +143,7 @@ config:
     tasks:
       - task: startSsm
 '@
-    "reset EC2Launch" | Out-File -FilePath /debug.txt -Append
+    "---- reset EC2Launch" | Out-File -FilePath /debug.txt -Append
     & "C:\Program Files\Amazon\EC2Launch\ec2launch" reset -c
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
