@@ -13,7 +13,7 @@ $tmpDir = "c:\temp"
 "[debug]" | Out-File -FilePath /debug.txt
 
 # required packages
-$installerPackageUrl =  "s3://ds-$environment-deployment-source/installation-packages/discovery"
+$installerPackageUrl = "s3://ds-$environment-deployment-source/installation-packages/discovery"
 
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
