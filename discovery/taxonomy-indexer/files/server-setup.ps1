@@ -69,7 +69,7 @@ try {
 
     "===> download and install updater code" | Out-File -FilePath /debug.txt -Append
     "---- download code" | Out-File -FilePath /debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp s3://ds-$environment-deployment-source/taxonomy/taxonomy-indexer.zip $tmpDir/taxonomy-indexer.zip"
+    Invoke-Expression -Command "aws s3 cp s3://ds-$environment-deployment-source/taxonomy/taxonomy-full-index.zip $tmpDir/taxonomy-full-index.zip"
     "---- install code" | Out-File -FilePath /debug.txt -Append
     New-Item -Path "$codeTarget" -ItemType "directory" -Force
     Expand-Archive -LiteralPath "$tmpDir/taxonomy-indexer.zip" -DestinationPath "$codeTarget"
