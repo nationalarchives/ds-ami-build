@@ -121,7 +121,7 @@
         security_token: "{{ assumed_role.sts_creds.session_token }}"
         key_name: "{{ key_name }}"
         image_id: "{{ latest_ami.image_id }}"#
-        instance_role: "ansible-ami-taxonomy-updater-role"
+        instance_role: "ansible-ami-taxonomy-indexers-role"
         instance_type: "t3a.medium"
         metadata_options:
           http_endpoint: "enabled"
