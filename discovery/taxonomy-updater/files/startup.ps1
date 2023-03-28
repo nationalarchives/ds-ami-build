@@ -2,7 +2,7 @@
 
 $logFile = "startup.log"
 $runFlag = "startupActive.txt"
-$codeTarget = "c://taxonomy-daily-index"
+$codeTarget = "c:\taxonomy-daily-index"
 
 function write-log
 {
