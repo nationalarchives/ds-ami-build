@@ -8,7 +8,7 @@ param(
 
 # Set-ExecutionPolicy Bypass -Scope Process
 
-$tmpDir = "c:\temp"
+$tmpDir = "c:/temp"
 
 "[debug]" | Out-File -FilePath /debug.txt
 
@@ -16,10 +16,10 @@ $tmpDir = "c:\temp"
 $installerPackageUrl = "s3://ds-$environment-deployment-source/installation-packages/discovery"
 
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
-$pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
-$dotnetSDK6 = "https://download.visualstudio.microsoft.com/download/pr/4a725ea4-cd2c-4383-9b63-263156d5f042/d973777b32563272b85617105a06d272/dotnet-sdk-6.0.406-win-x64.exe"
+$pathAWScli = "C:/Program Files/Amazon/AWSCLIV2"
+$dotnetSDK6 = "https://download.visualstudio.microsoft.com/download/pr/38dca5f5-f10f-49fb-b07f-a42dd123ea30/335bb4811c9636b3a4687757f9234db9/dotnet-sdk-6.0.407-win-x64.exe"
 $cloudwatchAgentInstaller = "https://s3.eu-west-2.amazonaws.com/amazoncloudwatch-agent-eu-west-2/windows/amd64/latest/amazon-cloudwatch-agent.msi"
-$codeTarget = "c://taxonomy-daily-index"
+$codeTarget = "c:/taxonomy-daily-index"
 
 "=================> start server setup script" | Out-File -FilePath /debug.txt -Append
 
@@ -29,9 +29,9 @@ try {
 
     "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
     "---- downloading AWS CLI" | Out-File -FilePath /debug.txt -Append
-    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:/temp/AWSCLIV2.msi
+    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile "$tmpDir/AWSCLIV2.msi"
     "---- installing AWS CLI" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\AWSCLIV2.msi /qn /norestart' -NoNewWindow
+    Start-Process msiexec.exe -Wait -ArgumentList "/i `"$tmpDir/AWSCLIV2.msi`" /qn /norestart" -NoNewWindow
     "---- set path to AWS CLI" | Out-File -FilePath /debug.txt -Append
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
@@ -52,27 +52,27 @@ try {
 
     "===> install CloudWatch Agent" | Out-File -FilePath /debug.txt -Append
     "---- download agent" | Out-File -FilePath /debug.txt -Append
-    (new-object System.Net.WebClient).DownloadFile($cloudwatchAgentInstaller, "$tmpDir\amazon-cloudwatch-agent.msi")
+    (new-object System.Net.WebClient).DownloadFile($cloudwatchAgentInstaller, "$tmpDir/amazon-cloudwatch-agent.msi")
     "---- download config json" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     "---- start installation" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet"
+    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir/amazon-cloudwatch-agent.msi`" /quiet"
     "---- configure agent" | Out-File -FilePath /debug.txt -Append
-    & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
+    & "C:/Program Files/Amazon/AmazonCloudWatchAgent/amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir/$cloudwatchAgentJSON -s
     "---- end cloudwatch installation process" | Out-File -FilePath /debug.txt -Append
 
     "===> download and install dotnet sdk 6" | Out-File -FilePath /debug.txt -Append
     "---- download" | Out-File -FilePath /debug.txt -Append
-    (new-object System.Net.WebClient).DownloadFile($dotnetSDK6, "$tmpDir\dotnet-sdk-6.0.406-win-x64.exe")
+    (new-object System.Net.WebClient).DownloadFile($dotnetSDK6, "$tmpDir/dotnet-sdk-6.0.407-win-x64.exe")
     "---- install" | Out-File -FilePath /debug.txt -Append
-    & "$tmpDir\dotnet-sdk-6.0.406-win-x64.exe" /install /passive /norestart
+    & "$tmpDir/dotnet-sdk-6.0.407-win-x64.exe" /install /passive /norestart
 
     "===> download and install updater code" | Out-File -FilePath /debug.txt -Append
     "---- download code" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp s3://ds-$environment-deployment-source/taxonomy/taxonomy-daily-index.zip $tmpDir/taxonomy-daily-index.zip"
     "---- install code" | Out-File -FilePath /debug.txt -Append
     New-Item -Path "$codeTarget" -ItemType "directory" -Force
-    Expand-Archive -LiteralPath "$tmpDir/taxonomy-daily-index.zip" -DestinationPath "$codeTarget"
+    Expand-Archive -LiteralPath "$tmpDir/taxonomy-daily-index.zip" -DestinationPath /
 
     "===> set network interface profile to private" | Out-File -FilePath /debug.txt -Append
     $networks = Get-NetConnectionProfile
@@ -90,23 +90,23 @@ try {
     "---- download installer" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest `
         https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
-        -OutFile $tmpDir\SSMAgent_latest.exe
+        -OutFile $tmpDir/SSMAgent_latest.exe
     "---- run installer" | Out-File -FilePath /debug.txt -Append
     cd $tmpDir
     Start-Process `
-        -FilePath .\SSMAgent_latest.exe `
+        -FilePath ./SSMAgent_latest.exe `
         -ArgumentList "/S"
     Restart-Service AmazonSSMAgent
 
     "===> install EC2Launch" | Out-File -FilePath /debug.txt -Append
     $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/386/latest/AmazonEC2Launch.msi"
-    $DownloadFile = "c:\temp\" + $(Split-Path -Path $Url -Leaf)
+    $DownloadFile = "$tmpDir" + $(Split-Path -Path $Url -Leaf)
     "---- download package" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
     "---- install EC2Launch v2" | Out-File -FilePath /debug.txt -Append
     Start-Process -Wait -FilePath msiexec -ArgumentList /i, "$DownloadFile", /qn
     "---- write agent-config.yml" | Out-File -FilePath /debug.txt -Append
-    Set-Content -Path "C:\ProgramData\Amazon\EC2Launch\config\agent-config.yml" -Value @'
+    Set-Content -Path "C:/ProgramData/Amazon/EC2Launch/configagent-config.yml" -Value @'
 version: 1.0
 config:
   - stage: boot
@@ -144,7 +144,7 @@ config:
       - task: startSsm
 '@
     "---- reset EC2Launch" | Out-File -FilePath /debug.txt -Append
-    & "C:\Program Files\Amazon\EC2Launch\ec2launch" reset -c
+    & "C:/Program Files/Amazon/EC2Launch/ec2launch" reset -c
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
     "[status]" | Out-File -FilePath /setup-status.txt
