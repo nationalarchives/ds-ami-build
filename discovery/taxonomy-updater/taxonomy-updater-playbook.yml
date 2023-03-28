@@ -327,7 +327,7 @@
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
         security_token: "{{ assumed_role.sts_creds.session_token }}"
-        name: "ansible-ami-taxonomy-web-sg"
+        name: "ansible-ami-taxonomy-updater-sg"
         region: "{{ region }}"
         state: "absent"
 

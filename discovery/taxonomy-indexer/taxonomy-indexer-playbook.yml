@@ -95,7 +95,7 @@
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
         security_token: "{{ assumed_role.sts_creds.session_token }}"
-        policy_name: "ansible-ami-taxonomy-updater-s3-policy"
+        policy_name: "ansible-ami-taxonomy-indexer-s3-policy"
         policy: "{{ lookup('file', './instance-role-policy.json') }}"
         state: "present"
       register: s3_policy
@@ -105,7 +105,7 @@
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
         security_token: "{{ assumed_role.sts_creds.session_token }}"
-        name: "ansible-ami-taxonomy-updater-role"
+        name: "ansible-ami-taxonomy-indexer-role"
         region: "{{ region }}"
         assume_role_policy_document: "{{ lookup('file', './updater-role-policy.json') }}"
         managed_policies: ["{{ s3_policy.policy.arn }}"]
@@ -327,7 +327,7 @@
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
         security_token: "{{ assumed_role.sts_creds.session_token }}"
-        name: "ansible-ami-taxonomy-web-sg"
+        name: "ansible-ami-taxonomy-indexer-sg"
         region: "{{ region }}"
         state: "absent"
 
@@ -336,7 +336,7 @@
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
         security_token: "{{ assumed_role.sts_creds.session_token }}"
-        name: "ansible-ami-taxonomy-updater-role"
+        name: "ansible-ami-taxonomy-indexer-role"
         region: "{{ region }}"
         state: "absent"
 
@@ -345,5 +345,5 @@
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
         security_token: "{{ assumed_role.sts_creds.session_token }}"
-        policy_name: "ansible-ami-taxonomy-updater-s3-policy"
+        policy_name: "ansible-ami-taxonomy-indexer-s3-policy"
         state: "absent"
