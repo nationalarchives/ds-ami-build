@@ -95,7 +95,7 @@ try {
 
     "===> install EC2Launch" | Out-File -FilePath \debug.txt -Append
     $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/386/latest/AmazonEC2Launch.msi"
-    $DownloadFile = "$tmpDir" + $(Split-Path -Path $Url -Leaf)
+    $DownloadFile = "$tmpDir\" + $(Split-Path -Path $Url -Leaf)
     "---- download package" | Out-File -FilePath \debug.txt -Append
     Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
     "---- install EC2Launch v2" | Out-File -FilePath \debug.txt -Append
