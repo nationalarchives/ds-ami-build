@@ -233,10 +233,10 @@
         src: "./files/server-setup.ps1"
         dest: "c:\\temp\\server-setup.ps1"
 
-    - name: copy configagent-config.yml
+    - name: copy agent-config.yml
       ansible.windows.win_copy:
-        src: "./files/server-setup.ps1"
-        dest: "c:\\temp\\server-setup.ps1"
+        src: "./files/agent-config.yml"
+        dest: "c:\\temp\\agent-config.yml"
 
     - name: copy startup script
       ansible.windows.win_copy:
