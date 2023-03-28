@@ -31,7 +31,7 @@ try {
     "---- downloading AWS CLI" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile "$tmpDir/AWSCLIV2.msi"
     "---- installing AWS CLI" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList "/i $tmpDir/AWSCLIV2.msi /qn /norestart" -NoNewWindow
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i, "$tmpDir/AWSCLIV2.msi", /qn
     "---- set path to AWS CLI" | Out-File -FilePath /debug.txt -Append
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
@@ -50,7 +50,7 @@ try {
     "---- download config json" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     "---- start installation" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList "/I $tmpDir/amazon-cloudwatch-agent.msi /quiet"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i, "$tmpDir/amazon-cloudwatch-agent.msi", /qn
     "---- configure agent" | Out-File -FilePath /debug.txt -Append
     & "C:/Program Files/Amazon/AmazonCloudWatchAgent/amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir/$cloudwatchAgentJSON -s
     "---- end cloudwatch installation process" | Out-File -FilePath /debug.txt -Append
@@ -99,7 +99,7 @@ try {
     "---- download package" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -Uri $Url -OutFile $DownloadFile
     "---- install EC2Launch v2" | Out-File -FilePath /debug.txt -Append
-    Start-Process -Wait -FilePath msiexec -ArgumentList /i, "$DownloadFile", /qn
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i, "$DownloadFile", /qn
     "---- write agent-config.yml" | Out-File -FilePath /debug.txt -Append
     Set-Content -Path "C:/ProgramData/Amazon/EC2Launch/configagent-config.yml" -Value @'
 version: 1.0
