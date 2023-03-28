@@ -31,7 +31,7 @@ try {
     "---- downloading AWS CLI" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile "$tmpDir/AWSCLIV2.msi"
     "---- installing AWS CLI" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList "/i `"$tmpDir/AWSCLIV2.msi`" /qn /norestart" -NoNewWindow
+    Start-Process msiexec.exe -Wait -ArgumentList "/i $tmpDir/AWSCLIV2.msi /qn /norestart" -NoNewWindow
     "---- set path to AWS CLI" | Out-File -FilePath /debug.txt -Append
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
@@ -40,12 +40,6 @@ try {
 
     "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
     Import-Module AWSPowerShell
-
-    "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
-    netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
-    Install-WindowsFeature Web-Mgmt-Service
-    Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
-    Set-Service -Name WMSVC -StartupType Automatic
 
     "===> download and install required packages and config files" | Out-File -FilePath /debug.txt -Append
     Set-Location -Path $tmpDir
@@ -56,7 +50,7 @@ try {
     "---- download config json" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     "---- start installation" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir/amazon-cloudwatch-agent.msi`" /quiet"
+    Start-Process msiexec.exe -Wait -ArgumentList "/I $tmpDir/amazon-cloudwatch-agent.msi /quiet"
     "---- configure agent" | Out-File -FilePath /debug.txt -Append
     & "C:/Program Files/Amazon/AmazonCloudWatchAgent/amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir/$cloudwatchAgentJSON -s
     "---- end cloudwatch installation process" | Out-File -FilePath /debug.txt -Append
@@ -91,6 +85,7 @@ try {
     Invoke-WebRequest `
         https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
         -OutFile $tmpDir/SSMAgent_latest.exe
+
     "---- run installer" | Out-File -FilePath /debug.txt -Append
     cd $tmpDir
     Start-Process `
