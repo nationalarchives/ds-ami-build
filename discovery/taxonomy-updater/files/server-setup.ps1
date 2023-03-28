@@ -48,7 +48,7 @@ try {
     "---- download agent" | Out-File -FilePath \debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile($cloudwatchAgentInstaller, "$tmpDir\amazon-cloudwatch-agent.msi")
     "---- download config json" | Out-File -FilePath \debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp $installerPackageUrl\$cloudwatchAgentJSON $tmpDir"
+    Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     "---- start installation" | Out-File -FilePath \debug.txt -Append
     Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i, "$tmpDir\amazon-cloudwatch-agent.msi", /qn
     "---- configure agent" | Out-File -FilePath \debug.txt -Append
