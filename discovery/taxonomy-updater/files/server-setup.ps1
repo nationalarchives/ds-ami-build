@@ -66,7 +66,7 @@ try {
     Invoke-Expression -Command "aws s3 cp s3://ds-$environment-deployment-source/taxonomy/taxonomy-daily-index.zip $tmpDir\taxonomy-daily-index.zip"
     "---- install code" | Out-File -FilePath \debug.txt -Append
     New-Item -Path "$codeTarget" -ItemType "directory" -Force
-    Expand-Archive -LiteralPath "$tmpDir\taxonomy-daily-index.zip" -DestinationPath /
+    Expand-Archive -LiteralPath "$tmpDir\taxonomy-daily-index.zip" -DestinationPath \
 
     "===> set network interface profile to private" | Out-File -FilePath \debug.txt -Append
     $networks = Get-NetConnectionProfile
