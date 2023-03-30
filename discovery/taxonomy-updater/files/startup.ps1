@@ -27,22 +27,29 @@ try {
 	Restart-Service AmazonSSMAgent
 
 	write-log -Message "starting updater"
-	Set-Location -Path "$codeTarget"
 
-	write-log -Message "--- live - NationalArchives.Taxonomy.Batch.exe"
-	Start-Process "$codeTarget\live\process\NationalArchives.Taxonomy.Batch.exe" -WindowStyle "Hidden"
-	write-log -Message "--- live - NationalArchives.Taxonomy.Batch.Update.Elastic.exe"
-	Start-Process "$codeTarget\live\update\NationalArchives.Taxonomy.Batch.Update.Elastic.exe" -WindowStyle "Hidden"
-	write-log -Message "--- staging - NationalArchives.Taxonomy.Batch.exe"
-	Start-Process "$codeTarget\staging\process\NationalArchives.Taxonomy.Batch.exe" -WindowStyle "Hidden"
-	write-log -Message "--- staging - NationalArchives.Taxonomy.Batch.Update.Elastic.exe"
-	Start-Process "$codeTarget\staging\update\NationalArchives.Taxonomy.Batch.Update.Elastic.exe" -WindowStyle "Hidden"
+	write-log -Message "--- live-process - NationalArchives.Taxonomy.Batch.exe"
+	Set-Location "$codeTarget\live\process"
+	start powershell .\NationalArchives.Taxonomy.Batch.exe
+
+	write-log -Message "--- live-update - NationalArchives.Taxonomy.Batch.Update.Elastic.exe"
+	Set-Location "$codeTarget\live\update"
+	start powershell .\NationalArchives.Taxonomy.Batch.Update.Elastic.exe
+
+	write-log -Message "--- staging-process - NationalArchives.Taxonomy.Batch.exe"
+	Set-Location "$codeTarget\staging\process"
+	start powershell .\NationalArchives.Taxonomy.Batch.exe
+
+	write-log -Message "--- staging-update - NationalArchives.Taxonomy.Batch.Update.Elastic.exe"
+	Set-Location "$codeTarget\staging\update"
+	start powershell .\NationalArchives.Taxonomy.Batch.Update.Elastic.exe
+
 	write-log -Message "all processes started"
-	del $runFlag
+	Remove-Item $runFlag
 } catch {
 	write-log -Message "Caught an exception:" -Severity "Error"
 	write-log -Message "Exception Type: $($_.Exception.GetType().FullName)" -Severity "Error"
 	write-log -Message "Exception Message: $($_.Exception.Message)" -Severity "Error"
-	del $runFlag
+	Remove-Item $runFlag
     exit 1
 }
