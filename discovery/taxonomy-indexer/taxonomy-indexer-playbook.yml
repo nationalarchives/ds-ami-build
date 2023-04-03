@@ -107,7 +107,7 @@
         security_token: "{{ assumed_role.sts_creds.session_token }}"
         name: "ansible-ami-taxonomy-indexer-role"
         region: "{{ region }}"
-        assume_role_policy_document: "{{ lookup('file', './updater-role-policy.json') }}"
+        assume_role_policy_document: "{{ lookup('file', './indexer-role-policy.json') }}"
         managed_policies: ["{{ s3_policy.policy.arn }}"]
         create_instance_profile: yes
         purge_policies: yes

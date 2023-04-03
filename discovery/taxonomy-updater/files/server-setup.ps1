@@ -79,30 +79,8 @@ try {
     New-Item -Path "$codeTarget" -ItemType "directory" -Force
     Expand-Archive -LiteralPath "$tmpDir\taxonomy-daily-index.zip" -DestinationPath \
 
-##    write-log -Message "===> set network interface profile to private"
-##    $networks = Get-NetConnectionProfile
-##    Write-Output $networks
-##    $interfaceIndex = $networks.InterfaceIndex
-##    write-log -Message "---- change interface index $interfaceIndex"
-##    Set-NetConnectionProfile -InterfaceIndex $interfaceIndex -NetworkCategory private
-##    Write-Output $(Get-NetConnectionProfile -InterfaceIndex $interfaceIndex)
-
     write-log -Message "===> enable SMBv2 signing"
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
-
-##    write-log -Message "===> install SSM"
-###    $progressPreference = 'silentlyContinue'
-##    write-log -Message "---- download installer"
-##    Invoke-WebRequest `
-##        https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/windows_amd64/AmazonSSMAgentSetup.exe `
-##        -OutFile $tmpDir\SSMAgent_latest.exe
-##
-##    write-log -Message "---- run installer"
-##    cd $tmpDir
-##    Start-Process `
-##        -FilePath .\SSMAgent_latest.exe `
-##        -ArgumentList "/S"
-##    Restart-Service AmazonSSMAgent
 
     write-log -Message "===> install EC2Launch"
     $Url = "https://s3.amazonaws.com/amazon-ec2launch-v2/windows/386/latest/AmazonEC2Launch.msi"
