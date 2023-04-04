@@ -2,6 +2,7 @@
 
 $logFile = "startup.log"
 $runFlag = "startupActive.txt"
+$codeTarget = "c://taxonomy-full-index"
 
 function write-log
 {
@@ -23,14 +24,7 @@ try {
 		Add-content $runFlag -value "$Time - startup script is activated"
 	}
 
-	$sysEnv = $Env:TNA_APP_ENVIRONMENT
-
-	# check if environment is set correctly
-	if (-not ($sysEnv -eq "dev" -or $sysEnv -eq "staging" -or $sysEnv -eq "live")) {
-		write-log -Message "environment variable not set" -Severity "Error"
-		exit 1
-	}
-
+	Restart-Service AmazonSSMAgent
 } catch {
 	write-log -Message "Caught an exception:" -Severity "Error"
 	write-log -Message "Exception Type: $($_.Exception.GetType().FullName)" -Severity "Error"
