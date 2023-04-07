@@ -60,9 +60,9 @@ try {
 
     "===> AWS CLI V2" | Out-File -FilePath \debug.txt -Append
     "---- downloading AWS CLI" | Out-File -FilePath \debug.txt -Append
-    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:\temp\AWSCLIV2.msi
+    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile "$tmpDir\AWSCLIV2.msi"
     "---- installing AWS CLI" | Out-File -FilePath \debug.txt -Append
-    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i, c:\temp\AWSCLIV2.msi, /qn
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i, "$tmpDir\AWSCLIV2.msi", /qn
     "---- set path to AWS CLI" | Out-File -FilePath \debug.txt -Append
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
@@ -103,7 +103,7 @@ try {
     "---- download config json" | Out-File -FilePath \debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     "---- start installation" | Out-File -FilePath \debug.txt -Append
-    Start-Process -Wait -NoNewWindow -FilePath msiexec  -ArgumentList /i "$tmpDir\amazon-cloudwatch-agent.msi" /quite"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec  -ArgumentList /i "$tmpDir\amazon-cloudwatch-agent.msi" /quite
     "---- configure agent" | Out-File -FilePath \debug.txt -Append
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
     "---- end cloudwatch installation process" | Out-File -FilePath \debug.txt -Append
@@ -205,7 +205,7 @@ try {
     netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
     "---- start installation process" | Out-File -FilePath \debug.txt -Append
-    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i "$tmpDir\$wacInstaller SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" /norestart /qn /L*v "wac-log.txt"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i "$tmpDir\$wacInstaller" /norestart /qn /L*v "wac-log.txt" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0
 #    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
     "=================> end of server setup script" | Out-File -FilePath \debug.txt -Append
