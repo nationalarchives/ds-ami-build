@@ -82,11 +82,11 @@ try {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
 
-    "===> aquire AWS credentials" | Out-File -FilePath \debug.txt -Append
-    $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
-    $Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
-    $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
-    $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
+#    "===> aquire AWS credentials" | Out-File -FilePath \debug.txt -Append
+#    $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
+#    $Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
+#    $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
+#    $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
 
     "===> download and install required packages and config files" | Out-File -FilePath \debug.txt -Append
     Set-Location -Path $tmpDir
@@ -205,7 +205,8 @@ try {
     netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
     "---- start installation process" | Out-File -FilePath \debug.txt -Append
-    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i "$tmpDir\$wacInstaller SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" /norestart /qn /L*v "wac-log.txt"
+#    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
     "=================> end of server setup script" | Out-File -FilePath \debug.txt -Append
 } catch {
