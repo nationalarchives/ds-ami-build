@@ -74,7 +74,7 @@ try {
 
     "===> install CodeDeploy Agent" | Out-File -FilePath \debug.txt -Append
     Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir\codedeploy-agent.msi"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i "$tmpDir\codedeploy-agent.msi" /quite /l "$tmpDir\codedeploy-log.txt"
 
     "===> IIS Remote Management" | Out-File -FilePath \debug.txt -Append
     netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
@@ -103,7 +103,7 @@ try {
     "---- download config json" | Out-File -FilePath \debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     "---- start installation" | Out-File -FilePath \debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec  -ArgumentList /i "$tmpDir\amazon-cloudwatch-agent.msi" /quite"
     "---- configure agent" | Out-File -FilePath \debug.txt -Append
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
     "---- end cloudwatch installation process" | Out-File -FilePath \debug.txt -Append
