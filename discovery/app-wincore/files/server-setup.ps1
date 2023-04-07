@@ -62,7 +62,7 @@ try {
     "---- downloading AWS CLI" | Out-File -FilePath \debug.txt -Append
     Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile "$tmpDir\AWSCLIV2.msi"
     "---- installing AWS CLI" | Out-File -FilePath \debug.txt -Append
-    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,/qn,"$tmpDir\AWSCLIV2.msi"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\AWSCLIV2.msi",/qn
     "---- set path to AWS CLI" | Out-File -FilePath \debug.txt -Append
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
@@ -74,7 +74,7 @@ try {
 
     "===> install CodeDeploy Agent" | Out-File -FilePath \debug.txt -Append
     Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir\codedeploy-agent.msi"
-    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,/qn,"$tmpDir\codedeploy-agent.msi /l $tmpDir\codedeploy-log.txt"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\codedeploy-agent.msi /l $tmpDir\codedeploy-log.txt",/qn
 
     "===> IIS Remote Management" | Out-File -FilePath \debug.txt -Append
     netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
@@ -95,7 +95,7 @@ try {
     "---- download from S3" | Out-File -FilePath \debug.txt -Append
     Invoke-Expression -Command "aws s3 cp s3://ds-intersite-deployment/discovery/installation-packages/rewrite_amd64_en-US.msi $tmpDir\rewrite_amd64_en-US.msi"
     "---- run installer" | Out-File -FilePath \debug.txt -Append
-    Start-Process -Wait -NoNewWindow -PassThru -FilePath msiexec -ArgumentList "$tmpDir\rewrite_amd64_en-US.msi /norestart"
+    Start-Process -Wait -NoNewWindow -PassThru -FilePath msiexec -ArgumentList /i,"$tmpDir\rewrite_amd64_en-US.msi /norestart",/qn
 
     "===> install CloudWatch Agent" | Out-File -FilePath \debug.txt -Append
     "---- download agent" | Out-File -FilePath \debug.txt -Append
@@ -103,7 +103,7 @@ try {
     "---- download config json" | Out-File -FilePath \debug.txt -Append
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     "---- start installation" | Out-File -FilePath \debug.txt -Append
-    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,/qn,"$tmpDir\amazon-cloudwatch-agent.msi"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\amazon-cloudwatch-agent.msi",/qn
     "---- configure agent" | Out-File -FilePath \debug.txt -Append
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
     "---- end cloudwatch installation process" | Out-File -FilePath \debug.txt -Append
@@ -205,7 +205,7 @@ try {
     netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
     "---- start installation process" | Out-File -FilePath \debug.txt -Append
-    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,/qn,"$tmpDir\$wacInstaller /norestart /L*v wac-log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\$wacInstaller /norestart /L*v wac-log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0",/qn
 #    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
     "=================> end of server setup script" | Out-File -FilePath \debug.txt -Append
