@@ -135,6 +135,8 @@ try {
         write-log -Message "---- end installation process"
     }
 
+    write-log -Message "---- import ServerManager"
+    Import-Module ServerManager
     write-log -Message "---- import WebAdministration"
     Import-Module WebAdministration
 
