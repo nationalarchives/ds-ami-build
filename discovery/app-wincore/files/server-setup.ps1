@@ -138,7 +138,7 @@ try {
         write-log -Message "===> $dotnetCorePackagename"
         Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetCoreInstaller $tmpDir"
         write-log -Message "---- start installation process"
-        Start-Process -Wait -NoNewWindow -PassThru -FilePath $tmpDir\$dotnetCoreInstaller -ArgumentList /q,/norestart
+        Start-Process -Wait -NoNewWindow -PassThru -FilePath $dotnetCoreInstaller -ArgumentList /q,/norestart
         write-log -Message "---- end installation process"
     }
 
