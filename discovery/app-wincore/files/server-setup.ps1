@@ -105,7 +105,7 @@ try {
     Set-Location -Path $tmpDir
 
     write-log -Message "===> aquire AWS credentials"
-    $sts = (Use-STSRole -RoleArn "arn:aws:iam::123456789012:role/RoleName" -RoleSessionName "MyRoleSessionName").Credentials
+    $sts = (Use-STSRole -RoleArn "arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access" -RoleSessionName "MyRoleSessionName").Credentials
 #    $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
     $Env:AWS_ACCESS_KEY_ID = $sts.AccessKeyId
     $Env:AWS_SECRET_ACCESS_KEY = $sts.SecretAccessKey
