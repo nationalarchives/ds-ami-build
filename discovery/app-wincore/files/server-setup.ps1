@@ -95,18 +95,11 @@ try {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
 
-#    write-log -Message "===> aquire AWS credentials"
-#    $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
-#    $Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
-#    $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
-#    $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
-
     write-log -Message "===> download and install required packages and config files"
     Set-Location -Path $tmpDir
 
     write-log -Message "===> aquire AWS credentials"
     $sts = (Use-STSRole -RoleArn "arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access" -RoleSessionName "MyRoleSessionName").Credentials
-#    $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
     $Env:AWS_ACCESS_KEY_ID = $sts.AccessKeyId
     $Env:AWS_SECRET_ACCESS_KEY = $sts.SecretAccessKey
     $Env:AWS_SESSION_TOKEN = $sts.SessionToken
@@ -138,7 +131,7 @@ try {
         write-log -Message "===> $dotnetCorePackagename"
         Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetCoreInstaller $tmpDir"
         write-log -Message "---- start installation process"
-        Start-Process -Wait -NoNewWindow -PassThru -FilePath $dotnetCoreInstaller -ArgumentList /q,/norestart
+        Start-Process -Wait -NoNewWindow -PassThru -FilePath "$tmpDir\$dotnetCoreInstaller" -ArgumentList /q,/norestart
         write-log -Message "---- end installation process"
     }
 
