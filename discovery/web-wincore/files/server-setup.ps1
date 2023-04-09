@@ -138,15 +138,16 @@ try {
     write-log -Message "---- import WebAdministration"
     Import-Module WebAdministration
 
-    New-WebAppPool -name $appPool  -force
-    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value 'v4.0'
-    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value 'True'
-
     write-log -Message "---- create website"
     Stop-Website -Name "Default Web Site"
     Set-ItemProperty "IIS:\Sites\Default Web Site" serverAutoStart False
     Remove-WebSite -Name "Default Web Site"
     $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
+
+    write-log -Message "---- create AppPool"
+    New-WebAppPool -name $appPool  -force
+    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value "v4.0"
+    Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value "True"
 
     write-log -Message "---- give IIS_USRS permissions"
     $acl = Get-ACL $webSiteRoot
