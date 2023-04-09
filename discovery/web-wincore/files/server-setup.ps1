@@ -7,6 +7,8 @@ param(
 	[string]$tier = ""
 )
 
+$logFile = "\debug.txt"
+
 function write-log
 {
    param(
@@ -22,7 +24,7 @@ function write-log
 
 $tmpDir = "c:\temp"
 
-"[debug]" | Out-File -FilePath debug.txt
+"[debug]" | Out-File -FilePath \debug.txt
 
 # required packages
 $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
@@ -69,9 +71,9 @@ try {
 
     write-log -Message "===> AWS CLI V2"
     write-log -Message "---- downloading AWS CLI"
-    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:/temp/AWSCLIV2.msi
+    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile "$tmpDir\AWSCLIV2.msi"
     write-log -Message "---- installing AWS CLI"
-    Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\AWSCLIV2.msi /qn /norestart' -NoNewWindow
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\AWSCLIV2.msi",/qn
     write-log -Message "---- set path to AWS CLI"
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
@@ -82,8 +84,8 @@ try {
     Import-Module AWSPowerShell
 
     write-log -Message "===> install CodeDeploy Agent"
-    Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
+    Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir\codedeploy-agent.msi"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\codedeploy-agent.msi /l $tmpDir\codedeploy-log.txt",/qn
 
     write-log -Message "===> IIS Remote Management"
     netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
@@ -91,20 +93,20 @@ try {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
 
-    write-log -Message "===> aquire AWS credentials"
-    $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
-    $Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
-    $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
-    $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
-
     write-log -Message "===> download and install required packages and config files"
     Set-Location -Path $tmpDir
 
+    write-log -Message "===> aquire AWS credentials"
+    $sts = (Use-STSRole -RoleArn "arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access" -RoleSessionName "MyRoleSessionName").Credentials
+    $Env:AWS_ACCESS_KEY_ID = $sts.AccessKeyId
+    $Env:AWS_SECRET_ACCESS_KEY = $sts.SecretAccessKey
+    $Env:AWS_SESSION_TOKEN = $sts.SessionToken
+
     write-log -Message "===> URLRewrite2"
     write-log -Message "---- download from S3"
-    Invoke-Expression -Command "aws s3 cp s3://ds-intersite-deployment/discovery/installation-packages/rewrite_amd64_en-US.msi $tmpDir/rewrite_amd64_en-US.msi"
+    Invoke-Expression -Command "aws s3 cp s3://ds-intersite-deployment/discovery/installation-packages/rewrite_amd64_en-US.msi $tmpDir\rewrite_amd64_en-US.msi"
     write-log -Message "---- run installer"
-    Start-Process -FilePath "$tmpDir/rewrite_amd64_en-US.msi" -ArgumentList "/quiet /norestart" -PassThru -Wait
+    Start-Process -Wait -NoNewWindow -PassThru -FilePath msiexec -ArgumentList /i,"$tmpDir\rewrite_amd64_en-US.msi /norestart",/qn
 
     write-log -Message "===> install CloudWatch Agent"
     write-log -Message "---- download agent"
@@ -112,7 +114,7 @@ try {
     write-log -Message "---- download config json"
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
     write-log -Message "---- start installation"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\amazon-cloudwatch-agent.msi",/qn
     write-log -Message "---- configure agent"
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
     write-log -Message "---- end cloudwatch installation process"
@@ -120,19 +122,22 @@ try {
     write-log -Message "===> $dotnetPackagename"
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
     write-log -Message "---- start installation process"
-    Start-Process -FilePath $dotnetInstaller -ArgumentList "/q /norestart" -PassThru -Wait
+    Start-Process -Wait -NoNewWindow -PassThru -FilePath "$tmpDir\$dotnetInstaller" -ArgumentList /q,/norestart
     write-log -Message "---- end installation process"
 
     if ($tier -eq "api") {
         write-log -Message "===> $dotnetCorePackagename"
         Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetCoreInstaller $tmpDir"
         write-log -Message "---- start installation process"
-        Start-Process -FilePath $dotnetCoreInstaller -ArgumentList "/q /norestart" -PassThru -Wait
+        Start-Process -Wait -NoNewWindow -PassThru -FilePath "$tmpDir\$dotnetCoreInstaller" -ArgumentList /q,/norestart
         write-log -Message "---- end installation process"
     }
 
-    write-log -Message "---- create AppPool"
+    write-log -Message "---- import ServerManager"
+    Import-Module ServerManager
+    write-log -Message "---- import WebAdministration"
     Import-Module WebAdministration
+
     New-WebAppPool -name $appPool  -force
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value 'v4.0'
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value 'True'
@@ -192,14 +197,15 @@ try {
     C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
-    "[status]" | Out-File -FilePath /setup-status.txt
-    "finished = true" | Out-File -FilePath /setup-status.txt -Append
+    "[status]" | Out-File -FilePath \setup-status.txt
+    "finished = true" | Out-File -FilePath \setup-status.txt -Append
 
     write-log -Message "===> Windows Admin Center"
     netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
     write-log -Message "---- start installation process"
-    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\$wacInstaller /norestart /L*v wac-log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0",/qn
+#    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
     write-log -Message "=================> end of server setup script"
 } catch {
