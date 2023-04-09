@@ -171,7 +171,7 @@ try {
     New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
     write-log -Message "---- step 8"
     New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
-\
+
     write-log -Message "---- give IIS_USRS permissions"
     $acl = Get-ACL $webSiteRoot
     $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("IIS_IUSRS", "FullControl", "ContainerInherit,ObjectInherit", "None", "Allow")
