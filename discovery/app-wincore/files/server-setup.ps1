@@ -153,23 +153,14 @@ try {
 
     write-log -Message "---- create .NET v6.0 AppPool"
     $net6_app_pool_name = ".NET v6.0 AppPool"
-    #New-WebAppPool -Name "$net6_app_pool_name" -force
-    write-log -Message "---- step 1"
     [system.reflection.assembly]::Loadwithpartialname("Microsoft.Web.Administration")
-    write-log -Message "---- step 2"
     $servermgr = New-Object Microsoft.web.administration.servermanager
-    write-log -Message "---- step 3"
     $servermgr.ApplicationPools.Add("$net6_app_pool_name")
-    write-log -Message "---- step 4"
     $servermgr.CommitChanges()
 
-    write-log -Message "---- step 5"
     Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name managedRuntimeVersion ""
-    write-log -Message "---- step 6"
     Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name processModel.loadUserProfile -Value "True"
-    write-log -Message "---- step 7"
     New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
-    write-log -Message "---- step 8"
     New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
 
     write-log -Message "---- give IIS_USRS permissions"
