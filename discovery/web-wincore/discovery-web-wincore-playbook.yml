@@ -266,6 +266,16 @@
       src: "./files/server-setup.ps1"
       dest: "c:\\temp\\server-setup.ps1"
 
+  - name: copy webserver stop script
+    ansible.windows.win_copy:
+      src: "./files/startup.ps1"
+      dest: "c:\\tna-startup\\stop-webserver.ps1"
+
+  - name: copy webserver start script
+    ansible.windows.win_copy:
+      src: "./files/startup.ps1"
+      dest: "c:\\tna-startup\\start-webserver.ps1"
+
   - name: copy startup script
     ansible.windows.win_copy:
       src: "./files/startup.ps1"
