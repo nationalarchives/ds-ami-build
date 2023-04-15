@@ -7,11 +7,24 @@ param(
 	[string]$tier = ""
 )
 
+$logFile = "\debug.txt"
+
+function write-log
+{
+   param(
+        [string]$Message,
+        [string]$Severity = 'Information'
+   )
+
+   $Time = (Get-Date -f g)
+   Add-content $logFile -value "$Time - $Severity - $Message"
+   echo $Message
+}
 # Set-ExecutionPolicy Bypass -Scope Process
 
 $tmpDir = "c:\temp"
 
-"[debug]" | Out-File -FilePath /debug.txt
+"[debug]" | Out-File -FilePath \debug.txt
 
 # required packages
 $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
@@ -47,98 +60,99 @@ $envHash = @{
     "TNA_APP_TIER" = "$tier"
 }
 
-"=================> start server setup script" | Out-File -FilePath /debug.txt -Append
+write-log -Message "=================> start server setup script"
 
 try {
     # Catch non-terminateing errors
     $ErrorActionPreference = "Stop"
 
-    "---- create required directories" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- create required directories"
     New-Item -itemtype "directory" $webSiteRoot -Force
     New-Item -itemtype "directory" "$servicesPath" -Force
     New-Item -itemtype "directory" "$webSitePath" -Force
 
-    "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
-    "---- downloading AWS CLI" | Out-File -FilePath /debug.txt -Append
-    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile c:/temp/AWSCLIV2.msi
-    "---- installing AWS CLI" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList "/i c:\temp\AWSCLIV2.msi /qn /norestart" -NoNewWindow
-    "---- set path to AWS CLI" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> AWS CLI V2"
+    write-log -Message "---- downloading AWS CLI"
+    Invoke-WebRequest -UseBasicParsing -Uri https://awscli.amazonaws.com/AWSCLIV2.msi -OutFile "$tmpDir\AWSCLIV2.msi"
+    write-log -Message "---- installing AWS CLI"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\AWSCLIV2.msi",/qn
+    write-log -Message "---- set path to AWS CLI"
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = $oldpath;$pathAWScli
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
     $env:Path = "$env:Path;$pathAWScli"
 
-    "===> AWS for PowerShell" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> AWS for PowerShell"
     Import-Module AWSPowerShell
 
-    "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
+    write-log -Message "===> install CodeDeploy Agent"
+    Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir\codedeploy-agent.msi"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\codedeploy-agent.msi /l $tmpDir\codedeploy-log.txt",/qn
 
-    "===> IIS Remote Management" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> IIS Remote Management"
     netsh advfirewall firewall add rule name="IIS Remote Management" dir=in action=allow protocol=TCP localport=8172
     Install-WindowsFeature Web-Mgmt-Service
     Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1
     Set-Service -Name WMSVC -StartupType Automatic
 
-    "===> aquire AWS credentials" | Out-File -FilePath /debug.txt -Append
-    $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
-    $Env:AWS_ACCESS_KEY_ID = $sts.Credentials.AccessKeyId
-    $Env:AWS_SECRET_ACCESS_KEY = $sts.Credentials.SecretAccessKey
-    $Env:AWS_SESSION_TOKEN = $sts.Credentials.SessionToken
-
-    "===> download and install required packages and config files" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> download and install required packages and config files"
     Set-Location -Path $tmpDir
 
-    "===> URLRewrite2" | Out-File -FilePath /debug.txt -Append
-    "---- download from S3" | Out-File -FilePath /debug.txt -Append
-    Invoke-Expression -Command "aws s3 cp s3://ds-intersite-deployment/discovery/installation-packages/rewrite_amd64_en-US.msi $tmpDir/rewrite_amd64_en-US.msi"
-    "---- run installer" | Out-File -FilePath /debug.txt -Append
-    Start-Process -FilePath "$tmpDir/rewrite_amd64_en-US.msi" -ArgumentList "/quiet /norestart" -PassThru -Wait
+    write-log -Message "===> aquire AWS credentials"
+    $sts = (Use-STSRole -RoleArn "arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access" -RoleSessionName "MyRoleSessionName").Credentials
+    $Env:AWS_ACCESS_KEY_ID = $sts.AccessKeyId
+    $Env:AWS_SECRET_ACCESS_KEY = $sts.SecretAccessKey
+    $Env:AWS_SESSION_TOKEN = $sts.SessionToken
 
-    "===> install CloudWatch Agent" | Out-File -FilePath /debug.txt -Append
-    "---- download agent" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> URLRewrite2"
+    write-log -Message "---- download from S3"
+    Invoke-Expression -Command "aws s3 cp s3://ds-intersite-deployment/discovery/installation-packages/rewrite_amd64_en-US.msi $tmpDir\rewrite_amd64_en-US.msi"
+    write-log -Message "---- run installer"
+    Start-Process -Wait -NoNewWindow -PassThru -FilePath msiexec -ArgumentList /i,"$tmpDir\rewrite_amd64_en-US.msi /norestart",/qn
+
+    write-log -Message "===> install CloudWatch Agent"
+    write-log -Message "---- download agent"
     (new-object System.Net.WebClient).DownloadFile($cloudwatchAgentInstaller, "$tmpDir\amazon-cloudwatch-agent.msi")
-    "---- download config json" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- download config json"
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
-    "---- start installation" | Out-File -FilePath /debug.txt -Append
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet"
-    "---- configure agent" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- start installation"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\amazon-cloudwatch-agent.msi",/qn
+    write-log -Message "---- configure agent"
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
-    "---- end cloudwatch installation process" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- end cloudwatch installation process"
 
-    "===> $dotnetPackagename" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> $dotnetPackagename"
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetInstaller $tmpDir"
-    "---- start installation process" | Out-File -FilePath /debug.txt -Append
-    Start-Process -FilePath $dotnetInstaller -ArgumentList "/q /norestart" -PassThru -Wait
-    "---- end installation process" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- start installation process"
+    Start-Process -Wait -NoNewWindow -PassThru -FilePath "$tmpDir\$dotnetInstaller" -ArgumentList /q,/norestart
+    write-log -Message "---- end installation process"
 
     if ($tier -eq "api") {
-        "===> $dotnetCorePackagename" | Out-File -FilePath /debug.txt -Append
+        write-log -Message "===> $dotnetCorePackagename"
         Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$dotnetCoreInstaller $tmpDir"
-        "---- start installation process" | Out-File -FilePath /debug.txt -Append
-        Start-Process -FilePath $dotnetCoreInstaller -ArgumentList "/q /norestart" -PassThru -Wait
-        "---- end installation process" | Out-File -FilePath /debug.txt -Append
+        write-log -Message "---- start installation process"
+        Start-Process -Wait -NoNewWindow -PassThru -FilePath "$tmpDir\$dotnetCoreInstaller" -ArgumentList /q,/norestart
+        write-log -Message "---- end installation process"
     }
 
-    "---- import WebAdministration" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- import ServerManager"
+    Import-Module ServerManager
+    write-log -Message "---- import WebAdministration"
     Import-Module WebAdministration
 
-    "---- create website" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- create website"
     Stop-Website -Name "Default Web Site"
     Set-ItemProperty "IIS:\Sites\Default Web Site" serverAutoStart False
     Remove-WebSite -Name "Default Web Site"
     $site = new-WebSite -name $webSiteName -PhysicalPath $webSitePath -ApplicationPool $appPool -force
 
-    "---- create AppPool" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- create AppPool"
     New-WebAppPool -name $appPool  -force
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value "v4.0"
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value "True"
 
-    "---- create .NET v6.0 AppPool" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- create .NET v6.0 AppPool"
     $net6_app_pool_name = ".NET v6.0 AppPool"
-    #New-WebAppPool -Name "$net6_app_pool_name" -force
     [system.reflection.assembly]::Loadwithpartialname("Microsoft.Web.Administration")
     $servermgr = New-Object Microsoft.web.administration.servermanager
     $servermgr.ApplicationPools.Add("$net6_app_pool_name")
@@ -146,10 +160,10 @@ try {
 
     Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name managedRuntimeVersion ""
     Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name processModel.loadUserProfile -Value "True"
-    New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
-    New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath/Services/IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
+    New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
+    New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
 
-    "---- give IIS_USRS permissions" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- give IIS_USRS permissions"
     $acl = Get-ACL $webSiteRoot
     $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("IIS_IUSRS", "FullControl", "ContainerInherit,ObjectInherit", "None", "Allow")
     $acl.AddAccessRule($accessRule)
@@ -161,26 +175,26 @@ try {
     Start-WebSite -Name $webSiteName
 
     # set system variables for application
-    "===> environment variables" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> environment variables"
     foreach ($key in $envHash.keys) {
         $envKey = $($key)
         $envValue = $($envHash[$key])
         [System.Environment]::SetEnvironmentVariable($envKey, $envValue, "Machine")
     }
 
-    "===> set network interface profile to private" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> set network interface profile to private"
     $networks = Get-NetConnectionProfile
     Write-Output $networks
     $interfaceIndex = $networks.InterfaceIndex
-    "change interface index $interfaceIndex" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "change interface index $interfaceIndex"
     Set-NetConnectionProfile -InterfaceIndex $interfaceIndex -NetworkCategory private
     Write-Output $(Get-NetConnectionProfile -InterfaceIndex $interfaceIndex)
 
-    "===> enable SMBv2 signing" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> enable SMBv2 signing"
     Set-SmbServerConfiguration -EnableSMB2Protocol $true -Force
 
-    "===> EC2Launch" | Out-File -FilePath /debug.txt -Append
-    "---> set instance to generate a new password for next start and run user script" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> EC2Launch"
+    write-log -Message "---> set instance to generate a new password for next start and run user script"
     $destination = "C:\ProgramData\Amazon\EC2-Windows\Launch\Config"
     Set-Content -Path "$destination\LaunchConfig.json" -Value @"
 {
@@ -194,23 +208,24 @@ try {
     "AdminPassword":  ""
 }
 "@
-    "---- schedule EC2Launch for next start" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "---- schedule EC2Launch for next start"
     C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
 
     # this need to be before WAC installation. The installation will restart winrm and the script won't finish
-    "[status]" | Out-File -FilePath /setup-status.txt
-    "finished = true" | Out-File -FilePath /setup-status.txt -Append
+    "[status]" | Out-File -FilePath \setup-status.txt
+    "finished = true" | Out-File -FilePath \setup-status.txt -Append
 
-    "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "===> Windows Admin Center"
     netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
-    "---- start installation process" | Out-File -FilePath /debug.txt -Append
-    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
+    write-log -Message "---- start installation process"
+    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i,"$tmpDir\$wacInstaller /norestart /L*v wac-log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0",/qn
+#    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
 
-    "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "=================> end of server setup script"
 } catch {
-    "Caught an exception:" | Out-File -FilePath /debug.txt -Append
-    "Exception Type: $($_.Exception.GetType().FullName)" | Out-File -FilePath /debug.txt -Append
-    "Exception Message: $($_.Exception.Message)" | Out-File -FilePath /debug.txt -Append
+    write-log -Message "Caught an exception:"
+    write-log -Message "Exception Type: $($_.Exception.GetType().FullName)"
+    write-log -Message "Exception Message: $($_.Exception.Message)"
     exit 1
 }

@@ -60,7 +60,7 @@ try {
 
     "===> AWS CLI V2" | Out-File -FilePath /debug.txt -Append
     Invoke-WebRequest -UseBasicParsing -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "$tmpDir/AWSCLIV2.msi"
-    Start-Process msiexec.exe -Wait -ArgumentList "/i $tmpDir\AWSCLIV2.msi /qn /norestart" -NoNewWindow
+    Start-Process -Wait -NoNewWindow -FilePath msiexec.exe -ArgumentList /i "$tmpDir\AWSCLIV2.msi" /qn
     $oldpath = (Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH).path
     $newpath = "$oldpath;$pathAWScli"
     Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" -Name PATH -Value $newPath
@@ -71,7 +71,7 @@ try {
 
     "===> install CodeDeploy Agent" | Out-File -FilePath /debug.txt -Append
     Invoke-Expression -Command "aws s3 cp s3://aws-codedeploy-eu-west-2/latest/codedeploy-agent.msi $tmpDir/codedeploy-agent.msi"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\codedeploy-agent.msi`" /quiet /l `"$tmpDir\codedeploy-log.txt`""
+    Start-Process -Wait -NoNewWindow -FilePath msiexec.exe -ArgumentList /i "$tmpDir\codedeploy-agent.msi" /quiet /l "$tmpDir\codedeploy-log.txt"
 
     "===> aquire AWS credentials" | Out-File -FilePath /debug.txt -Append
     $sts = Invoke-Expression -Command "aws sts assume-role --role-arn arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access --role-session-name s3-access" | ConvertFrom-Json
@@ -85,7 +85,7 @@ try {
     "===> install CloudWatch Agent" | Out-File -FilePath /debug.txt -Append
     (new-object System.Net.WebClient).DownloadFile($cloudwatchAgentInstaller, "$tmpDir\amazon-cloudwatch-agent.msi")
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$cloudwatchAgentJSON $tmpDir"
-    Start-Process msiexec.exe -Wait -ArgumentList "/I `"$tmpDir\amazon-cloudwatch-agent.msi`" /quiet /l `"$tmpDir\cloudwatch-log.txt`""
+    Start-Process -Wait -NoNewWindow -FilePath msiexec.exe -ArgumentList /i "$tmpDir\amazon-cloudwatch-agent.msi" /quiet /l "$tmpDir\cloudwatch-log.txt"
     & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -c file:$tmpDir\$cloudwatchAgentJSON -s
 
     "===> Windows features for IIS" | Out-File -FilePath /debug.txt -Append
@@ -206,8 +206,11 @@ config:
     "finished = true" | Out-File -FilePath /setup-status.txt -Append
 
     "===> Windows Admin Center" | Out-File -FilePath /debug.txt -Append
+    netsh advfirewall firewall add rule name="WAC" dir=in action=allow protocol=TCP localport=3390
     Invoke-Expression -Command "aws s3 cp $installerPackageUrl/$wacInstaller $tmpDir"
-    Start-Process msiexec.exe -Wait -ArgumentList "/i ""$tmpDir\$wacInstaller"" /norestart /qn /L*v ""wac-log.txt"" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0"
+    write-log -Message "---- start installation process"
+    Start-Process -FilePath $wacInstaller -ArgumentList "/qn /L*v log.txt SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0" -PassThru -Wait
+#    Start-Process -Wait -NoNewWindow -FilePath msiexec -ArgumentList /i "$tmpDir\$wacInstaller" /norestart /qn /L*v "wac-log.txt" SME_PORT=3390 SSL_CERTIFICATE_OPTION=generate RESTART_WINRM=0"
 
     "=================> end of server setup script" | Out-File -FilePath /debug.txt -Append
 
