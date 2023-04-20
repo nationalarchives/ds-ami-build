@@ -23,8 +23,7 @@ try {
 		$Time = (Get-Date -f g)
 		Add-content $runFlag -value "$Time - startup script is activated"
 	}
-
-	Restart-Service AmazonSSMAgent
+	write-log -Message "nothing to do at the moment" -Severity "Info"
 } catch {
 	write-log -Message "Caught an exception:" -Severity "Error"
 	write-log -Message "Exception Type: $($_.Exception.GetType().FullName)" -Severity "Error"
