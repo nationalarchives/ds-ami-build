@@ -1,0 +1,49 @@
+#!/bin/bash
+
+sudo yum update -y
+
+# install ssm agent -x86_64
+sudo systemctl enable amazon-ssm-agent
+sudo systemctl start amazon-ssm-agent
+
+# Install Cloudwatch agent
+sudo yum install amazon-cloudwatch-agent -y
+sudo amazon-linux-extras install -y collectd
+sudo aws s3 cp s3://{{ s3_deployment_bucket  }}/{{ service  }}/cloudwatch/cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+
+# Install NFS packages
+sudo yum install -y amazon-efs-utils
+sudo yum install -y nfs-utils
+sudo service nfs start
+sudo service nfs status
+
+# create swap file
+sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+sudo /sbin/mkswap /var/swap.1
+sudo /sbin/swapon /var/swap.1s
+
+# get mysql
+sudo yum install wget -y
+sudo yum module disable mysql
+sudo wget http://repo.mysql.com/mysql80-community-release-el8-4.noarch.rpm
+sudo rpm -ivh mysql80-community-release-el8-4.noarch.rpm
+sudo service mysqld start
+sudo temp_pw="$(grep "temporary password" /var/log/mysqld.log)"
+
+# secure the instance
+sudo cat << EOF > ~/mysql_secure_installation.sql
+UPDATE mysql.user SET Password=PASSWORD('{{ root_password }}') WHERE User='root';
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+CREATE USER '{{ admin_user }}'@'10.128.224.0/255.255.254.0' IDENTIFIED BY '{{ admin_password }}';
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'10.128.224.0/255.255.254.0';
+FLUSH PRIVILEGES;
+EOF
+
+mysql -sfu --user=root --password=$temp_pw < "mysql_secure_installation.sql"
+
+sudo systemctl active mysqld
+sudo systemctl start mysqld
