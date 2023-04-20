@@ -24,8 +24,6 @@ try {
 		Add-content $runFlag -value "$Time - startup script is activated"
 	}
 
-	Restart-Service AmazonSSMAgent
-
 	write-log -Message "starting updater"
 
 	write-log -Message "--- live-process - NationalArchives.Taxonomy.Batch.exe"
