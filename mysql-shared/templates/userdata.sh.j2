@@ -2,10 +2,6 @@
 
 sudo yum update -y
 
-# install ssm agent -x86_64
-sudo systemctl enable amazon-ssm-agent
-sudo systemctl start amazon-ssm-agent
-
 # Install Cloudwatch agent
 sudo yum install amazon-cloudwatch-agent -y
 sudo amazon-linux-extras install -y collectd
@@ -20,30 +16,70 @@ sudo service nfs status
 
 # create swap file
 sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+sudo chmod 0600 /var/swap.1
 sudo /sbin/mkswap /var/swap.1
-sudo /sbin/swapon /var/swap.1s
+sudo /sbin/swapon /var/swap.1
 
 # get mysql
-sudo yum install wget -y
-sudo yum module disable mysql
-sudo wget http://repo.mysql.com/mysql80-community-release-el8-4.noarch.rpm
-sudo rpm -ivh mysql80-community-release-el8-4.noarch.rpm
-sudo service mysqld start
-sudo temp_pw="$(grep "temporary password" /var/log/mysqld.log)"
+sudo amazon-linux-extras install epel -y
+sudo yum install https://dev.mysql.com/get/mysql80-community-release-el7-5.noarch.rpm -y
+sudo yum install mysql-community-server -y
+sudo systemctl enable mysqld
+sudo systemctl start mysqld
 
-# secure the instance
-sudo cat << EOF > ~/mysql_secure_installation.sql
-UPDATE mysql.user SET Password=PASSWORD('{{ root_password }}') WHERE User='root';
+temp_pw="$(sudo grep "temporary password" /var/log/mysqld.log | grep -o '[^ ]\+$')"
+
+# sql statements to secure the instance
+cat << EOF > ~/mysql_secure_installation.sql
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 CREATE USER '{{ admin_user }}'@'10.128.224.0/255.255.254.0' IDENTIFIED BY '{{ admin_password }}';
-GRANT ALL PRIVILEGES ON *.* TO 'admin'@'10.128.224.0/255.255.254.0';
+GRANT ALL ON *.* TO '{{ admin_user }}'@'10.128.224.0/255.255.254.0';
+GRANT GRANT OPTION ON *.* TO '{{ admin_user }}'@'10.128.224.0/255.255.254.0';
 FLUSH PRIVILEGES;
 EOF
 
-mysql -sfu --user=root --password=$temp_pw < "mysql_secure_installation.sql"
+cat << EOF > ~/replica_data.sql
+SHOW MASTER STATUS;
+EOF
 
-sudo systemctl active mysqld
-sudo systemctl start mysqld
+# setting password for root to secrets manager parameters, secure mysql
+# and set administration access
+mysqladmin --user=root --password=$temp_pw password '{{ root_password }}'
+mysql --user=root --password={{ root_password }} < ~/mysql_secure_installation.sql
+
+# remove setup file containing passwords - security
+sudo rm ~/mysql_secure_installation.sql
+
+# mount EBS to instance which contains the MySQL database / schemas
+sudo mkdir /mysql
+sudo mount /dev/sdf /mysql
+mntDriveID="$(sudo blkid /dev/sdf | grep -oP 'UUID="(.*?)"' | grep -oP '"(.*?)"' | sed 's/"//g')"
+echo "UUID=$mntDriveID  /mysql  xfs  defaults,nofail  0  2" | sudo tee -a /etc/fstab > /dev/null
+
+priv_ip="$(curl http://169.254.169.254/latest/meta-data/local-ipv4)"
+
+# point mysql data to /mysql/data and error log to /mysql/log
+sudo sed -i 's/datadir=\/var\/lib\/mysql/datadir=\/mysql\/data/g' /etc/my.cnf
+sudo sed -i 's/log-error=\/var\/log\/mysqld.log/log-error=\/mysql\/log\/mysqld.log/g' /etc/my.cnf
+
+#echo "log_bin = /mysql/log/mysql-bin.log" | sudo tee -a /etc/my.cnf > /dev/null
+echo "log_bin = /mysql/log/mysql-bin.log " | sudo tee -a /etc/my.cnf > /dev/null
+echo "log_bin_index = /mysql/log/mysql-bin.log.index " | sudo tee -a /etc/my.cnf > /dev/null
+echo "relay_log_index = /mysql/log/mysql-relay-bin.index" | sudo tee -a /etc/my.cnf > /dev/null
+echo "bind-address = $priv_ip" | sudo tee -a /etc/my.cnf > /dev/null
+
+sudo systemctl restart mysqld
+
+mysql --user=root --password={{ root_password }} < ~/replica_data.sql | grep mysql-bin > ~/replica-info
+mysql_bin="$(awk {print $1} replica-info)"
+mysql_pos="$(awk {print $2} replica-info)"
+
+
+# prime
+echo "server-id = 1" | sudo tee -a /etc/my.cnf > /dev/null
+# ancillary
+echo "server-id = 2" | sudo tee -a /etc/my.cnf > /dev/null
+
