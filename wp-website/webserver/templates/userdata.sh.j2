@@ -154,12 +154,12 @@ PHP
 # Download TNA theme and licensed plugins
 mkdir /home/ec2-user/themes
 curl -H "Authorization: token {{ github_token }}" -L https://github.com/nationalarchives/tna/archive/master.zip > /home/ec2-user/themes/tna.zip
-sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/acf-flexible-content.zip ~/plugins/acf-flexible-content.zip
-sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/acf-options-page.zip ~/plugins/acf-options-page.zip
-sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/acf-repeater.zip ~/plugins/acf-repeater.zip
-sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/advanced-custom-fields-code-area-field.zip ~/plugins/advanced-custom-fields-code-area-field.zip
-sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/post-tags-and-categories-for-pages.zip ~/plugins/post-tags-and-categories-for-pages.zip
-sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/wds-active-plugin-data.zip ~/plugins/wds-active-plugin-data.zip
+sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/acf-flexible-content.zip ~/plugins/acf-flexible-content.zip 2>>/var/www/html/wp-cli.log
+sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/acf-options-page.zip ~/plugins/acf-options-page.zip 2>>/var/www/html/wp-cli.log
+sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/acf-repeater.zip ~/plugins/acf-repeater.zip  2>>/var/www/html/wp-cli.log
+sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/advanced-custom-fields-code-area-field.zip ~/plugins/advanced-custom-fields-code-area-field.zip 2>>/var/www/html/wp-cli.log
+sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/post-tags-and-categories-for-pages.zip ~/plugins/post-tags-and-categories-for-pages.zip 2>>/var/www/html/wp-cli.log
+sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/wds-active-plugin-data.zip ~/plugins/wds-active-plugin-data.zip 2>>/var/www/html/wp-cli.log
 
 # Install themes
 /usr/local/bin/wp theme install /home/ec2-user/themes/tna.zip --force --allow-root 2>>/var/www/html/wp-cli.log
