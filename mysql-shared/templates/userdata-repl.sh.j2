@@ -7,7 +7,7 @@ sudo yum install jq -y
 # Install Cloudwatch agent
 sudo yum install amazon-cloudwatch-agent -y
 sudo amazon-linux-extras install -y collectd
-sudo aws s3 cp s3://{{ s3_deployment_bucket  }}/{{ service  }}/cloudwatch/cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
+sudo aws s3 cp s3://{{ s3_deployment_bucket  }}/{{ s3_deployment_root  }}/cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 
 # mount EBS to instance which contains the MySQL database / schemas
@@ -85,3 +85,8 @@ echo "bind-address = $priv_ip" | sudo tee -a /etc/my.cnf > /dev/null
 echo "server-id = 2" | sudo tee -a /etc/my.cnf > /dev/null
 
 sudo systemctl restart mysqld
+
+cat << EOF > /var/finish-init.txt
+[status]
+finished = true
+EOF
