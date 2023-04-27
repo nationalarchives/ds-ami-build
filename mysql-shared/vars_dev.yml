@@ -5,6 +5,8 @@ service: "mysql"
 env: "dev"
 volume_size: 20
 
+credentials_key: "/infrastructure/credentials/shared-mysql"
+
 s3_deployment_bucket: "ds-dev-deployment-source"
 s3_deployment_root: "mysql"
 ...

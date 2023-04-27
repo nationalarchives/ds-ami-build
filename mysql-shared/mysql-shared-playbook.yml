@@ -1,0 +1,68 @@
+# MySQL Shared playbook
+---
+
+- name: create MySQL Shared AMI
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+
+  - name: load variables
+    ansible.builtin.include_vars:
+      file: "{{ ansible_var_file }}"
+
+  - name: get AWS session token
+    community.aws.sts_session_token:
+      duration_seconds: 3600
+    register: session_credentials
+
+  - name: switch role credentials
+    community.aws.sts_assume_role:
+      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
+      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
+      security_token: "{{ session_credentials.sts_creds.session_token }}"
+      role_arn: "{{ lookup ('env', 'AWS_ROLE_ARN') }}"
+      role_session_name: "s-devops"
+    register: assumed_role
+
+  - name: get linux2 AMI
+    amazon.aws.ec2_ami_info:
+      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+      security_token: "{{ assumed_role.sts_creds.session_token }}"
+      owners: amazon
+      region: "{{ region }}"
+      filters:
+        name: "amzn2-ami-hvm*"
+    register: findami
+
+  - name: set latest AMI
+    set_fact:
+      latest_ami: >
+        {{ findami.images | sort(attribute='creation_date') | last }}
+
+  - name: set secrets
+    vars:
+      secret_data: "{{ lookup('amazon.aws.aws_secret', '{{ credentials_key }}', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
+    set_fact:
+        root_password: "{{ secret_data.root_password }}"
+        admin_user: "{{ secret_data.admin_user }}"
+        admin_pass: "{{ secret_data.admin_password }}"
+        repl_user: "{{ secret_data.repl_user }}"
+        repl_pass: "{{ secret_data.repl_password }}"
+        network_cidr: "{{ secret_data.network_cidr }}"
+
+  - name: template userdata prime
+    vars:
+      s3_deployment_bucket: {{ s3_deployment_bucket }}
+      s3_deployment_root: {{ s3_deployment_root }}
+      root_password: "{{ root_password }}"
+      admin_user: "{{ admin_user }}"
+      admin_password: "{{ admin_password }}"
+      repl_user: "{{ repl_user }}"
+      repl_password: "{{ repl_password }}"
+      network_cidr: "{{ network_cidr }}"
+    template:
+      src: "./templates/userdata-prime.sh.j2"
+      dest: "./userdata=prime.sh"
+      force: yes
