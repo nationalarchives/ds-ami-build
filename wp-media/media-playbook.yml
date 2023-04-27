@@ -92,6 +92,7 @@
       assume_role_policy_document: "{{ lookup('file', './media-role-policy.json') }}"
       managed_policies: ["{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"]
       create_instance_profile: yes
+      delete_instance_profile: yes
       purge_policies: yes
       state: "present"
     register: media_iam_role
