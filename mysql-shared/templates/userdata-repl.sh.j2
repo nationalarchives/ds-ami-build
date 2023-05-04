@@ -30,7 +30,7 @@ sudo systemctl enable mysqld
 sudo systemctl start mysqld
 
 # get setup values from prime instance
-mysql_info=$(aws ssm put-paramter --name "/infrastructure/shared-mysql/setup/replica-info")
+mysql_info=$(aws ssm get-paramter --name "/infrastructure/shared-mysql/setup/replica-info")
 prime_ip=$(echo $mysql_info | jq .prime_ip)
 mysql_bin=$(echo $mysql_info | jq .bin)
 mysql_pos=$(echo $mysql_info | jq .pos)
