@@ -54,9 +54,9 @@ try {
         {
             if ($line.Name -Match "^s-DI-")
             {
-                $envVarNameUser = $line.Value.username + "_USR"
+                $envVarNameUser = $line.Value.username.ToUpper() + "_USR"
                 $envUsernameValue = $line.Value.username
-                $envVarNamePassword = $line.Value.username + "_PWD"
+                $envVarNamePassword = $line.Value.username.ToUpper() + "_PWD"
                 $envPasswordValue = $line.Value.password
 
                 write-log -Message "set: $envVarNameUser - $envUsernameValue"
