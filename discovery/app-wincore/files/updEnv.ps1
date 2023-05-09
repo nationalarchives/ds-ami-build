@@ -52,7 +52,7 @@ try {
         $userList = $mongoSecrets.SecretString | ConvertFrom-Json
 		foreach ($line in $userList.PSObject.Properties)
 		{
-			if ($line.Name -Match "^s-DI-")
+			if ($line.Name -Match "^DISC_MONGO_")
 			{
 				$envVarNameUser = $line.Value.username.ToUpper() + "_USR"
 				$envUsernameValue = $line.Value.username
