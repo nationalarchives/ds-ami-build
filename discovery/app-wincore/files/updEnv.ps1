@@ -54,9 +54,9 @@ try {
 		{
 			if ($line.Name -Match "^DISC_MONGO_")
 			{
-				$envVarNameUser = $line.Value.username.ToUpper() + "_USR"
+				$envVarNameUser = $line.Name + "_USR"
 				$envUsernameValue = $line.Value.username
-				$envVarNamePassword = $line.Value.username.ToUpper() + "_PWD"
+				$envVarNamePassword = $line.Name + "_PWD"
 				$envPasswordValue = $line.Value.password
 
 				write-log -Message "set: $envVarNameUser - $envUsernameValue"
