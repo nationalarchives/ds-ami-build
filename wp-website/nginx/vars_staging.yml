@@ -4,7 +4,7 @@ region: "eu-west-2"
 service: "website"
 env: "staging"
 volume_size: 100
-s3_deployment_bucket: "ds-staging-wp-deployment"
+s3_deployment_bucket: "ds-staging-deployment-source"
 s3_deployment_root: "website"
 s3_logfile_bucket: "ds-staging-wp-logfiles"
 s3_logfile_root: "website"
