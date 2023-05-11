@@ -1,5 +1,5 @@
 
-$logFile = "updEnv.log"
+$logFile = "/updEnv.log"
 
 function write-log
 {
@@ -54,15 +54,16 @@ try {
         {
             if ($line.Name -Match "^DISC_MONGO_")
             {
-                $envVarNameUser = $line.Value.username + "_USR"
-                $envVarNamePassword = $line.Value.username + "_PWD"
-                $envPosition = $line.Name
+                $envVarNameUser = $line.Name + "_USR"
+                $envUsernameValue = $line.Value.username
+                $envVarNamePassword = $line.Name + "_PWD"
+                $envPasswordValue = $line.Value.password
 
-                write-log -Message "set: $envVarNameUser - $userList.$envPosition.username" -Severity "Information"
-                [System.Environment]::SetEnvironmentVariable($envVarNameUser.trim(),$userList.$envPosition.username.trim(), "Machine")
+                write-log -Message "set: $envVarNameUser - $envUsernameValue"
+                [System.Environment]::SetEnvironmentVariable($envVarNameUser.trim(),$envUsernameValue.trim(), "Machine")
 
-                write-log -Message "set: $envVarNamePassword - $userList.$envPosition.password" -Severity "Information"
-                [System.Environment]::SetEnvironmentVariable($envVarNamePassword.trim(),$userList.$envPosition.password.trim(), "Machine")
+                write-log -Message "set: $envVarNamePassword - $envPasswordValue"
+                [System.Environment]::SetEnvironmentVariable($envVarNamePassword.trim(),$envPasswordValue.trim(), "Machine")
             }
         }
     }
