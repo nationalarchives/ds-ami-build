@@ -267,139 +267,139 @@
         CostCentre: 53
         Terraform: false
 
-  - name: provisioning replica instance
-    amazon.aws.ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      key_name: "{{ key_name }}"
-      image_id: "{{ latest_ami.image_id }}"#
-      instance_role: "ansible-ami-shared-mysql-role"
-      instance_type: "t3a.small"
-      metadata_options:
-        http_endpoint: "enabled"
-        http_tokens: "required"
-      name : "{{ service }}-shared-repl-{{ env }}"
-      network:
-        assign_public_ip: yes
-        delete_on_termination: yes
-        subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
-      region: "{{ region }}"
-      security_groups: ["{{ ec2_sec_group.group_id }}", "{{ db_sg.security_groups[0].group_id }}"]
-      state: "running"
-      termination_protection: no
-      user_data: "{{ lookup('file', './userdata-repl.sh') }}"
-      wait: true
-      volumes:
-        - device_name: "/dev/xvda"
-          ebs:
-            delete_on_termination: true
-            encrypted: true
-            volume_size: "{{ volume_size }}"
-      vpc_subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
-      tags:
-        Environment: "{{ env }}"
-        Service: "{{ service }}"
-        Owner: "Digital Services"
-        CreatedBy: "ansible"
-        CostCentre: 53
-        Terraform: false
-    register: ec2_repl
+#  - name: provisioning replica instance
+#    amazon.aws.ec2_instance:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      key_name: "{{ key_name }}"
+#      image_id: "{{ latest_ami.image_id }}"#
+#      instance_role: "ansible-ami-shared-mysql-role"
+#      instance_type: "t3a.small"
+#      metadata_options:
+#        http_endpoint: "enabled"
+#        http_tokens: "required"
+#      name : "{{ service }}-shared-repl-{{ env }}"
+#      network:
+#        assign_public_ip: yes
+#        delete_on_termination: yes
+#        subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
+#      region: "{{ region }}"
+#      security_groups: ["{{ ec2_sec_group.group_id }}", "{{ db_sg.security_groups[0].group_id }}"]
+#      state: "running"
+#      termination_protection: no
+#      user_data: "{{ lookup('file', './userdata-repl.sh') }}"
+#      wait: true
+#      volumes:
+#        - device_name: "/dev/xvda"
+#          ebs:
+#            delete_on_termination: true
+#            encrypted: true
+#            volume_size: "{{ volume_size }}"
+#      vpc_subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
+#      tags:
+#        Environment: "{{ env }}"
+#        Service: "{{ service }}"
+#        Owner: "Digital Services"
+#        CreatedBy: "ansible"
+#        CostCentre: 53
+#        Terraform: false
+#    register: ec2_repl
+#
+#  - name: get instance ip address
+#    set_fact:
+#      repl_private_ip: "{{ ec2_repl.instances[0].private_ip_address }}"
+#      repl_public_ip: "{{ ec2_repl.instances[0].public_ip_address }}"
+#      repl_id: "{{ ec2_repl.instances[0].instance_id }}"
+#
+#  - ansible.builtin.debug:
+#      msg:
+#        - "====================================================================="
+#        - "instance started up"
+#        - "instance private ip: {{ repl_private_ip }}"
+#        - "instance id: {{ repl_id }}"
+#        - "instance public ip {{ repl_public_ip }}"
+#        - "====================================================================="
+#
+#  - name: register new ec2 as host
+#    add_host:
+#      hostname: "{{ repl_public_ip }}"
+#      groups: ec2hosts
+#      ansible_user: ec2-user
+#      remote_user: ec2-user
+#      gather_facts: no
+#
+#  - name: wait for SSH service to bind on new instance
+#    wait_for:
+#      host: "{{ repl_public_ip }}"
+#      port: 22
+#      delay: 90
+#      timeout: 600
+#      state: started
+#    tags: [ami]
+#
+#- name: switch to ec2hosts - checking if setup has finished
+#  hosts: ec2hosts
+#  gather_facts: false
+#  tasks:
+#  - ansible.builtin.debug:
+#      msg:
+#        - "====================================================================="
+#        - "checking status of new instance before ami can be build"
+#        - "20 second interval with max duration of 15 minutes"
+#        - "====================================================================="
+#
+#  - name: check if ec2 instance is ready
+#    ansible.builtin.stat:
+#      path: "/var/finish-init.txt"
+#    remote_user: ec2-user
+#    register: init_finished
+#    until: "init_finished.stat.exists"
+#    retries: 45
+#    delay: 20
+#
+#- name: switch to localhost
+#  hosts: localhost
+#  gather_facts: true
+#
+#  tasks:
+#  - name: create replica AMI
+#    amazon.aws.ec2_ami:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      instance_id: "{{ repl_id }}"
+#      name: "{{ service }}-shared-repl-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+#      description: "MySQL Prime Instance - ready for deployment"
+#      region: "{{ region }}"
+#      state: "present"
+#      wait: yes
+#      tags:
+#        Name: "{{ service }}-shared-repl-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+#        Service: "{{ service }}"
+#        Owner: "Digital Services"
+#        CreatedBy: "ansible"
+#        CostCentre: 53
+#        Terraform: false
 
-  - name: get instance ip address
-    set_fact:
-      repl_private_ip: "{{ ec2_repl.instances[0].private_ip_address }}"
-      repl_public_ip: "{{ ec2_repl.instances[0].public_ip_address }}"
-      repl_id: "{{ ec2_repl.instances[0].instance_id }}"
+#  - name: terminate instance
+#    ec2_instance:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      instance_ids: ["{{ prime_id }}", "{{ repl_id }}"]
+#      region: "{{ region }}"
+#      state: "absent"
 
-  - ansible.builtin.debug:
-      msg:
-        - "====================================================================="
-        - "instance started up"
-        - "instance private ip: {{ repl_private_ip }}"
-        - "instance id: {{ repl_id }}"
-        - "instance public ip {{ repl_public_ip }}"
-        - "====================================================================="
-
-  - name: register new ec2 as host
-    add_host:
-      hostname: "{{ repl_public_ip }}"
-      groups: ec2hosts
-      ansible_user: ec2-user
-      remote_user: ec2-user
-      gather_facts: no
-
-  - name: wait for SSH service to bind on new instance
-    wait_for:
-      host: "{{ repl_public_ip }}"
-      port: 22
-      delay: 90
-      timeout: 600
-      state: started
-    tags: [ami]
-
-- name: switch to ec2hosts - checking if setup has finished
-  hosts: ec2hosts
-  gather_facts: false
-  tasks:
-  - ansible.builtin.debug:
-      msg:
-        - "====================================================================="
-        - "checking status of new instance before ami can be build"
-        - "20 second interval with max duration of 15 minutes"
-        - "====================================================================="
-
-  - name: check if ec2 instance is ready
-    ansible.builtin.stat:
-      path: "/var/finish-init.txt"
-    remote_user: ec2-user
-    register: init_finished
-    until: "init_finished.stat.exists"
-    retries: 45
-    delay: 20
-
-- name: switch to localhost
-  hosts: localhost
-  gather_facts: true
-
-  tasks:
-  - name: create replica AMI
-    amazon.aws.ec2_ami:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      instance_id: "{{ repl_id }}"
-      name: "{{ service }}-shared-repl-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
-      description: "MySQL Prime Instance - ready for deployment"
-      region: "{{ region }}"
-      state: "present"
-      wait: yes
-      tags:
-        Name: "{{ service }}-shared-repl-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
-        Service: "{{ service }}"
-        Owner: "Digital Services"
-        CreatedBy: "ansible"
-        CostCentre: 53
-        Terraform: false
-
-  - name: terminate instance
-    ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      instance_ids: ["{{ prime_id }}", "{{ repl_id }}"]
-      region: "{{ region }}"
-      state: "absent"
-
-  - name: remove security group
-    amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-blog-wp-sg"
-      region: "{{ region }}"
-      state: "absent"
-
+#  - name: remove security group
+#    amazon.aws.ec2_group:
+#      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
+#      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
+#      security_token: "{{ assumed_role.sts_creds.session_token }}"
+#      name: "ansible-ami-blog-wp-sg"
+#      region: "{{ region }}"
+#      state: "absent"
+#
   - name: remove IAM role
     community.aws.iam_role:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
