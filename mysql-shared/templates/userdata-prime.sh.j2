@@ -1,0 +1,91 @@
+#!/bin/bash
+
+sudo yum update -y
+
+# Install Cloudwatch agent
+sudo yum install amazon-cloudwatch-agent -y
+sudo amazon-linux-extras install -y collectd
+sudo aws s3 cp s3://{{ s3_deployment_bucket  }}/{{ s3_deployment_root  }}/cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+
+# mount EBS to instance which contains the MySQL database / schemas
+sudo mkdir /mysql-shared-prime
+sudo mount /dev/sdf /mysql-shared-prime
+mntDriveID="$(sudo blkid /dev/sdf | grep -oP 'UUID="(.*?)"' | grep -oP '"(.*?)"' | sed 's/"//g')"
+echo "UUID=$mntDriveID  /mysql  xfs  defaults,nofail  0  2" | sudo tee -a /etc/fstab > /dev/null
+
+# create swap file
+sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+sudo chmod 0600 /var/swap.1
+sudo /sbin/mkswap /var/swap.1
+sudo /sbin/swapon /var/swap.1
+
+# get mysql
+sudo amazon-linux-extras install epel -y
+sudo yum install https://dev.mysql.com/get/mysql80-community-release-el7-5.noarch.rpm -y
+sudo yum install mysql-community-server -y
+sudo systemctl enable mysqld
+sudo systemctl start mysqld
+
+temp_pw="$(sudo grep "temporary password" /var/log/mysqld.log | grep -o '[^ ]\+$')"
+
+# sql statements to secure the instance and setup replication user
+cat << EOF > ~/mysql_secure_installation.sql
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+CREATE USER '{{ admin_user }}'@'10.128.224.0/255.255.254.0' IDENTIFIED BY '{{ admin_password }}';
+GRANT ALL ON *.* TO '{{ admin_user }}'@'10.128.224.0/255.255.254.0';
+GRANT GRANT OPTION ON *.* TO '{{ admin_user }}'@'10.128.224.0/255.255.254.0';
+CREATE USER '{{ repl_user }}'@'{{ network_cidr }}' IDENTIFIED BY '{{ repl_password }}';
+GRANT REPLICATION SLAVE ON *.* TO '{{ repl_user }}'@'{{ network_cidr }}';
+FLUSH PRIVILEGES;
+EOF
+
+cat << EOF > ~/replica_data.sql
+SHOW MASTER STATUS;
+EOF
+
+# setting password for root to secrets manager parameters, secure mysql
+# and set administration access
+mysqladmin --user=root --password=$temp_pw password '{{ root_password }}'
+mysql --user=root --password={{ root_password }} < ~/mysql_secure_installation.sql
+
+# remove setup file containing passwords - avoiding security risks
+sudo rm ~/mysql_secure_installation.sql
+
+# point mysql data to /mysql/data and error log to /mysql/log
+sudo sed -i 's/datadir=\/var\/lib\/mysql/datadir=\/mysql-shared-prime\/data/g' /etc/my.cnf
+sudo sed -i 's/log-error=\/var\/log\/mysqld.log/log-error=\/mysql-shared-prime\/log\/mysqld.log/g' /etc/my.cnf
+
+#echo "log_bin = /mysql/log/mysql-bin.log" | sudo tee -a /etc/my.cnf > /dev/null
+echo "log_bin = /mysql-shared-prime/log/mysql-bin.log " | sudo tee -a /etc/my.cnf > /dev/null
+echo "log_bin_index = /mysql-shared-prime/log/mysql-bin.log.index " | sudo tee -a /etc/my.cnf > /dev/null
+echo "relay_log_index = /mysql-shared-prime/log/mysql-relay-bin.index" | sudo tee -a /etc/my.cnf > /dev/null
+echo "bind-address = $priv_ip" | sudo tee -a /etc/my.cnf > /dev/null
+# prime
+echo "server-id = 1" | sudo tee -a /etc/my.cnf > /dev/null
+
+sudo systemctl restart mysqld
+
+# prep replica setup data
+priv_ip="$(curl http://169.254.169.254/latest/meta-data/local-ipv4)"
+mysql --user=root --password={{ root_password }} < ~/replica_data.sql | grep mysql-bin > ~/replica-info
+mysql_bin="$(awk '{print $1}' ~/replica-info)"
+mysql_pos="$(awk '{print $2}' ~/replica-info)"
+
+# create mysql-info
+mysql_info="{\"prime_ip\":\"$priv_ip\",\"bin\":\"$mysql_bin\",\"pos\":\"$mysql_pos\"}"
+
+# write info to parameter store
+aws ssm put-paramter --name "/infrastructure/shared-mysql/setup/replica-info" \
+  --type "String" \
+  --value "$mysql_info" \
+  --overwrite \
+  --region {{ region }}
+
+cat << EOF > /var/finish-init.txt
+[status]
+finished = true
+EOF
