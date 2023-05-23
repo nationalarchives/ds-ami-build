@@ -52,7 +52,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-aim-website-rp-s3-policy"
+      policy_name: "ansible-aim-mysql-shared-s3-policy"
       policy: "{{ lookup('file', './instance-role-policy.json') }}"
       state: "present"
     register: s3_policy
@@ -77,7 +77,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-website-rp-sg"
+      name: "ansible-ami-mysql-shared-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
       vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
@@ -396,7 +396,7 @@
 #      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
 #      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
 #      security_token: "{{ assumed_role.sts_creds.session_token }}"
-#      name: "ansible-ami-blog-wp-sg"
+#      name: "ansible-ami-mysql-shared-sg"
 #      region: "{{ region }}"
 #      state: "absent"
 #
@@ -405,7 +405,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-blog-wp-role"
+      name: "ansible-ami-mysql-shared-role"
       region: "{{ region }}"
       delete_instance_profile: yes
       state: "absent"
@@ -415,6 +415,6 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-blog-wp-s3-policy"
+      policy_name: "ansible-ami-mysql-shared-s3-policy"
       state: "absent"
 ...
