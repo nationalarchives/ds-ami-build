@@ -61,6 +61,14 @@ CHANGE MASTER TO
 FLUSH PRIVILEGES;
 EOF
 
+#mysql> CHANGE REPLICATION SOURCE TO
+#     >     SOURCE_HOST = host,
+#     >     SOURCE_PORT = port,
+#     >     SOURCE_USER = user,
+#     >     SOURCE_PASSWORD = password,
+#     >     SOURCE_AUTO_POSITION = 1;
+#mysql> START REPLICA;
+
 # setting password for root to secrets manager parameters, secure mysql
 # and set administration access
 mysqladmin --user=root --password=$temp_pw password '{{ root_password }}'
