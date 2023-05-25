@@ -64,8 +64,6 @@ echo "log_bin = /mysql-shared-prime/log/mysql-bin.log " | sudo tee -a /etc/my.cn
 echo "log_bin_index = /mysql-shared-prime/log/mysql-bin.log.index " | sudo tee -a /etc/my.cnf > /dev/null
 echo "relay_log_index = /mysql-shared-prime/log/mysql-relay-bin.index" | sudo tee -a /etc/my.cnf > /dev/null
 echo "bind-address = $priv_ip" | sudo tee -a /etc/my.cnf > /dev/null
-echo "gtid_mode=ON" | sudo tee -a /etc/my.cnf > /dev/null
-echo "enforce-gtid-consistency=ON" | sudo tee -a /etc/my.cnf > /dev/null
 
 # prime
 #echo "server-id = 1" | sudo tee -a /etc/my.cnf > /dev/null
