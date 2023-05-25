@@ -52,15 +52,27 @@ EOF
 
 # sql statements setting up replication
 cat << EOF > ~/mysql_setup_replication.sql
-CHANGE MASTER TO
-  MASTER_HOST='$prime_ip',
-  MASTER_USER='{{ repl_user }}',
-  MASTER_PASSWORD='{{ repl_password }}',
-  MASTER_LOG_FILE='$mysql_bin',
-  MASTER_LOG_POS=$mysql_pos;
+CHANGE REPLICATION SOURCE TO
+  SOURCE_HOST='$prime_ip',
+  SOURCE_USER='{{ repl_user }}',
+  SOURCE_PASSWORD='{{ repl_password }}',
+  SOURCE_AUTO_POSITION = 1,
+  SOURCE_PORT = port;
 FLUSH PRIVILEGES;
 EOF
 
+## sql statements setting up replication
+#cat << EOF > ~/mysql_setup_replication.sql
+#CHANGE MASTER TO
+#  MASTER_HOST='$prime_ip',
+#  MASTER_USER='{{ repl_user }}',
+#  MASTER_PASSWORD='{{ repl_password }}',
+#  MASTER_LOG_FILE='$mysql_bin',
+#  MASTER_LOG_POS=$mysql_pos;
+#FLUSH PRIVILEGES;
+#EOF
+
+## Original code for changing replication source:
 #mysql> CHANGE REPLICATION SOURCE TO
 #     >     SOURCE_HOST = host,
 #     >     SOURCE_PORT = port,
