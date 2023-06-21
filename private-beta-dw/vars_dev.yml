@@ -1,0 +1,9 @@
+---
+key_name: "private-beta-dw-dev-eu-west-2"
+region: "eu-west-2"
+service: "private-beta"
+env: "dev"
+volume_size: 40
+s3_deployment_bucket: "ds-dev-deployment-source"
+s3_deployment_root: "private-beta"
+...
