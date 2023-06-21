@@ -41,7 +41,7 @@
 
   - name: set credential key
     ansible.builtin.set_fact:
-      credential_key: "devops/{{ lookup('env', 'SERVICE_NAME') }}/credentials/postgres"
+      credential_key: "devops/{{ service }}/credentials/postgres"
 
   - name: set secrets
     vars:
