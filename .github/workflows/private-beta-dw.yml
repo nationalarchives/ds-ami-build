@@ -62,7 +62,6 @@ jobs:
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
           VPC_ID: ${{ secrets.VPC_ID }}
           SUBNET_ID: ${{ secrets.SUBNET_ID }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/private-beta-dw

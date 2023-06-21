@@ -6,6 +6,4 @@ env: "dev"
 volume_size: 40
 s3_deployment_bucket: "ds-dev-deployment-source"
 s3_deployment_root: "private-beta"
-
-python_version: "3.11"
 ...
