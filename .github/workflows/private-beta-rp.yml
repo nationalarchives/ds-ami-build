@@ -23,7 +23,7 @@ jobs:
   ami-deployment-dev:
     if: github.event.inputs.deploy-environment == 'dev'
     runs-on: ubuntu-latest
-    environment: dev
+    environment: private-beta-rp-dev
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -76,7 +76,7 @@ jobs:
   ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
     runs-on: ubuntu-latest
-    environment: staging
+    environment: private-beta-rp-staging
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -129,7 +129,7 @@ jobs:
   ami-deployment-live:
     if: github.event.inputs.deploy-environment == 'production'
     runs-on: ubuntu-latest
-    environment: live
+    environment: private-beta-rp-live
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
