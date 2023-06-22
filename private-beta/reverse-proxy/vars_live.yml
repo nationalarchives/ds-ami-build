@@ -1,0 +1,12 @@
+---
+key_name: "private-beta-rp-dev-eu-west-2"
+region: "eu-west-2"
+service: "private-beta"
+env: "live"
+volume_size: 100
+s3_deployment_bucket: "ds-live-deployment-source"
+s3_deployment_root: "private-beta"
+s3_logfile_bucket: "ds-live-wp-logfiles"
+s3_logfile_root: "private-beta"
+ssm_download_region: "eu-west-2"
+...
