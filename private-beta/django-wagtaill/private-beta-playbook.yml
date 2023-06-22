@@ -65,7 +65,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-private-beta-s3-policy"
+      policy_name: "ansible-ami-private-beta-dw-s3-policy"
       policy: "{{ lookup('file', './instance-role-policy.json') }}"
       state: "present"
     register: s3_policy
@@ -75,7 +75,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-private-beta-role"
+      name: "ansible-ami-private-beta-dw-role"
       region: "{{ region }}"
       assume_role_policy_document: "{{ lookup('file', './templates/private-beta-role-policy.json') }}"
       managed_policies: ["{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"]
@@ -90,7 +90,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-private-beta-sg"
+      name: "ansible-ami-private-beta-dw-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
       vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
@@ -138,7 +138,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
-      instance_role: "ansible-ami-private-beta-role"
+      instance_role: "ansible-ami-private-beta-dw-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
@@ -233,7 +233,7 @@
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance_id: "{{ instance_id }}"
-      name: "{{ service }}-primer-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+      name: "{{ service }}-dw-primer-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
       description: "private-beta server - ready for deployment"
       region: "{{ region }}"
       state: "present"
@@ -260,7 +260,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-private-beta-sg"
+      name: "ansible-ami-private-beta-dw-sg"
       region: "{{ region }}"
       state: "absent"
 
@@ -269,7 +269,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-private-beta-role"
+      name: "ansible-ami-private-beta-dw-role"
       region: "{{ region }}"
       delete_instance_profile: yes
       state: "absent"
@@ -279,6 +279,6 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-private-beta-s3-policy"
+      policy_name: "ansible-ami-private-beta-dw-s3-policy"
       state: "absent"
 ...

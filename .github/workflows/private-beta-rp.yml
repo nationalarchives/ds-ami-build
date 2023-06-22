@@ -23,7 +23,7 @@ jobs:
   ami-deployment-dev:
     if: github.event.inputs.deploy-environment == 'dev'
     runs-on: ubuntu-latest
-    environment: dev
+    environment: private-beta-rp-dev
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -33,7 +33,7 @@ jobs:
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=rp-app-dev-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=private-beta-rp-dev-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -44,7 +44,7 @@ jobs:
 
       - name: write ssh key file
         run: |
-          echo "${{ secrets.RP_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
@@ -76,7 +76,7 @@ jobs:
   ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
     runs-on: ubuntu-latest
-    environment: staging
+    environment: private-beta-rp-staging
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -86,7 +86,7 @@ jobs:
       - name: set ansible var file for staging
         run: |
           echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=rp-app-staging-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=private-beta-rp-staging-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -97,7 +97,7 @@ jobs:
 
       - name: write ssh key file
         run: |
-          echo "${{ secrets.RP_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
@@ -129,7 +129,7 @@ jobs:
   ami-deployment-live:
     if: github.event.inputs.deploy-environment == 'production'
     runs-on: ubuntu-latest
-    environment: live
+    environment: private-beta-rp-live
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -139,7 +139,7 @@ jobs:
       - name: set ansible var file for live
         run: |
           echo "ANSIBLE_VAR_FILE=vars_live.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=rp-app-live-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=private-beta-rp-live-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -150,7 +150,7 @@ jobs:
 
       - name: write ssh key file
         run: |
-          echo "${{ secrets.RP_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
           chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python

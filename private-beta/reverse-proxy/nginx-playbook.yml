@@ -1,7 +1,7 @@
 # NginX playbook
 ---
 
-- name: create NginX Reverse Proxy Primer
+- name: create Reverse Proxy Primer for Private Beta
   hosts: localhost
   gather_facts: false
 
@@ -57,7 +57,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-aim-website-rp-s3-policy"
+      policy_name: "ansible-aim-private-beta-rp-s3-policy"
       policy: "{{ lookup('file', './instance-role-policy.json') }}"
       state: "present"
     register: s3_policy
@@ -67,7 +67,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-website-rp-role"
+      name: "ansible-ami-private-beta-rp-role"
       region: "{{ region }}"
       assume_role_policy_document: "{{ lookup('file', './rp-role-policy.json') }}"
       managed_policies: ["{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"]
@@ -81,7 +81,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-website-rp-sg"
+      name: "ansible-ami-private-beta-rp-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
       vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
@@ -128,7 +128,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"
-      instance_role: "ansible-ami-website-rp-role"
+      instance_role: "ansible-ami-private-beta-rp-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
@@ -180,7 +180,6 @@
       hostname: "{{ instance_public_ip }}"
       groups: ec2hosts
       ansible_user: ec2-user
-      remote_user: ec2-user
       gather_facts: no
 
   - name: wait for SSH service to bind on new instance
@@ -224,7 +223,7 @@
       security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance_id: "{{ instance_id }}"
       name: "{{ service }}-rp-primer--{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
-      description: "Website reverse proxy - ready for deployment"
+      description: "private-beta reverse proxy - ready for deployment"
       region: "{{ region }}"
       state: "present"
       wait: yes
@@ -250,7 +249,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-website-rp-sg"
+      name: "ansible-ami-private-beta-rp-sg"
       region: "{{ region }}"
       state: "absent"
 
@@ -259,7 +258,7 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-website-rp-role"
+      name: "ansible-ami-private-beta-rp-role"
       region: "{{ region }}"
       delete_instance_profile: yes
       state: "absent"
@@ -269,6 +268,6 @@
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
       aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
       security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-aim-website-rp-s3-policy"
+      policy_name: "ansible-aim-private-beta-rp-s3-policy"
       state: "absent"
 ...
