@@ -1,0 +1,177 @@
+name: Private Beta Reverse Proxy AMI
+
+permissions:
+  id-token: write
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy-environment:
+        type: choice
+        description: Environment
+        required: true
+        options:
+        - dev
+        - staging
+        - production
+
+jobs:
+# ------------------------------------------------------------------------------
+# dev deployment
+# ------------------------------------------------------------------------------
+  ami-deployment-dev:
+    if: github.event.inputs.deploy-environment == 'dev'
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ github.event.inputs.branch }}"
+
+      - name: set ansible var file for dev
+        run: |
+          echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=rp-app-dev-eu-west-2" >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+
+      - name: write ssh key file
+        run: |
+          echo "${{ secrets.RP_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          chmod 0600 ${{ env.SSH_KEY_FILE }}
+
+      - name: install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/private-beta-rp-req.txt'
+
+      - run: pip install -r ${{ github.workspace }}/.github/workflows/private-beta-rp-req.txt
+
+      - name: run ansible playbook
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          VPC_ID: ${{ secrets.VPC_ID }}
+          SUBNET_ID: ${{ secrets.SUBNET_ID }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          cur_dir=$(pwd)
+          cd $cur_dir/private-beta/reverse-proxy
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=eu-west-2
+          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} nginx-playbook.yml
+
+# ------------------------------------------------------------------------------
+# staging deployment
+# ------------------------------------------------------------------------------
+  ami-deployment-staging:
+    if: github.event.inputs.deploy-environment == 'staging'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ github.event.inputs.branch }}"
+
+      - name: set ansible var file for staging
+        run: |
+          echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=rp-app-staging-eu-west-2" >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+
+      - name: write ssh key file
+        run: |
+          echo "${{ secrets.RP_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          chmod 0600 ${{ env.SSH_KEY_FILE }}
+
+      - name: install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/private-beta-rp-req.txt'
+
+      - run: pip install -r ${{ github.workspace }}/.github/workflows/private-beta-rp-req.txt
+
+      - name: run ansible playbook
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          VPC_ID: ${{ secrets.VPC_ID }}
+          SUBNET_ID: ${{ secrets.SUBNET_ID }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          cur_dir=$(pwd)
+          cd $cur_dir/private-beta/reverse-proxy
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=eu-west-2
+          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} nginx-playbook.yml
+
+# ------------------------------------------------------------------------------
+# live deployment
+# ------------------------------------------------------------------------------
+  ami-deployment-live:
+    if: github.event.inputs.deploy-environment == 'production'
+    runs-on: ubuntu-latest
+    environment: live
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ github.event.inputs.branch }}"
+
+      - name: set ansible var file for live
+        run: |
+          echo "ANSIBLE_VAR_FILE=vars_live.yml" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=rp-app-live-eu-west-2" >> $GITHUB_ENV
+
+      - name: aws variable settings
+        run: |
+          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
+          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+
+      - name: write ssh key file
+        run: |
+          echo "${{ secrets.RP_SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+          chmod 0600 ${{ env.SSH_KEY_FILE }}
+
+      - name: install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/private-beta-rp-req.txt'
+
+      - run: pip install -r ${{ github.workspace }}/.github/workflows/private-beta-rp-req.txt
+
+      - name: run ansible playbook
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          VPC_ID: ${{ secrets.VPC_ID }}
+          SUBNET_ID: ${{ secrets.SUBNET_ID }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          cur_dir=$(pwd)
+          cd $cur_dir/private-beta/reverse-proxy
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_DEFAULT_REGION=eu-west-2
+          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} nginx-playbook.yml
