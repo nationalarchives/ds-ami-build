@@ -1,5 +1,5 @@
 ---
-name: Private Beta AMI
+name: Private Beta Django/Wagtail AMI
 
 permissions:
   id-token: write
@@ -24,7 +24,7 @@ jobs:
   private-beta-ami-deployment-dev:
     if: github.event.inputs.deploy-environment == 'dev'
     runs-on: ubuntu-latest
-    environment: private-beta-dev
+    environment: private-beta-dw-dev
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -76,7 +76,7 @@ jobs:
   private-beta-ami-deployment-staging:
     if: github.event.inputs.deploy-environment == 'staging'
     runs-on: ubuntu-latest
-    environment: private-beta-staging
+    environment: private-beta-dw-staging
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -129,7 +129,7 @@ jobs:
   private-beta-ami-deployment-live:
     if: github.event.inputs.deploy-environment == 'live'
     runs-on: ubuntu-latest
-    environment: private-beta-live
+    environment: private-beta-dw-live
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
