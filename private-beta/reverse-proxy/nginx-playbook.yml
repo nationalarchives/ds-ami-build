@@ -228,7 +228,7 @@
       state: "present"
       wait: yes
       tags:
-        Name: "{{ service }}-rp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+        Name: "{{ service }}-rp-primer-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
         Service: "{{ service }}"
         Owner: "Digital Services"
         CreatedBy: "ansible"
