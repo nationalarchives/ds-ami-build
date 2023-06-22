@@ -133,7 +133,7 @@
       metadata_options:
         http_endpoint: "enabled"
         http_tokens: "required"
-      name : "{{ service }}-rp-primer-{{ env }}"
+      name : "{{ service }}-rp-primer"
       network:
         assign_public_ip: yes
         delete_on_termination: yes
