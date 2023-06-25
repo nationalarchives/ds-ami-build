@@ -3,7 +3,7 @@ key_name: "private-beta-rp-dev-eu-west-2"
 region: "eu-west-2"
 service: "private-beta"
 env: "live"
-volume_size: 100
+volume_size: 40
 s3_deployment_bucket: "ds-live-deployment-source"
 s3_deployment_root: "private-beta"
 s3_logfile_bucket: "ds-live-wp-logfiles"
