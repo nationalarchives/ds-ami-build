@@ -21,7 +21,7 @@ sudo aws s3 cp s3://{{ s3_deployment_bucket }}/website/cloudwatch/cloudwatch-age
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 
 # Copy configuration files for nginx
-sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ s3_deployment_root }}/nginx/ /etc/nginx/ --recursive --exclude "*" --include "*.conf"
+sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ s3_deployment_root }}/nginx/ /etc/nginx/ --recursive --exclude "*" --include "*.conf" --include "mime.types"
 
 # Copy configuration files for nginx log rotation
 sudo aws s3 cp s3://{{ s3_logfile_bucket }}/{{ s3_logfile_root }}/nginx/nginx /etc/logrotate.d/nginx
