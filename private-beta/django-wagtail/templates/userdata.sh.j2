@@ -9,7 +9,7 @@ sudo chmod 0600 /var/swap.1
 sudo /sbin/mkswap /var/swap.1
 sudo /sbin/swapon /var/swap.1
 
-# Install apache
+# Install docker
 sudo yum docker -y
 sudo systemctl enable docker
 sudo systemctl start docker
@@ -25,6 +25,25 @@ sudo yum install amazon-cloudwatch-agent -y
 sudo amazon-linux-extras install -y collectd
 sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/cloudwatch/cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+
+# Set up ETNA
+# Will become ds-wagtail:develop once changes are merged in
+docker pull ghcr.io/nationalarchives/ds-wagtail:docker-static-assets
+# Run ETNA image on port 8000
+docker run \
+    --name ds-wagtail \
+    --publish 8000:8080 \
+    --env DATABASE_URL=postgres://postgres:@postgres:5432/postgres \
+    --env DATABASE_NAME=postgres \
+    --env DATABASE_USER=postgres \
+    --env DATABASE_PASSWORD=mysecretpassword \
+    --env DATABASE_HOST=db \
+    --env DJANGO_SETTINGS_MODULE=config.settings.production \
+    --env SECRET_KEY=mysecretkey \
+    --restart=unless-stopped \
+    --platform linux/arm64 \
+    --detach \
+	ghcr.io/nationalarchives/ds-wagtail:docker-static-assets
 
 cat << EOF > /var/finish-init.txt
 [status]
