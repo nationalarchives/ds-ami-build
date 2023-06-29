@@ -41,7 +41,7 @@ docker run \
     --env DJANGO_SETTINGS_MODULE=config.settings.production \
     --env SECRET_KEY=mysecretkey \
     --restart=unless-stopped \
-    --platform linux/arm64 \
+    --platform linux/amd64 \
     --detach \
 	ghcr.io/nationalarchives/ds-wagtail:docker-static-assets
 
