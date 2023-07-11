@@ -10,7 +10,7 @@ sudo /sbin/mkswap /var/swap.1
 sudo /sbin/swapon /var/swap.1
 
 # Install docker
-sudo yum docker -y
+sudo yum install docker -y
 sudo systemctl enable docker
 sudo systemctl start docker
 
