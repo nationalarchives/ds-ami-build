@@ -53,6 +53,9 @@
       repl_user: "{{ secret_data.repl_user }}"
       repl_pass: "{{ secret_data.repl_pass }}"
       network_cidr: "{{ secret_data.network_cidr }}"
+      # TODO: Change to fixed IP-less DNS address
+      host: "ip-10-128-212-90.eu-west-2.compute.internal"
+      secret_key: "{{ secret_data.secret_key }}"
 
   - name: template deployment policy
     template:
