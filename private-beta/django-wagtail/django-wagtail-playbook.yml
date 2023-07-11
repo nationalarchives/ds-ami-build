@@ -39,32 +39,25 @@
       latest_ami: >
         {{ findami.images | sort(attribute='creation_date') | last }}
 
-  - name: set credential key
+  - name: set credential keys
     ansible.builtin.set_fact:
+      application_credential_key: "devops/{{ service }}/application"
       postgres_credential_key: "devops/{{ service }}/credentials/postgres"
 
   - name: set secrets
     vars:
-      secret_data: "{{ lookup('amazon.aws.aws_secret', postgres_credential_key, region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
+      application_secret_data: "{{ lookup('amazon.aws.aws_secret', application_credential_key, region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
+      postgres_secret_data: "{{ lookup('amazon.aws.aws_secret', postgres_credential_key, region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
     set_fact:
-      root_password: "{{ secret_data.root_password }}"
-      admin_user: "{{ secret_data.admin_user }}"
-      admin_pass: "{{ secret_data.admin_pass }}"
-      repl_user: "{{ secret_data.repl_user }}"
-      repl_pass: "{{ secret_data.repl_pass }}"
-      network_cidr: "{{ secret_data.network_cidr }}"
+      root_password: "{{ postgres_secret_data.root_password }}"
+      admin_user: "{{ postgres_secret_data.admin_user }}"
+      admin_pass: "{{ postgres_secret_data.admin_pass }}"
+      repl_user: "{{ postgres_secret_data.repl_user }}"
+      repl_pass: "{{ postgres_secret_data.repl_pass }}"
+      network_cidr: "{{ postgres_secret_data.network_cidr }}"
       # TODO: Change to fixed IP-less DNS address
       host: "ip-10-128-212-90.eu-west-2.compute.internal"
-
-  - name: set credential key
-    ansible.builtin.set_fact:
-      app_credential_key: "devops/{{ service }}/application"
-
-  - name: set secrets
-    vars:
-      secret_data: "{{ lookup('amazon.aws.aws_secret', app_credential_key, region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
-    set_fact:
-      secret_key: "{{ secret_data.secret_key }}"
+      secret_key: "{{ application_secret_data.secret_key }}"
 
   - name: template deployment policy
     template:
