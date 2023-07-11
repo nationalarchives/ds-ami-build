@@ -29,11 +29,11 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 # Set up ETNA
 # Will become ds-wagtail:develop once changes are merged in to the develop branch
 docker pull ghcr.io/nationalarchives/ds-wagtail:aws-migration
-# Run ETNA image on port 8000
+# Run image on port 8000
 docker run \
     --name ds-wagtail \
     --publish 8000:8080 \
-    --env DATABASE_NAME=etna \
+    --env DATABASE_NAME=tna \
     --env DATABASE_USER={{ admin_user }} \
     --env DATABASE_PASSWORD={{ admin_pass }} \
     --env DATABASE_HOST={{ host }} \
