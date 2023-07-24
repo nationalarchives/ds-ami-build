@@ -27,8 +27,8 @@ sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/cloudwatch/cloudwat
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 
 # Set up ETNA
-# Will become ds-wagtail:develop once changes are merged in to the develop branch
-docker pull ghcr.io/nationalarchives/ds-wagtail:aws-migration
+# Could become ds-wagtail:latest once changes are merged in to the main branch although a static version number would be preferred
+docker pull ghcr.io/nationalarchives/ds-wagtail:develop
 # Run image on port 8000
 docker run \
     --name ds-wagtail \
@@ -42,7 +42,7 @@ docker run \
     --restart=unless-stopped \
     --platform linux/amd64 \
     --detach \
-	ghcr.io/nationalarchives/ds-wagtail:aws-migration
+	ghcr.io/nationalarchives/ds-wagtail:develop
 
 cat << EOF > /var/finish-init.txt
 [status]
