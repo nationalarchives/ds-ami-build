@@ -8,6 +8,4 @@ s3_deployment_bucket: "ds-staging-deployment-source"
 s3_deployment_root: "private-beta"
 settings_module: "config.settings.production"
 database_host: "db.private-beta.staging.local"
-# TODO: Real key
-application_docker_tag_parameter: "/aj/test-value-deploy-version-staging"
 ...
