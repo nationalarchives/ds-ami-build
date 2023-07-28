@@ -7,8 +7,7 @@ volume_size: 20
 s3_deployment_bucket: "ds-dev-deployment-source"
 s3_deployment_root: "private-beta"
 settings_module: "config.settings.dev"
-# TODO: [env]?
-database_host: "db.private-beta.[env].local"
+database_host: "db.private-beta.dev.local"
 # TODO: Real key
 application_docker_tag_parameter: "/aj/test-value-deploy-version-dev"
 ...
