@@ -6,4 +6,8 @@ env: "dev"
 volume_size: 40
 s3_deployment_bucket: "ds-live-deployment-source"
 s3_deployment_root: "private-beta"
+settings_module: "config.settings.production"
+database_host: "db.private-beta.[env].local"
+# TODO: This needs to be a static version somehow (e.g. 7.4.0)
+application_docker_tag: "latest"
 ...

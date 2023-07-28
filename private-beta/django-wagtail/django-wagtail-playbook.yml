@@ -55,7 +55,6 @@
       repl_user: "{{ postgres_secret_data.repl_user }}"
       repl_pass: "{{ postgres_secret_data.repl_pass }}"
       network_cidr: "{{ postgres_secret_data.network_cidr }}"
-      host: "ip-10-128-212-90.eu-west-2.compute.internal"
       secret_key: "{{ application_secret_data.secret_key }}"
 
   - name: template deployment policy
