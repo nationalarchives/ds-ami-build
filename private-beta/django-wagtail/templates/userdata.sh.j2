@@ -26,8 +26,11 @@ sudo amazon-linux-extras install -y collectd
 sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/cloudwatch/cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 
+# Get the application version to be deployed
+APPLICATION_DOCKER_TAG=$(sudo aws ssm get-parameter --name "{{ application_docker_tag_parameter }}" --region=eu-west-2 --query 'Value')
+
 # Set up ETNA
-docker pull ghcr.io/nationalarchives/ds-wagtail:{{ application_docker_tag }}
+docker pull ghcr.io/nationalarchives/ds-wagtail:$APPLICATION_DOCKER_TAG
 # Run image on port 8000
 docker run \
     --name ds-wagtail \
@@ -41,7 +44,7 @@ docker run \
     --restart=always \
     --platform linux/amd64 \
     --detach \
-	ghcr.io/nationalarchives/ds-wagtail:{{ application_docker_tag }}
+	ghcr.io/nationalarchives/ds-wagtail:$APPLICATION_DOCKER_TAG
 
 cat << EOF > /var/finish-init.txt
 [status]
