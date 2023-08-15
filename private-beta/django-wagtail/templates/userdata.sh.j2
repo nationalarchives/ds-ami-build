@@ -27,24 +27,24 @@ sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/cloudwatch/cloudwat
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 
 # Get the application version to be deployed
+APPLICATION_DOCKER_NAME=ds-wagtail
 APPLICATION_DOCKER_TAG=$(sudo aws ssm get-parameter --name "/devops/private-beta/version" --region=eu-west-2 --query 'Value')
 
 # Set up ETNA
-docker pull ghcr.io/nationalarchives/ds-wagtail:$APPLICATION_DOCKER_TAG
-# Run image on port 8000
+docker pull ghcr.io/nationalarchives/$APPLICATION_DOCKER_NAME:$APPLICATION_DOCKER_TAG
+# Run image on port 8080
 docker run \
-    --name ds-wagtail \
-    --publish 8000:8080 \
-    --env DATABASE_NAME=tna \
+    --name $APPLICATION_DOCKER_NAME \
+    --publish 8080:8080 \
+    --env DATABASE_NAME={{ database_name }} \
     --env DATABASE_USER={{ admin_user }} \
     --env DATABASE_PASSWORD={{ admin_pass }} \
     --env DATABASE_HOST={{ database_host }} \
     --env DJANGO_SETTINGS_MODULE={{ settings_module }} \
     --env SECRET_KEY={{ secret_key }} \
     --restart=always \
-    --platform linux/amd64 \
     --detach \
-	ghcr.io/nationalarchives/ds-wagtail:$APPLICATION_DOCKER_TAG
+	ghcr.io/nationalarchives/$APPLICATION_DOCKER_NAME:$APPLICATION_DOCKER_TAG
 
 cat << EOF > /var/finish-init.txt
 [status]
