@@ -1,0 +1,6 @@
+boto3
+requests
+pyjwt
+wheel
+ansible
+pywinrm
