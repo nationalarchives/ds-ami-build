@@ -1,0 +1,9 @@
+---
+key_name: "docker-general-dev-eu-west-2"
+region: "eu-west-2"
+service: "docker-general"
+env: "dev"
+volume_size: 100
+s3_deployment_bucket: "ds-dev-deployment-source"
+s3_deployment_root: "docker-general"
+...
