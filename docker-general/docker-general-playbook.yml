@@ -70,7 +70,7 @@
       delete_instance_profile: yes
       purge_policies: yes
       state: "present"
-    register: docker-general_iam_role
+    register: docker_general_iam_role
 
   - name: create security group - allowing updates and downloads
     amazon.aws.ec2_group:
