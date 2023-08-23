@@ -217,7 +217,7 @@
   - name: set timestamp for ami
     set_fact:
       ami_stamp: >
-        "{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+        "{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
 
   - name: create AMI
     amazon.aws.ec2_ami:
