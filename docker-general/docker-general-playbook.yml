@@ -33,7 +33,8 @@
       owners: amazon
       region: "{{ region }}"
       filters:
-        name: "amzn2-ami-hvm*"
+        name: "al2023-ami-2023*"
+#        name: "amzn2-ami-hvm*"
     register: findami
 
   - name: set latest AMI
