@@ -33,7 +33,8 @@
       owners: amazon
       region: "{{ region }}"
       filters:
-        name: "amzn2-ami-hvm*"
+        name: "al2023-ami-2023*"
+#        name: "amzn2-ami-hvm*"
     register: findami
 
   - name: set latest AMI
@@ -70,7 +71,7 @@
       delete_instance_profile: yes
       purge_policies: yes
       state: "present"
-    register: docker-general_iam_role
+    register: docker_general_iam_role
 
   - name: create security group - allowing updates and downloads
     amazon.aws.ec2_group:
@@ -217,7 +218,7 @@
   - name: set timestamp for ami
     set_fact:
       ami_stamp: >
-        "{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+        "{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
 
   - name: create AMI
     amazon.aws.ec2_ami:

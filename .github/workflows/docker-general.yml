@@ -34,7 +34,7 @@ jobs:
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=docker-general-app-dev-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=docker-general-dev-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -87,7 +87,7 @@ jobs:
       - name: set ansible var file for staging
         run: |
           echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=docker-general-app-staging-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=docker-general-staging-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
@@ -140,7 +140,7 @@ jobs:
       - name: set ansible var file for live
         run: |
           echo "ANSIBLE_VAR_FILE=vars_live.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=docker-general-app-live-eu-west-2" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=docker-general-live-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
