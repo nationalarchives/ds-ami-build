@@ -162,7 +162,7 @@
       ansible_winrm_server_cert_validation: ignore
 
   - name: wait for WinRM port
-    ansible.builtin.win_wait_for:
+    ansible.builtin.wait_for:
       host: "{{ instance_public_ip }}"
       port: 5986
       delay: 120
