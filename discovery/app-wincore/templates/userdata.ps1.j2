@@ -77,5 +77,6 @@ Disable-TlsCipherSuite -Name "TLS_PSK_WITH_NULL_SHA256"
 
 "[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
+Restart-Computer
 </powershell>
 <persist>false</persist>
