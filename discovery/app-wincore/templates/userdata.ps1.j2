@@ -7,7 +7,7 @@ cd \
 New-Item -itemtype "directory" "$tmpDir" -Force
 
 "--- download ConfigureRemotingForAnsible.ps1" | Out-File -FilePath /initial-debug.txt -Append
-(New-Object System.Net.Webclient).DownloadFile("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1", "$tmpDir\ConfigureRemotingForAnsible.ps1")
+(New-Object System.Net.Webclient).DownloadFile("https://raw.githubusercontent.com/AlbanAndrieu/ansible-windows/master/files/ConfigureRemotingForAnsible.ps1", "$tmpDir\ConfigureRemotingForAnsible.ps1")
 
 "--- create ansible admin user" | Out-File -FilePath /initial-debug.txt -Append
 $password = "{{password}}" | ConvertTo-SecureString -AsPlainText -Force
