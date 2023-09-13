@@ -8,7 +8,6 @@ New-Item -itemtype "directory" "$tmpDir" -Force
 
 "--- download ConfigureRemotingForAnsible.ps1" | Out-File -FilePath /initial-debug.txt -Append
 (New-Object System.Net.Webclient).DownloadFile("https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1", "$tmpDir\ConfigureRemotingForAnsible.ps1")
-New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name LocalAccountTokenFilterPolicy -Value 1 -PropertyType REG_DWORD
 
 "--- create ansible admin user" | Out-File -FilePath /initial-debug.txt -Append
 $password = "{{password}}" | ConvertTo-SecureString -AsPlainText -Force
@@ -21,6 +20,8 @@ $newUserParams = @{
 $null = New-LocalUser @newUserParams
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
+
+Enable-PSRemoting -force
 
 "---  ansible config script" | Out-File -FilePath /initial-debug.txt -Append
 Invoke-Expression -Command "$tmpDir\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck $true -CertValidityDays 90 -EnableCredSSP $true"
@@ -52,12 +53,12 @@ New-Item $SChannelRegPath"\TLS 1.0" -Name SERVER
 New-ItemProperty -Path $SChannelRegPath"\TLS 1.0\SERVER" -Name Enabled -Value 0 -PropertyType DWORD
 
 "--- disables TLS 1.1" | Out-File -FilePath /initial-debug.txt -Append
-New-Item $SChannelRegPath"\TLS 1.1\Server" –force
-New-Item $SChannelRegPath"\TLS 1.1\Client" –force
-New-ItemProperty -Path $SChannelRegPath"\TLS 1.1\Server" -Name Enabled -Value 0 -PropertyType DWORD
-New-ItemProperty -Path $SChannelRegPath"\TLS 1.1\Server" -Name DisabledByDefault -Value 0 -PropertyType DWORD
-New-ItemProperty -Path $SChannelRegPath"\TLS 1.1\Client" -Name Enabled -Value 0 -PropertyType DWORD
-New-ItemProperty -Path $SChannelRegPath"\TLS 1.1\Client" -Name DisabledByDefault -Value 0 -PropertyType DWORD
+#New-Item $SChannelRegPath"\TLS 1.1\Server" –force
+#New-Item $SChannelRegPath"\TLS 1.1\Client" –force
+#New-ItemProperty -Path $SChannelRegPath"\TLS 1.1\Server" -Name Enabled -Value 0 -PropertyType DWORD
+#New-ItemProperty -Path $SChannelRegPath"\TLS 1.1\Server" -Name DisabledByDefault -Value 0 -PropertyType DWORD
+#New-ItemProperty -Path $SChannelRegPath"\TLS 1.1\Client" -Name Enabled -Value 0 -PropertyType DWORD
+#New-ItemProperty -Path $SChannelRegPath"\TLS 1.1\Client" -Name DisabledByDefault -Value 0 -PropertyType DWORD
 
 #"--- disables TLS Cipher Suites" | Out-File -FilePath /initial-debug.txt -Append
 Disable-TlsCipherSuite -Name "TLS_RSA_WITH_AES_256_GCM_SHA384"
