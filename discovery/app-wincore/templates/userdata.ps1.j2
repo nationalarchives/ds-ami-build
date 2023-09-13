@@ -21,8 +21,6 @@ $null = New-LocalUser @newUserParams
 Add-LocalGroupMember -Group "Administrators" -Member "ansible-winrm"
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "ansible-winrm"
 
-Enable-PSRemoting -force
-
 "---  ansible config script" | Out-File -FilePath /initial-debug.txt -Append
 Invoke-Expression -Command "$tmpDir\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck $true -CertValidityDays 90 -EnableCredSSP $true"
 
