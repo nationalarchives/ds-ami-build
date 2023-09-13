@@ -29,7 +29,7 @@ $tmpDir = "c:\temp"
 # required packages
 $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
 
-$wacInstaller = "WindowsAdminCenter2110.2.msi"
+$wacInstaller = "WindowsAdminCenter2306.msi"
 $dotnetInstaller = "ndp48-web.exe"
 $dotnetPackagename = ".NET Framework 4.8 Platform (web installer)"
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
