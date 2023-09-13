@@ -166,7 +166,7 @@
       host: "{{ instance_public_ip }}"
       port: 5986
       delay: 120
-      timeout: 900
+      timeout: 600
       sleep: 10
       state: started
     register: port
