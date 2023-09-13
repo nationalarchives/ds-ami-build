@@ -151,17 +151,30 @@ try {
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name managedRuntimeVersion -Value "v4.0"
     Set-ItemProperty -Path IIS:\AppPools\$appPool -Name processModel.loadUserProfile -Value "True"
 
-    write-log -Message "---- create .NET v6.0 AppPool"
-    $net6_app_pool_name = ".NET v6.0 AppPool"
+    write-log -Message "---- create .NET v6.0 AppPools"
+#    $net6_app_pool_name = ".NET v6.0 AppPool"
+#    [system.reflection.assembly]::Loadwithpartialname("Microsoft.Web.Administration")
+#    $servermgr = New-Object Microsoft.web.administration.servermanager
+#    $servermgr.ApplicationPools.Add("$net6_app_pool_name")
+#    $servermgr.CommitChanges()
+    $net6_app_pool_metadata_api = ".NET v6.0 DigitalMeatdataAPI AppPool"
+    $net6_app_pool_iadata_api = ".NET v6.0 IAdataAPI AppPool"
     [system.reflection.assembly]::Loadwithpartialname("Microsoft.Web.Administration")
     $servermgr = New-Object Microsoft.web.administration.servermanager
-    $servermgr.ApplicationPools.Add("$net6_app_pool_name")
+    $servermgr.ApplicationPools.Add("$net6_app_pool_metadata_api")
+    $servermgr.CommitChanges()
+    $servermgr.ApplicationPools.Add("$net6_app_pool_iadata_api")
     $servermgr.CommitChanges()
 
-    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name managedRuntimeVersion ""
-    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_name" -Name processModel.loadUserProfile -Value "True"
-    New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_name" -force
-    New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\IAdataAPI" -ApplicationPool "$net6_app_pool_name" -force
+    write-log -Message "---- create $net6_app_pool_metadata_api"
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_metadata_api" -Name managedRuntimeVersion ""
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_metadata_api" -Name processModel.loadUserProfile -Value "True"
+    New-WebApplication -Name "DigitalMetadataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\DigitalMetadataAPI" -ApplicationPool "$net6_app_pool_metadata_api" -force
+
+    write-log -Message "---- create $net6_app_pool_iadata_api"
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_iadata_api" -Name managedRuntimeVersion ""
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_iadata_api" -Name processModel.loadUserProfile -Value "True"
+    New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\IAdataAPI" -ApplicationPool "$net6_app_pool_iadata_api" -force
 
     write-log -Message "---- give IIS_USRS permissions"
     $acl = Get-ACL $webSiteRoot
