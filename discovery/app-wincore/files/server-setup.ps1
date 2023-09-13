@@ -29,11 +29,11 @@ $tmpDir = "c:\temp"
 # required packages
 $installerPackageUrl =  "s3://ds-intersite-deployment/discovery/installation-packages"
 
-$wacInstaller = "WindowsAdminCenter2110.2.msi"
+$wacInstaller = "WindowsAdminCenter2306.msi"
 $dotnetInstaller = "ndp48-web.exe"
 $dotnetPackagename = ".NET Framework 4.8 Platform (web installer)"
-$dotnetCoreInstaller = "dotnet-hosting-6.0.11-win.exe"
-$dotnetCorePackagename = ".NET Core 6.0.11"
+$dotnetCoreInstaller = "dotnet-hosting-6.0.22-win.exe"
+$dotnetCorePackagename = ".NET Core 6.0.22"
 $cloudwatchAgentJSON = "discovery-cloudwatch-agent.json"
 $pathAWScli = "C:\Program Files\Amazon\AWSCLIV2"
 
