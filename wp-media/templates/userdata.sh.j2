@@ -180,6 +180,10 @@ PHP
 ## Advanced Custom Fields
 /usr/local/bin/wp plugin install advanced-custom-fields --activate --force --allow-root 2>/var/www/html/wp-cli.log
 
+## TNA Cookie Consent
+/usr/local/bin/wp plugin install https://github.com/nationalarchives/ds-cookie-consent/archive/refs/heads/master.zip --force --allow-root 2>/var/www/html/wp-cli.log
+
+
 # Set file permissions for apache
 sudo usermod -a -G apache ec2-user
 sudo usermod -a -G apache ssm-user
