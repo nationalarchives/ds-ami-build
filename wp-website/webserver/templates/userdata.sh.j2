@@ -64,6 +64,11 @@ Disallow: /" >> robots.txt
     echo "<?php phpinfo() ?>" >> phpinfo.php
 fi
 
+# Change Apache base config file to point to different root
+# /etc/httpd/conf/httpd.conf
+sudo sed -i 's/DocumentRoot "\/var\/www\/html"/DocumentRoot "\/var\/www"/g' /etc/httpd/conf/httpd.conf
+sudo sed -i 's/Directory "\/var\/www\/html"/Directory "\/var\/www"/g' /etc/httpd/conf/httpd.conf
+
 # Apache config and unset upgrade to HTTP/2
 sudo echo "# file: /etc/httpd/conf.d/wordpress.conf
 <VirtualHost *:80>
