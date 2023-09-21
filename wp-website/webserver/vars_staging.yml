@@ -14,6 +14,9 @@ wp_int_siteurl: "website.staging.local"
 wp_public_siteurl: "staging-www.nationalarchives.gov.uk"
 wp_editor_siteurl: "stagingwp.nationalarchives.gov.uk"
 
+pod_siteurl: "places-of-deposit.dev.local"
+pod_root: "ds-places-of-deposit"
+
 ses_host: "email-smtp.eu-west-2.amazonaws.com"
 ses_port: 587
 ses_secure: "tls"

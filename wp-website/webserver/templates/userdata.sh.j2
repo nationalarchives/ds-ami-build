@@ -82,7 +82,21 @@ sudo echo "# file: /etc/httpd/conf.d/wordpress.conf
     AllowOverride All
     Require all granted
   </Directory>
-</VirtualHost>" >> /etc/httpd/conf.d/wordpress.conf
+</VirtualHost>
+
+<VirtualHost *:80>
+  Header unset Upgrade
+  ServerName {{ pod_siteurl }}
+  ServerAlias {{ pod_siteurl }}
+  ServerAdmin webmaster@nationalarchives.gov.uk
+  DocumentRoot /var/www/{{ pod_root }}
+  <Directory "/var/www/{{ pod_root }}">
+    Options +FollowSymlinks
+    AllowOverride All
+    Require all granted
+  </Directory>
+</VirtualHost>
+" >> /etc/httpd/conf.d/wordpress.conf
 sudo systemctl restart httpd
 
 # Create .htaccess
