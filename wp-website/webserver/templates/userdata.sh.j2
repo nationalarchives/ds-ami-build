@@ -247,6 +247,11 @@ sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/plugins/wds-active-
 # Rename TNA theme dir
 sudo mv /var/www/html/wp-content/themes/tna-master /var/www/html/wp-content/themes/tna
 
+# install places of deposit from zip file
+cd /var/www
+sudo aws s3 cp s3://{{ s3_deployment_bucket }}/places-of-deposit/ds-places-of-deposit.zip ./ds-places-of-deposit.zip
+unzip ds-places-of-deposit.zip
+
 # Set file permissions for apache
 sudo usermod -a -G apache ec2-user
 sudo usermod -a -G apache ssm-user
