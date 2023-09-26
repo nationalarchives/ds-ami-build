@@ -6,7 +6,6 @@
   gather_facts: false
 
   tasks:
-
   - name: load variables
     ansible.builtin.include_vars:
       file: "{{ ansible_var_file }}"
@@ -241,6 +240,10 @@
         - "checking status of new instance before ami can be build"
         - "20 second interval with max duration of 15 minutes"
         - "====================================================================="
+
+  - name: load variables
+    ansible.builtin.include_vars:
+      file: "{{ ansible_var_file }}"
 
   - name: check if ec2 instance is ready
     ansible.builtin.stat:
