@@ -289,7 +289,7 @@
       dest: /var/www/html/robots.txt
       owner: apache
       group: apache
-    when: env == "live"
+    when: "{{ env }}" == "live"
 
   - name: copy general-robots.txt
     ansible.builtin.copy:
@@ -297,7 +297,7 @@
       dest: /var/www/html/robots.txt
       owner: apache
       group: apache
-    when: env != "live"
+    when: "{{ env }}" != "live"
 
   - name: copy phpinfo.php
     ansible.builtin.copy:
