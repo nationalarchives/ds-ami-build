@@ -252,6 +252,13 @@ cd /var/www
 sudo aws s3 cp s3://{{ s3_deployment_bucket }}/places-of-deposit/ds-places-of-deposit.zip ./ds-places-of-deposit.zip
 unzip ds-places-of-deposit.zip
 
+# change connection - replace existing entry on line 17
+sudo sed -i "17s|PDO('mysql:host=[^;]*;|PDO('mysql:host={{ pod_db_name }};|" /var/www/ds-places-of-deposit/includes/connection.php
+
+# change db user and password - replace existing entries
+sudo sed -i 's|remote_username = "[^"]*"|remote_username = "{{ pod_db_username }}"|' /var/www/ds-places-of-deposit/includes/constants-and-globals.php
+sudo sed -i 's|remote_password = "[^"]*"|remote_username = "{{ pod_db_password }}"|' /var/www/ds-places-of-deposit/includes/constants-and-globals.php
+
 # Set file permissions for apache
 sudo usermod -a -G apache ec2-user
 sudo usermod -a -G apache ssm-user
