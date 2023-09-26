@@ -283,21 +283,12 @@
       owner: apache
       group: apache
 
-  - name: copy production-robots.txt
+  - name: copy robots.txt
     ansible.builtin.copy:
-      src: ./files/production-robots.txt
+      src: "./files/{{ env }}-robots.txt"
       dest: /var/www/html/robots.txt
       owner: apache
       group: apache
-    when: "{{ env }}" == "live"
-
-  - name: copy general-robots.txt
-    ansible.builtin.copy:
-      src: ./files/general-robots.txt
-      dest: /var/www/html/robots.txt
-      owner: apache
-      group: apache
-    when: "{{ env }}" != "live"
 
   - name: copy phpinfo.php
     ansible.builtin.copy:
@@ -311,7 +302,6 @@
       src: ./files/wp-cli.yml
       dest: /var/www/html/wp-cli.yml
       owner: apache
-      group: apache
 
   - name: copy wordpress.conf
     ansible.builtin.copy:
