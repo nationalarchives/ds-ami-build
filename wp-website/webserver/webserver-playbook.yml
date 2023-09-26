@@ -58,7 +58,7 @@
     set_fact:
         pod_db_username: "{{ secret_data.username }}"
         pod_db_password: "{{ secret_data.password }}"
-        pod_db_name: "{{ secret_data.db-instance }}"
+        pod_db_name: "{{ secret_data.db_instance }}"
 
   - name: template deployment policy
     template:
