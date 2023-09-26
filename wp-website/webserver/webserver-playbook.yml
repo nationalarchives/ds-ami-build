@@ -269,41 +269,69 @@
     delay: 20
 
   - name: copy .htaccess
+    become: yes
+    become_user: ec2-user
     ansible.builtin.copy:
       src: ./files/.htaccess
       dest: /var/www/html/.htaccess
+      owner: apache
+      group: apache
 
   - name: copy healthcheck.html
+    become: yes
+    become_user: ec2-user
     ansible.builtin.copy:
       src: ./files/healthcheck.html
       dest: /var/www/html/healthcheck.html
+      owner: apache
+      group: apache
 
   - name: copy production-robots.txt
+    become: yes
+    become_user: ec2-user
     ansible.builtin.copy:
       src: ./files/production-robots.txt
       dest: /var/www/html/robots.txt
+      owner: apache
+      group: apache
     when: env == "live"
 
   - name: copy general-robots.txt
+    become: yes
+    become_user: ec2-user
     ansible.builtin.copy:
       src: ./files/general-robots.txt
       dest: /var/www/html/robots.txt
+      owner: apache
+      group: apache
     when: env != "live"
 
   - name: copy phpinfo.php
+    become: yes
+    become_user: ec2-user
     ansible.builtin.copy:
       src: ./files/phpinfo.php
       dest: /var/www/html/phpinfo.php
+      owner: apache
+      group: apache
 
   - name: copy wp-cli.yml
+    become: yes
+    become_user: ec2-user
     ansible.builtin.copy:
       src: ./files/wp-cli.yml
       dest: /var/www/html/wp-cli.yml
+      owner: apache
+      group: apache
 
   - name: copy wordpress.conf
+    become: yes
+    become_user: ec2-user
     ansible.builtin.copy:
       src: ./wordpress.conf
       dest: /etc/httpd/conf.d/wordpress.conf
+      owner: apache
+      group: apache
 
 - name: switch to localhost
   hosts: localhost
