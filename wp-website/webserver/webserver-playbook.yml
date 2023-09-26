@@ -153,6 +153,12 @@
       dest: "./userdata.sh"
       force: yes
 
+  - name: template wordpress.conf
+    template:
+      src: "./templates/wordpress.conf.j2"
+      dest: "./wordpress.conf"
+      force: yes
+
   - name: provisioning instance
     amazon.aws.ec2_instance:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
@@ -261,6 +267,43 @@
     until: "tnatheme.stat.exists"
     retries: 15
     delay: 20
+
+  - name: copy .htaccess
+    ansible.builtin.copy:
+      src: ./files/.htaccess
+      dest: /var/www/html/.htaccess
+
+  - name: copy healthcheck.html
+    ansible.builtin.copy:
+      src: ./files/healthcheck.html
+      dest: /var/www/html/healthcheck.html
+
+  - name: copy production-robots.txt
+    ansible.builtin.copy:
+      src: ./files/production-robots.txt
+      dest: /var/www/html/robots.txt
+    when: env == "live"
+
+  - name: copy general-robots.txt
+    ansible.builtin.copy:
+      src: ./files/general-robots.txt
+      dest: /var/www/html/robots.txt
+    when: env != "live"
+
+  - name: copy phpinfo.php
+    ansible.builtin.copy:
+      src: ./files/phpinfo.php
+      dest: /var/www/html/phpinfo.php
+
+  - name: copy wp-cli.yml
+    ansible.builtin.copy:
+      src: ./files/wp-cli.yml
+      dest: /var/www/html/wp-cli.yml
+
+  - name: copy wordpress.conf
+    ansible.builtin.copy:
+      src: ./wordpress.conf
+      dest: /etc/httpd/conf.d/wordpress.conf
 
 - name: switch to localhost
   hosts: localhost
