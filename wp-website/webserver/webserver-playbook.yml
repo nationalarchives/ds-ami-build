@@ -288,7 +288,7 @@
 
   - name: copy robots.txt
     ansible.builtin.copy:
-      src: "./files/{{ env }}-robots.txt"
+      src: "./files/robots-{{ env }}.txt"
       dest: /var/www/html/robots.txt
       owner: apache
       group: apache
