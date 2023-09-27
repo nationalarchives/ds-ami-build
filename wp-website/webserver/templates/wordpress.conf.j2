@@ -1,0 +1,25 @@
+<VirtualHost *:80>
+  Header unset Upgrade
+  ServerName {{ wp_int_siteurl }}
+  ServerAlias {{ wp_int_siteurl }}
+  ServerAdmin webmaster@nationalarchives.gov.uk
+  DocumentRoot /var/www/html
+  <Directory "/var/www/html">
+    Options +FollowSymlinks
+    AllowOverride All
+    Require all granted
+  </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+  Header unset Upgrade
+  ServerName {{ pod_siteurl }}
+  ServerAlias {{ pod_siteurl }}
+  ServerAdmin webmaster@nationalarchives.gov.uk
+  DocumentRoot /var/www/{{ pod_root }}
+  <Directory "/var/www/{{ pod_root }}">
+    Options +FollowSymlinks
+    AllowOverride All
+    Require all granted
+  </Directory>
+</VirtualHost>

@@ -6,7 +6,6 @@
   gather_facts: false
 
   tasks:
-
   - name: load variables
     ansible.builtin.include_vars:
       file: "{{ ansible_var_file }}"
@@ -153,6 +152,12 @@
       dest: "./userdata.sh"
       force: yes
 
+  - name: template wordpress.conf
+    template:
+      src: "./templates/wordpress.conf.j2"
+      dest: "./wordpress.conf"
+      force: yes
+
   - name: provisioning instance
     amazon.aws.ec2_instance:
       aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
@@ -226,6 +231,7 @@
 
 - name: switch to ec2hosts - checking if setup has finished
   hosts: ec2hosts
+  become: yes
   gather_facts: false
   tasks:
   - ansible.builtin.debug:
@@ -234,6 +240,10 @@
         - "checking status of new instance before ami can be build"
         - "20 second interval with max duration of 15 minutes"
         - "====================================================================="
+
+  - name: load variables
+    ansible.builtin.include_vars:
+      file: "{{ ansible_var_file }}"
 
   - name: check if ec2 instance is ready
     ansible.builtin.stat:
@@ -261,6 +271,47 @@
     until: "tnatheme.stat.exists"
     retries: 15
     delay: 20
+
+  - name: copy .htaccess
+    ansible.builtin.copy:
+      src: ./files/.htaccess
+      dest: /var/www/html/.htaccess
+      owner: apache
+      group: apache
+
+  - name: copy healthcheck.html
+    ansible.builtin.copy:
+      src: ./files/healthcheck.html
+      dest: /var/www/html/healthcheck.html
+      owner: apache
+      group: apache
+
+  - name: copy robots.txt
+    ansible.builtin.copy:
+      src: "./files/robots-{{ env }}.txt"
+      dest: /var/www/html/robots.txt
+      owner: apache
+      group: apache
+
+  - name: copy phpinfo.php
+    ansible.builtin.copy:
+      src: ./files/phpinfo.php
+      dest: /var/www/html/phpinfo.php
+      owner: apache
+      group: apache
+
+  - name: copy wp-cli.yml
+    ansible.builtin.copy:
+      src: ./files/wp-cli.yml
+      dest: /var/www/html/wp-cli.yml
+      owner: apache
+
+  - name: copy wordpress.conf
+    ansible.builtin.copy:
+      src: ./wordpress.conf
+      dest: /etc/httpd/conf.d/wordpress.conf
+      owner: apache
+      group: apache
 
 - name: switch to localhost
   hosts: localhost
