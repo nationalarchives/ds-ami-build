@@ -16,8 +16,6 @@ sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/cloudwatch/cloudwat
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 
 sudo dnf install docker -y
-sudo systemctl enable docker
-sudo systemctl start docker
 
 sudo dnf -y install wget
 
@@ -29,6 +27,9 @@ sudo curl -s https://api.github.com/repos/docker/compose/releases/latest \
   | sudo wget -qi -
 sudo chmod +x docker-compose-linux-x86_64
 sudo mv docker-compose-linux-x86_64 /usr/local/bin/docker-compose
+
+sudo systemctl enable docker
+sudo systemctl start docker
 
 cat << EOF > /var/finish-init.txt
 [status]
