@@ -16,6 +16,10 @@ on:
         - dev
         - staging
         - live
+      ami-prefix:
+        type: string
+        description: AMI prefix - defaults to docker-general
+        default: docker-general
 
 jobs:
 # ------------------------------------------------------------------------------
@@ -51,7 +55,7 @@ jobs:
       - name: install python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           cache: 'pip'
           cache-dependency-path: '**/docker-general-req.txt'
 
@@ -59,10 +63,11 @@ jobs:
 
       - name: run ansible playbook
         env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_DEV }}
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
           VPC_ID: ${{ secrets.VPC_ID_DEV }}
           SUBNET_ID: ${{ secrets.SUBNET_ID_2A_DEV }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_DEV }}
+          AMI_PREFIX: ${{ github.event.inputs.ami-prefix }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/docker-general
@@ -112,10 +117,11 @@ jobs:
 
       - name: run ansible playbook
         env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_STAGING }}
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_STAGING }}
           VPC_ID: ${{ secrets.VPC_ID_STAGING }}
           SUBNET_ID: ${{ secrets.SUBNET_ID_2A_STAGING }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_STAGING }}
+          AMI_PREFIX: ${{ github.event.inputs.ami-prefix }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/docker-general
@@ -165,10 +171,11 @@ jobs:
 
       - name: run ansible playbook
         env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_LIVE }}
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_LIVE }}
           VPC_ID: ${{ secrets.VPC_ID_LIVE }}
           SUBNET_ID: ${{ secrets.SUBNET_ID_2A_LIVE }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_LIVE }}
+          AMI_PREFIX: ${{ github.event.inputs.ami-prefix }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/docker-general
