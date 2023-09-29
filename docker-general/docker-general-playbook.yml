@@ -227,7 +227,7 @@
       state: "present"
       wait: yes
       tags:
-        Name: "{{ lookup('env', 'SUBNET_ID') }}-primer-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+        Name: "{{ lookup('env', 'AMI_PREFIX') }}-primer-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
         Service: "{{ service }}"
         Owner: "Digital Services"
         CreatedBy: "ansible"
