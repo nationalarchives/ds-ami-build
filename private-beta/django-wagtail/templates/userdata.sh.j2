@@ -27,7 +27,7 @@ sudo aws s3 cp s3://{{ s3_deployment_bucket }}/{{ service }}/cloudwatch/cloudwat
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 
 # Get the application version to be deployed
-APPLICATION_DOCKER_NAME=ds-wagtail
+APPLICATION_DOCKER_NAME=national-archives-website
 APPLICATION_DOCKER_TAG=$(sudo aws ssm get-parameter --name "/devops/private-beta/version" --region=eu-west-2 --query 'Value')
 
 # Set up ETNA
