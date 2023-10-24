@@ -6,7 +6,7 @@ env: "dev"
 volume_size: 100
 s3_deployment_bucket: "ds-dev-deployment-source"
 s3_deployment_root: "website"
-s3_logfile_bucket: "ds-dev-wp-logfiles-v2"
+s3_logfile_bucket: "ds-dev-logfiles"
 s3_logfile_root: "website"
 ssm_download_region: "eu-west-2"
 
