@@ -7,7 +7,7 @@ volume_size: 100
 s3_deployment_bucket: "ds-staging-deployment-source"
 s3_deployment_root: "website"
 s3_logfile_bucket: "ds-staging-logfiles"
-s3_logfile_root: "website"
+s3_logfile_root: "wp-website"
 ssm_download_region: "eu-west-2"
 
 wp_int_siteurl: "website.staging.local"

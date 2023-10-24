@@ -7,6 +7,6 @@ volume_size: 100
 s3_deployment_bucket: "ds-live-deployment-source"
 s3_deployment_root: "website"
 s3_logfile_bucket: "ds-live-logfiles"
-s3_logfile_root: "website"
+s3_logfile_root: "wp-website"
 ssm_download_region: "eu-west-2"
 ...
