@@ -7,6 +7,6 @@ volume_size: 20
 s3_deployment_bucket: "ds-dev-deployment-source"
 s3_deployment_root: "private-beta"
 s3_logfile_bucket: "ds-dev-logfiles"
-s3_logfile_root: "private-beta"
+s3_logfile_root: "etna/reverse-proxy"
 ssm_download_region: "eu-west-2"
 ...
