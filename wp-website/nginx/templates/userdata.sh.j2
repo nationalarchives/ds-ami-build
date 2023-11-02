@@ -103,7 +103,7 @@ for i in /var/log/nginx/*.gz
         do
                 REMOVEPATH="${i#*x?}"
                 NEWNAME="${REMOVEPATH/%.gz/%-$InstanceId.gz}"
-                sudo aws s3 cp "$i" s3://ds-dev-logfiles/wp-website/test-folder/"$NEWNAME"
+                sudo aws s3 cp "$i" s3://{{ s3_logfile_bucket }}/{{ s3_logfile_root }}/"$NEWNAME"
         done
 
 sudo rm /var/log/nginx/*.gz
