@@ -103,7 +103,7 @@ InstanceId=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.25
 for i in /var/log/nginx/*.gz
         do
                 REMOVEPATH="${i#*x?}"
-                NEWNAME="${REMOVEPATH/%.gz/%-$InstanceId.gz}"
+                NEWNAME="${REMOVEPATH/%.gz/_$InstanceId.gz}"
                 sudo aws s3 cp "$i" s3://{{ s3_logfile_bucket }}/{{ s3_logfile_root }}/"$NEWNAME"
         done
 
