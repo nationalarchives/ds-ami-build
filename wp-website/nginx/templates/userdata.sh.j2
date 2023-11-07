@@ -97,7 +97,13 @@ sudo cat << 'EOF' > logfile_archive.sh
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 InstanceId=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/instance-id)
 
-sudo aws s3 cp /var/log/nginx/ s3://{{ s3_logfile_bucket }}/{{ s3_logfile_root }}/nginx/$InstanceId/ --recursive --exclude "*" --include "*.gz"
+for i in /var/log/nginx/*.gz
+        do
+                REMOVEPATH="${i#*x?}"
+                NEWNAME="${REMOVEPATH/%.gz/_$InstanceId.gz}"
+                sudo aws s3 cp "$i" s3://{{ s3_logfile_bucket }}/{{ s3_logfile_root }}/"$NEWNAME"
+        done
+
 sudo rm /var/log/nginx/*.gz
 
 EOF

@@ -6,8 +6,8 @@ env: "live"
 volume_size: 100
 s3_deployment_bucket: "ds-live-deployment-source"
 s3_deployment_root: "website"
-s3_logfile_bucket: "ds-live-wp-logfiles"
-s3_logfile_root: "website"
+s3_logfile_bucket: "ds-live-logfiles"
+s3_logfile_root: "website/wordpress"
 ssm_download_region: "eu-west-2"
 
 wp_int_siteurl: "website.live.local"
