@@ -1,7 +1,7 @@
 # startup and deployment script for Command Papers .NET framework
 
-$logFile = "startup.log"
-$runFlag = "startupActive.txt"
+$logFile = "c:\startup.log"
+$runFlag = "c:\startupActive.txt"
 
 function write-log
 {
