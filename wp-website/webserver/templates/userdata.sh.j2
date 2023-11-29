@@ -204,7 +204,7 @@ sudo systemctl restart httpd
 # overwrite the logrotate file
 
 sudo cat << 'EOF' > httpd
-# rotating nginx log files on a daily bases
+# rotating apache log files on a daily bases
 # file location /etc/logrotate.d/
 /var/log/httpd/*log {
     create 0644 httpd httpd
