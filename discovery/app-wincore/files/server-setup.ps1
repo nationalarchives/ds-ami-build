@@ -159,11 +159,14 @@ try {
 #    $servermgr.CommitChanges()
     $net6_app_pool_metadata_api = ".NET v6.0 DigitalMeatdataAPI AppPool"
     $net6_app_pool_iadata_api = ".NET v6.0 IAdataAPI AppPool"
+    $net6_app_pool_taxonomy_api = ".NET v6.0 TaxonomyAPI AppPool"
     [system.reflection.assembly]::Loadwithpartialname("Microsoft.Web.Administration")
     $servermgr = New-Object Microsoft.web.administration.servermanager
     $servermgr.ApplicationPools.Add("$net6_app_pool_metadata_api")
     $servermgr.CommitChanges()
     $servermgr.ApplicationPools.Add("$net6_app_pool_iadata_api")
+    $servermgr.CommitChanges()
+    $servermgr.ApplicationPools.Add("$net6_app_pool_taxonomy_api")
     $servermgr.CommitChanges()
 
     write-log -Message "---- create $net6_app_pool_metadata_api"
@@ -175,6 +178,11 @@ try {
     Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_iadata_api" -Name managedRuntimeVersion ""
     Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_iadata_api" -Name processModel.loadUserProfile -Value "True"
     New-WebApplication -Name "IAdataAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\IAdataAPI" -ApplicationPool "$net6_app_pool_iadata_api" -force
+
+    write-log -Message "---- create $net6_app_pool_taxonomy_api"
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_taxonomy_api" -Name managedRuntimeVersion ""
+    Set-ItemProperty -Path "IIS:\AppPools\$net6_app_pool_taxonomy_api" -Name processModel.loadUserProfile -Value "True"
+    New-WebApplication -Name "TaxonomyAPI" -Site "$webSiteName" -PhysicalPath "$webSitePath\Services\TaxonomyAPI" -ApplicationPool "$net6_app_pool_taxonomy_api" -force
 
     write-log -Message "---- give IIS_USRS permissions"
     $acl = Get-ACL $webSiteRoot
