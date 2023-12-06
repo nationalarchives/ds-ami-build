@@ -158,6 +158,9 @@ try {
     # remove unwanted IIS headers
     Clear-WebConfiguration "/system.webServer/httpProtocol/customHeaders/add[@name='X-Powered-By']"
 
+    write-log -Message "---- add X-Forwarded-For to IIS log file"
+    Add-WebConfigurationProperty -filter "system.applicationHost/sites/siteDefaults/logFile/customFields" -name "." -value @{logFieldName='xff';sourceName='X-Forwarded-For';sourceType='RequestHeader'}
+
     Start-WebSite -Name $webSiteName
 
     # set system variables for application
