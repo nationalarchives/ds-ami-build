@@ -89,6 +89,30 @@ sudo cp ~/nginx.service /lib/systemd/system/nginx.service
 sudo systemctl enable nginx
 sudo systemctl start nginx
 
+# overwrite the logrotate file
+
+sudo cat << 'EOF' > nginx
+# rotating nginx log files on a daily bases
+# file location /etc/logrotate.d/
+/var/log/nginx/*log {
+    create 0644 nginx nginx
+    daily
+    rotate 10
+    missingok
+    notifempty
+    compress
+    delaycompress
+    sharedscripts
+    postrotate
+        /bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
+        /usr/local/sbin/logfile_archive.sh > /var/log/nginx/logfile_archive_log.txt
+    endscript
+}
+
+EOF
+
+sudo mv nginx /etc/logrotate.d/nginx
+
 # write script files to /usr/local/sbin/
 sudo cat << 'EOF' > logfile_archive.sh
 #!/bin/bash
@@ -112,9 +136,9 @@ sudo mv logfile_archive.sh /usr/local/sbin/logfile_archive.sh
 sudo chmod u+x /usr/local/sbin/logfile_archive.sh
 
 # cronjob for logfile archiving
-printf "%s\n" "17 0 * * * root /usr/local/sbin/logfile_archive.sh >>/usr/local/sbin/logfile_archive.out 2>&1" "" >> archivelogfiles
-sudo mv archivelogfiles /etc/cron.d/
-sudo chmod 0644 /etc/cron.d/archivelogfiles
+#printf "%s\n" "17 0 * * * root /usr/local/sbin/logfile_archive.sh >>/usr/local/sbin/logfile_archive.out 2>&1" "" >> archivelogfiles
+#sudo mv archivelogfiles /etc/cron.d/
+#sudo chmod 0644 /etc/cron.d/archivelogfiles
 
 %{ if ssm_download_region != "" ~ }}
 # install ssm agent -x86_64
