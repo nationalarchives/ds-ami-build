@@ -91,28 +91,27 @@ sudo systemctl start nginx
 
 # overwrite the logrotate file
 
-sudo cat << 'EOF' > httpd
-# rotating apache log files on a daily bases
+sudo cat << 'EOF' > nginx
+# rotating nginx log files on a daily bases
 # file location /etc/logrotate.d/
 /var/log/nginx/*log {
     create 0644 nginx nginx
     daily
-    dateext
     rotate 10
     missingok
     notifempty
-    delaycompress
     compress
+    delaycompress
     sharedscripts
     postrotate
         /bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
-        /usr/local/sbin/logfile_archive.sh > /var/log/httpd/logfile_archive_log.txt
+        /usr/local/sbin/logfile_archive.sh > /var/log/nginx/logfile_archive_log.txt
     endscript
 }
 
 EOF
 
-sudo mv httpd /etc/logrotate.d/nginx
+sudo mv nginx /etc/logrotate.d/nginx
 
 # write script files to /usr/local/sbin/
 sudo cat << 'EOF' > logfile_archive.sh
