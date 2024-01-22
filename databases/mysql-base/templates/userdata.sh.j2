@@ -1,0 +1,52 @@
+#!/bin/bash
+
+sudo dnf update -y
+
+# create swap file
+sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+sudo chmod 0600 /var/swap.1
+sudo /sbin/mkswap /var/swap.1
+sudo /sbin/swapon /var/swap.1
+
+# Install Cloudwatch agent
+sudo dnf install amazon-cloudwatch-agent -y
+sudo dnf install collectd -y
+
+sudo aws s3 cp s3://{{ s3_deployment_bucket  }}/{{ s3_deployment_root  }}/cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+
+sudo dnf install wget -y
+
+wget https://dev.mysql.com/get/mysql80-community-release-el9-3.noarch.rpm
+sudo dnf install mysql-community-server -y
+sudo systemctl enable mysqld
+sudo systemctl start mysqld
+
+temp_pw="$(sudo grep "temporary password" /var/log/mysqld.log | grep -o '[^ ]\+$')"
+
+# sql statements to secure the instance and setup replication user
+cat << EOF > ~/mysql_secure_installation.sql
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+CREATE USER '{{ admin_user }}'@'10.128.224.0/255.255.254.0' IDENTIFIED BY '{{ admin_password }}';
+GRANT ALL ON *.* TO '{{ admin_user }}'@'10.128.224.0/255.255.254.0';
+GRANT GRANT OPTION ON *.* TO '{{ admin_user }}'@'10.128.224.0/255.255.254.0';
+FLUSH PRIVILEGES;
+EOF
+
+# setting password for root to secrets manager parameters, secure mysql
+# and set administration access
+mysqladmin --user=root --password=$temp_pw password '{{ root_password }}'
+mysql --user=root --password={{ root_password }} < ~/mysql_secure_installation.sql
+
+# remove setup file containing passwords - avoiding security risks
+sudo rm ~/mysql_secure_installation.sql
+
+sudo systemctl restart mysqld
+
+cat << EOF > /var/finish-init.txt
+[status]
+finished = true
+EOF
