@@ -90,6 +90,14 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
           export AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }}
           export AWS_DEFAULT_REGION=eu-west-2
-          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}' project_name='${{ github.event.inputs.project-name }}' keypair='${{ env.key_name }}' asm_key='/infrastructure/credentials/mysql-${{ github.event.inputs.project-name }}' env='${{ github.event.inputs.deploy-environment }}' region='${{ env.region }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} mysql-base-playbook.yml
+          ansible-playbook \
+          --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}' \
+          project_name='${{ github.event.inputs.project-name }}' \
+          keypair='${{ env.key_name }}' \
+          asm_key='/infrastructure/credentials/mysql-${{ github.event.inputs.project-name }}' \
+          env='${{ github.event.inputs.deploy-environment }}' \
+          region='${{ env.region }}'" \
+          --private-key $cur_dir/${{ env.SSH_KEY_FILE }} \
+          mysql-base-playbook.yml
 
 ...
