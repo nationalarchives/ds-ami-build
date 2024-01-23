@@ -71,7 +71,7 @@ jobs:
           AWS_ROLE_ARN: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
           VPC_ID: ${{ secrets.VPC_ID }}
           SUBNET_ID: ${{ secrets.SUBNET_ID }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_ACCOUNT_ID: "846769538626"
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/mysql-base
