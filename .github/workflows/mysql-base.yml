@@ -32,7 +32,7 @@ jobs:
     environment: mysql-base-dev
     env:
       ansible_var_file: "vars_dev.yml"
-      key_name: "mysql-${{ github.event.inputs.project-name }}-${{ deploy-environment }}-eu-west-2"
+      key_name: "mysql-${{ github.event.inputs.project-name }}-${{ github.event.inputs.deploy-environment }}-eu-west-2"
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
