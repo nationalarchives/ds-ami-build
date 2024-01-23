@@ -57,17 +57,12 @@ jobs:
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
-          source: s3://ds-dev-kpf-administration/${{ env.key_name }}
+          source: s3://ds-dev-kpf-administration/mysql/${{ env.key_name }}
           destination: ${{ env.key_name }}
           aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
           aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
           aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
           aws_region: ${{ env.region }}
-
-#      - name: write ssh key file
-#        run: |
-#          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
-#          chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
         uses: actions/setup-python@v5
