@@ -32,7 +32,8 @@ jobs:
     environment: mysql-base-dev
     env:
       ansible_var_file: "vars_dev.yml"
-      key_name: "mysql-${{ github.event.inputs.project-name }}-${{ github.event.inputs.deploy-environment }}-eu-west-2"
+      region: "eu-west-2"
+      key_name: "mysql-${{ github.event.inputs.project-name }}-${{ github.event.inputs.deploy-environment }}-${{ env.region }}"
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
@@ -61,7 +62,7 @@ jobs:
           aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
           aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
           aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
-          aws_region: eu-west-2
+          aws_region: ${{ env.region }}
 
 #      - name: write ssh key file
 #        run: |
@@ -82,7 +83,6 @@ jobs:
           AWS_ROLE_ARN: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
           VPC_ID: ${{ secrets.VPC_ID }}
           SUBNET_ID: ${{ secrets.SUBNET_ID }}
-          AWS_ACCOUNT_ID: "846769538626"
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/databases/mysql-base
@@ -90,6 +90,6 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
           export AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }}
           export AWS_DEFAULT_REGION=eu-west-2
-          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} mysql-base-playbook.yml
+          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}' project_name='${{ env.region }}' keypair='${{ env.key_name }}' asm_key='/infrastructure/credentials/mysql-${{ github.event.inputs.project-name }}' env='${{ github.event.inputs.deploy-environment }}' region='${{ env.region }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} mysql-base-playbook.yml
 
 ...

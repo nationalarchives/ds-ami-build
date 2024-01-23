@@ -1,11 +1,6 @@
 ---
-key_name: "mysql-base-dev-eu-west-2"
-region: "eu-west-2"
-service: "mysql"
-env: "dev"
+instance_type: 't3a.small'
 volume_size: 20
-
-credentials_key: "/infrastructure/credentials/mysql-base"
 
 s3_deployment_bucket: "ds-dev-deployment-source"
 s3_deployment_root: "mysql"
