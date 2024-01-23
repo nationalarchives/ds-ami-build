@@ -52,10 +52,21 @@ jobs:
           role-to-assume: arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL
           output-credentials: true
 
-      - name: write ssh key file
-        run: |
-          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
-          chmod 0600 ${{ env.SSH_KEY_FILE }}
+      - name: download key file
+        uses: keithweaver/aws-s3-github-action@v1.0.0
+        with:
+          command: cp
+          source: s3://ds-dev-kpf-administration/$key_name
+          destination: $key_name
+          aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
+          aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
+          aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
+          aws_region: eu-west-2
+
+#      - name: write ssh key file
+#        run: |
+#          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
+#          chmod 0600 ${{ env.SSH_KEY_FILE }}
 
       - name: install python
         uses: actions/setup-python@v5
