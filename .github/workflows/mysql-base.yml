@@ -85,7 +85,7 @@ jobs:
           AWS_ACCOUNT_ID: "846769538626"
         run: |
           cur_dir=$(pwd)
-          cd $cur_dir/mysql-base
+          cd $cur_dir/databases/mysql-base
           export AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }}
           export AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
           export AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }}
