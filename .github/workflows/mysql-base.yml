@@ -42,7 +42,7 @@ jobs:
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=$ansible_var_file" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=$key_name" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=${{ env.key_name }}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         id: creds
@@ -56,7 +56,7 @@ jobs:
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
-          source: s3://ds-dev-kpf-administration/$key_name
+          source: s3://ds-dev-kpf-administration/${{ env.key_name }}
           destination: $key_name
           aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
           aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
