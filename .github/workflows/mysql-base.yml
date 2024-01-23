@@ -18,7 +18,7 @@ on:
         - live
       project-name:
         type: string
-        description: "Project name"
+        description: Project name
         required: true
 
 
@@ -32,7 +32,7 @@ jobs:
     environment: mysql-base-dev
     env:
       ansible_var_file: "vars_dev.yml"
-      key_name: "mysql-${{ env.project-name }}-${{ deploy-environment }}-${{ env.region }}"
+      key_name: "mysql-${{ env.project-name }}-${{ deploy-environment }}-eu-west-2"
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
