@@ -63,7 +63,7 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
           cache-dependency-path: '**/mysql-base-req.txt'
-      - run: |
+        run: |
           pip install -r ${{ github.workspace }}/.github/workflows/mysql-base-req.txt
 
       - name: run ansible playbook
