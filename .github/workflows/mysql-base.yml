@@ -63,7 +63,7 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
           cache-dependency-path: '**/mysql-base-req.txt'
-        run: |
+      - run: |
           pip install -r ${{ github.workspace }}/.github/workflows/mysql-base-req.txt
 
       - name: run ansible playbook
@@ -80,4 +80,5 @@ jobs:
           export AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }}
           export AWS_DEFAULT_REGION=eu-west-2
           ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} mysql-base-playbook.yml
+
 ...
