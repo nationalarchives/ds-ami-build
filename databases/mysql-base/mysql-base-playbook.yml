@@ -97,9 +97,7 @@
     set_fact:
         root_password: "{{ secret_data.root_password }}"
         admin_user: "{{ secret_data.admin_user }}"
-        admin_pass: "{{ secret_data.admin_password }}"
-        repl_user: "{{ secret_data.repl_user }}"
-        repl_pass: "{{ secret_data.repl_password }}"
+        admin_password: "{{ secret_data.admin_password }}"
         network_cidr: "{{ secret_data.network_cidr }}"
 
   - name: template userdata
