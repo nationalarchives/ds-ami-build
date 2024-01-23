@@ -224,6 +224,12 @@
         CostCentre: 53
         Terraform: false
 
+  - name: terminate instance
+    amazon.aws.ec2_instance:
+      instance_ids: "{{ prime_id }}"
+      region: "{{ region }}"
+      state: "absent"
+
   - name: remove IAM role
     community.aws.iam_role:
       name: "ansible-ami-mysql-{{ project_name }}-role"
