@@ -17,7 +17,9 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 
 sudo dnf install wget -y
 
-wget https://dev.mysql.com/get/mysql80-community-release-el9-3.noarch.rpm
+sudo wget https://repo.mysql.com/mysql80-community-release-el9.rpm
+sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+sudo dnf install mysql80-community-release-el9.rpm -y
 sudo dnf install mysql-community-server -y
 sudo systemctl enable mysqld
 sudo systemctl start mysqld
