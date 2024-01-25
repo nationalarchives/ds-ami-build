@@ -93,12 +93,17 @@
 
   - name: set secrets
     vars:
-      secret_data: "{{ lookup('amazon.aws.aws_secret', '{{ asm_key }}', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
+      secret_data: "{{ lookup('amazon.aws.aws_secret', '{{ asm_key }}', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='error') | from_json }}"
     set_fact:
         root_password: "{{ secret_data.root_password }}"
         admin_user: "{{ secret_data.admin_user }}"
         admin_password: "{{ secret_data.admin_password }}"
         network_cidr: "{{ secret_data.network_cidr }}"
+
+  - name: get network information
+    ansible.builtin.set_fact:
+      subnet_db_cidr_a: "{{ lookup('amazon.aws.ssm_parameter', '/infrastructure/network/base/private_db_subnet_2a_cidr', access_key=assumed_role.sts_creds.access_key, secret_key=assumed_role.sts_creds.secret_key, session_token=assumed_role.sts_creds.session_token, on_denied='error') }}"
+      subnet_db_cidr_b: "{{ lookup('amazon.aws.ssm_parameter', '/infrastructure/network/base/private_db_subnet_2b_cidr', access_key=assumed_role.sts_creds.access_key, secret_key=assumed_role.sts_creds.secret_key, session_token=assumed_role.sts_creds.session_token, on_denied='error') }}"
 
   - name: template userdata
     vars:
@@ -110,6 +115,8 @@
       repl_user: "{{ repl_user }}"
       repl_password: "{{ repl_password }}"
       network_cidr: "{{ network_cidr }}"
+      subnet_db_cidr_a: "{{ subnet_db_cidr_a }}"
+      subnet_db_cidr_b: "{{ subnet_db_cidr_b }}"
     template:
       src: "./templates/userdata.sh.j2"
       dest: "./userdata.sh"
