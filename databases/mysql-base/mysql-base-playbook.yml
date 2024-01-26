@@ -98,6 +98,8 @@
         root_password: "{{ secret_data.root_password }}"
         admin_user: "{{ secret_data.admin_user }}"
         admin_password: "{{ secret_data.admin_password }}"
+        repl_user: "{{ secret_data.repl_user }}"
+        repl_password: "{{ secret_data.repl_password }}"
         network_cidr: "{{ secret_data.network_cidr }}"
 
   - name: get network information
