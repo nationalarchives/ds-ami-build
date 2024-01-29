@@ -69,7 +69,7 @@ sudo rm ~/mysql_secure_installation.sql
 # set backup to include routines
 sudo sed -i "/\[mysqld\]/a \n[mysqldump]\n" /etc/my.cnf
 sudo sed -i "/\[mysqldump\]/a routines=true\n" /etc/my.cnf
-# set up server - need to manually changed when replication is used!
+# set up server - need to be manually changed when replication is used!
 sudo sed -i "/\[mysqld\]/a server-id=101\n" /etc/my.cnf
 
 sudo systemctl restart mysqld
