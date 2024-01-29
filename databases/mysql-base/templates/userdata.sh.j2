@@ -17,22 +17,44 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 
 sudo dnf install wget -y
 
-wget https://dev.mysql.com/get/mysql80-community-release-el9-3.noarch.rpm
+sudo mkdir /packages
+sudo wget -P /packages https://repo.mysql.com/mysql80-community-release-el9.rpm
+sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+sudo dnf install /packages/mysql80-community-release-el9.rpm -y
 sudo dnf install mysql-community-server -y
-sudo systemctl enable mysqld
 sudo systemctl start mysqld
+sudo systemctl enable mysqld
 
 temp_pw="$(sudo grep "temporary password" /var/log/mysqld.log | grep -o '[^ ]\+$')"
 
+# get netmask form cidr
+function cidr_mask() {
+  ip=`echo $1 | cut -d"/" -f1`
+  cidr=`echo $1 | cut -d"/" -f2`
+  if [[ "cidr" == "" ]] then
+    mask="255.255.255.255"
+    exit 0
+  fi
+  value=$(( 0xffffffff ^ ((1 << (32 - $cidr)) - 1) ))
+  mask=`echo "$(( (value >> 24) & 0xff )).$(( (value >> 16) & 0xff )).$(( (value >> 8) & 0xff )).$(( value & 0xff ))"`
+  echo "$ip/$mask"
+}
+
+admin_at=$(cidr_mask {{ network_cidr }})
+rep_subnet_a=$(cidr_mask {{ subnet_db_cidr_a }})
+rep_subnet_b=$(cidr_mask {{ subnet_db_cidr_b }})
 # sql statements to secure the instance and setup replication user
 cat << EOF > ~/mysql_secure_installation.sql
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-CREATE USER '{{ admin_user }}'@'10.128.224.0/255.255.254.0' IDENTIFIED BY '{{ admin_password }}';
-GRANT ALL ON *.* TO '{{ admin_user }}'@'10.128.224.0/255.255.254.0';
-GRANT GRANT OPTION ON *.* TO '{{ admin_user }}'@'10.128.224.0/255.255.254.0';
+CREATE USER '{{ admin_user }}'@'$at_entry' IDENTIFIED BY '{{ admin_password }}';
+GRANT ALL ON *.* TO '{{ admin_user }}'@'$at_entry';
+GRANT GRANT OPTION ON *.* TO '{{ admin_user }}'@'$at_entry';
+CREATE USER '{{ repl_user }}'@'$rep_subnet_a' IDENTIFIED BY '{{ repl_password }}';
+CREATE USER '{{ repl_user }}'@'$rep_subnet_b' IDENTIFIED BY '{{ repl_password }}';
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'$rep_subnet_a', 'repl'@'$rep_subnet_b'
 FLUSH PRIVILEGES;
 EOF
 
@@ -43,6 +65,12 @@ mysql --user=root --password={{ root_password }} < ~/mysql_secure_installation.s
 
 # remove setup file containing passwords - avoiding security risks
 sudo rm ~/mysql_secure_installation.sql
+
+# set backup to include routines
+sudo sed -i "/\[mysqld\]/a \n[mysqldump]\n" /etc/my.cnf
+sudo sed -i "/\[mysqldump\]/a routines=true\n" /etc/my.cnf
+# set up server - need to be manually changed when replication is used!
+sudo sed -i "/\[mysqld\]/a server-id=101\n" /etc/my.cnf
 
 sudo systemctl restart mysqld
 

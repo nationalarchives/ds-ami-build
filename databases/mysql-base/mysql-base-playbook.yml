@@ -10,25 +10,14 @@
     ansible.builtin.include_vars:
       file: "{{ ansible_var_file }}"
 
-  - name: get AWS session token
-    community.aws.sts_session_token:
-      duration_seconds: 3600
-    register: session_credentials
-
   - name: switch role credentials
     community.aws.sts_assume_role:
-      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
-      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
-      security_token: "{{ session_credentials.sts_creds.session_token }}"
       role_arn: "{{ lookup ('env', 'AWS_ROLE_ARN') }}"
       role_session_name: "s-devops-mysql-base"
     register: assumed_role
 
   - name: get linux2 AMI
     amazon.aws.ec2_ami_info:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       owners: amazon
       region: "{{ region }}"
       filters:
@@ -49,22 +38,16 @@
 
   - name: create deployment policy
     community.aws.iam_managed_policy:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-aim-mysql-base-s3-policy"
+      policy_name: "ansible-ami-mysql-{{ project_name }}-s3-policy"
       policy: "{{ lookup('file', './instance-role-policy.json') }}"
       state: "present"
     register: s3_policy
 
   - name: create base mysql IAM role
     community.aws.iam_role:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-base_mysql-role"
+      name: "ansible-ami-mysql-{{ project_name }}-role"
       region: "{{ region }}"
-      assume_role_policy_document: "{{ lookup('file', './instance-role-policy.json') }}"
+      assume_role_policy_document: "{{ lookup('file', './ec2-role-policy.json') }}"
       managed_policies: ["{{ s3_policy.policy.arn }}", "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM", "arn:aws:iam::aws:policy/SecretsManagerReadWrite"]
       create_instance_profile: yes
       delete_instance_profile: yes
@@ -74,10 +57,7 @@
 
   - name: create security group - allowing updates and downloads
     amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-mysql-base-sg"
+      name: "ansible-ami-mysql-{{ project_name }}-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
       vpc_id: "{{ lookup( 'env', 'VPC_ID') }}"
@@ -113,14 +93,19 @@
 
   - name: set secrets
     vars:
-      secret_data: "{{ lookup('amazon.aws.aws_secret', '{{ credentials_key }}', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
+      secret_data: "{{ lookup('amazon.aws.aws_secret', '{{ asm_key }}', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='error') | from_json }}"
     set_fact:
         root_password: "{{ secret_data.root_password }}"
         admin_user: "{{ secret_data.admin_user }}"
-        admin_pass: "{{ secret_data.admin_password }}"
+        admin_password: "{{ secret_data.admin_password }}"
         repl_user: "{{ secret_data.repl_user }}"
-        repl_pass: "{{ secret_data.repl_password }}"
+        repl_password: "{{ secret_data.repl_password }}"
         network_cidr: "{{ secret_data.network_cidr }}"
+
+  - name: get network information
+    ansible.builtin.set_fact:
+      subnet_db_cidr_a: "{{ lookup('amazon.aws.ssm_parameter', '/infrastructure/network/base/private_db_subnet_2a_cidr', access_key=assumed_role.sts_creds.access_key, secret_key=assumed_role.sts_creds.secret_key, session_token=assumed_role.sts_creds.session_token, on_denied='error') }}"
+      subnet_db_cidr_b: "{{ lookup('amazon.aws.ssm_parameter', '/infrastructure/network/base/private_db_subnet_2b_cidr', access_key=assumed_role.sts_creds.access_key, secret_key=assumed_role.sts_creds.secret_key, session_token=assumed_role.sts_creds.session_token, on_denied='error') }}"
 
   - name: template userdata
     vars:
@@ -132,6 +117,8 @@
       repl_user: "{{ repl_user }}"
       repl_password: "{{ repl_password }}"
       network_cidr: "{{ network_cidr }}"
+      subnet_db_cidr_a: "{{ subnet_db_cidr_a }}"
+      subnet_db_cidr_b: "{{ subnet_db_cidr_b }}"
     template:
       src: "./templates/userdata.sh.j2"
       dest: "./userdata.sh"
@@ -139,23 +126,19 @@
 
   - name: provisioning instance
     amazon.aws.ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      key_name: "{{ key_name }}"
+      key_name: "{{ keypair }}"
       image_id: "{{ latest_ami.image_id }}"#
-      instance_role: "ansible-ami-base-mysql-role"
-      instance_type: "t3a.small"
+      instance_role: "ansible-ami-mysql-{{ project_name }}-role"
+      instance_type: "{{ instance_type }}"
       metadata_options:
-        http_endpoint: "enabled"
         http_tokens: "required"
-      name : "{{ service }}-base-{{ env }}"
+      name : "mysql-{{ project_name }}-primer"
       network:
         assign_public_ip: yes
         delete_on_termination: yes
         subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
       region: "{{ region }}"
-      security_groups: ["{{ ec2_sec_group.group_id }}", "{{ db_sg.security_groups[0].group_id }}"]
+      security_groups: ["{{ ec2_sec_group.group_id }}"]
       state: "running"
       termination_protection: no
       user_data: "{{ lookup('file', './userdata.sh') }}"
@@ -168,8 +151,9 @@
             volume_size: "{{ volume_size }}"
       vpc_subnet_id: "{{ lookup('env', 'SUBNET_ID') }}"
       tags:
+        Name: "mysql-{{ project_name }}-primer"
         Environment: "{{ env }}"
-        Service: "{{ service }}"
+        Service: "MySQL"
         Owner: "Digital Services"
         CreatedBy: "ansible"
         CostCentre: 53
@@ -235,38 +219,35 @@
   tasks:
   - name: create AMI
     amazon.aws.ec2_ami:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance_id: "{{ prime_id }}"
-      name: "{{ service }}-base-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+      name: "mysql-{{ project_name }}-primer-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
       description: "MySQL Instance - ready for deployment"
       region: "{{ region }}"
       state: "present"
       wait: yes
       tags:
-        Name: "{{ service }}-base-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
-        Service: "{{ service }}"
+        Name: "mysql-{{ project_name }}-primer-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+        Service: "MySQL"
         Owner: "Digital Services"
         CreatedBy: "ansible"
         CostCentre: 53
         Terraform: false
 
+  - name: terminate instance
+    amazon.aws.ec2_instance:
+      instance_ids: "{{ prime_id }}"
+      region: "{{ region }}"
+      state: "absent"
+
   - name: remove IAM role
     community.aws.iam_role:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      name: "ansible-ami-mysql-base-role"
+      name: "ansible-ami-mysql-{{ project_name }}-role"
       region: "{{ region }}"
       delete_instance_profile: yes
       state: "absent"
 
   - name: remove deployment policy
     community.aws.iam_managed_policy:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
-      policy_name: "ansible-ami-mysql-base-s3-policy"
+      policy_name: "ansible-ami-mysql-{{ project_name }}-s3-policy"
       state: "absent"
 ...
