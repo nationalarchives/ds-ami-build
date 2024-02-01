@@ -75,6 +75,9 @@ Disable-TlsCipherSuite -Name "TLS_PSK_WITH_AES_128_CBC_SHA256"
 Disable-TlsCipherSuite -Name "TLS_PSK_WITH_NULL_SHA384"
 Disable-TlsCipherSuite -Name "TLS_PSK_WITH_NULL_SHA256"
 
+#"--- set IIS to log X-Forwarded-For header" | Out-File -FilePath /initial-debug.txt -Append
+Add-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.applicationHost/sites/siteDefaults/logFile/customFields" -name "." -value @{logFieldName='X-Forwarded-For';sourceName='X-Forwarded-For';sourceType='RequestHeader'}
+
 "[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
 #Restart-Computer
