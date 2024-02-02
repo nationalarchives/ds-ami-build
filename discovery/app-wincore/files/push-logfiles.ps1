@@ -23,6 +23,11 @@ if ([string]::IsNullOrEmpty($files)) {
         $zipName = (Get-Item ($SourceDir + $fileName)).Basename + "_" + $InstanceId + ".zip"
         Write-Output $zipName
         Compress-Archive -Path "$SourceDir$fileName" -DestinationPath "$SourceDir$zipName"
+    }
+    # Compress-Archive returns before the process has finished and locks the file for some time afterwards.
+    # This is the reason to split the compressing from the copy-delete to give the process to finish and unlock the file.
+    Start-Sleep -Seconds 5
+    foreach ($file in $files) {
         if (Test-Path -Path "$SourceDir$zipName" -PathType Leaf) {
             aws s3 cp $SourceDir$zipName s3://ds-dev-logfiles/discovery/$Env:TNA_APP_TIER/$zipName
             if ($LASTEXITCODE -eq 0) {
