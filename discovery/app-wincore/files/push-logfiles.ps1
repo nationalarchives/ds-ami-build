@@ -8,6 +8,7 @@ $TodaysLog = "u_ex" + $Today + "*"
 $SourceDir = "C:\inetpub\logs\LogFiles\W3SVC1\"
 
 if ($termination) {
+    & "c:/tna-startup/stop-webserver.ps1"
     $files = Get-ChildItem $SourceDir
 } else {
     $files = Get-ChildItem $SourceDir -Exclude $Todayslog
