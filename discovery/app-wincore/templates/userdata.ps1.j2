@@ -81,7 +81,7 @@ Add-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.
 #"--- set scheduled task for logfile" | Out-File -FilePath /initial-debug.txt -Append
 $action = New-ScheduledTaskAction -Execute "c:\tna-start-up\push-logfiles.ps1"
 $trigger = New-ScheduledTaskTrigger -Daily -At '8:15 AM'
-$principal = "Administrator"
+$principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators"
 $settings = New-ScheduledTaskSettingsSet
 $task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settings
 Register-ScheduledTask 'PushLogfiles' -InputObject $task
