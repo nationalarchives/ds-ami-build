@@ -78,6 +78,14 @@ Disable-TlsCipherSuite -Name "TLS_PSK_WITH_NULL_SHA256"
 #"--- set IIS to log X-Forwarded-For header" | Out-File -FilePath /initial-debug.txt -Append
 Add-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.applicationHost/sites/siteDefaults/logFile/customFields" -name "." -value @{logFieldName='X-Forwarded-For';sourceName='X-Forwarded-For';sourceType='RequestHeader'}
 
+#"--- set scheduled task for logfile" | Out-File -FilePath /initial-debug.txt -Append
+$action = New-ScheduledTaskAction -Execute "c:\tna-start-up\push-logfiles.ps1"
+$trigger = New-ScheduledTaskTrigger -Daily -At '8:15 AM'
+$principal = "Administrator"
+$settings = New-ScheduledTaskSettingsSet
+$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settings
+Register-ScheduledTask 'PushLogfiles' -InputObject $task
+
 "[status]" | Out-File -FilePath C:\finish-init.txt
 "finished = true" | Out-File -FilePath C:\finish-init.txt -Append
 #Restart-Computer
