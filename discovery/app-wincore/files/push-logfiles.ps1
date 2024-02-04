@@ -1,20 +1,18 @@
 # Get-EC2InstanceMetadata can take a long time to run
-param([switch] $termination)
+param([switch] $termination = $false)
 
 function Set-FileName {
-    param([string] $bucket, [string] $keyPrefix, [string] $fileName, [int] $count)
+    param([string] $bucket, [string] $keyPrefix, [string] $baseName, [int] $count = 0)
 
-    if ([int]::IsNullOrEmpty($count)) {
-        $zName = $fileName + ".zip"
-        $count = 0
+    if ($count -eq 0) {
+        $zName = $baseName + ".zip"
     } else {
-        $zName = "$fileName($count).zip"
+        $zName = $baseName + "(" + $count + ").zip"
     }
-
-    $x = (aws s3api head-object --bucket $bucket --key $keyPrefix/$zName 2> $null)
+    $x = (aws s3api head-object --bucket "$bucket" --key "$keyPrefix/$zName" 2> $null)
     if (-not ([string]::IsNullOrEmpty($x))) {
-        $count++
-        $zName = Set-FileName -bucket $bucket -keyPrefix $keyPrefix -fileName $fileName -count $count
+        $count += 1
+        $zName = Set-FileName -bucket "$bucket" -keyPrefix "$keyPrefix" -baseName "$baseName" -count $count
     }
     Write-Output $zName
 }
@@ -22,39 +20,42 @@ function Set-FileName {
 $InstanceId = Get-EC2InstanceMetadata -Category InstanceId
 $Today = Get-Date -Format "yyMMdd"
 $TodaysLog = "u_ex" + $Today + "*"
-$bucket = "ds-" + $Env:TNA_APP_ENVIRONMENT  + "-logfiles"
-$keyPrefix = "discovery/" + $Env:TNA_APP_TIER
+$Bucket = "ds-" + $Env:TNA_APP_ENVIRONMENT  + "-logfiles"
+$KeyPrefix = "discovery/" + $Env:TNA_APP_TIER
 
-$SourceDir = "C:\inetpub\logs\LogFiles\W3SVC1\"
+$TempCopyDir = "C:/iis-copy-logfiles"
+$SourceDir = "C:/inetpub/logs/LogFiles/W3SVC1"
 
 if ($termination) {
-    & "c:/tna-startup/stop-webserver.ps1"
-    $files = Get-ChildItem $SourceDir
+    $files = Get-ChildItem -Path "$SourceDir/*.log" -Name
 } else {
-    $files = Get-ChildItem $SourceDir -Exclude $Todayslog
+    $files = Get-ChildItem -Path "$SourceDir/*.log" -Exclude $TodaysLog -Name
 }
 
 if ([string]::IsNullOrEmpty($files)) {
     Write-Output 'No logfiles found'
 } else {
+    # compress the logfiles
+    # Compress-Archive won't work on a log file which is currently in use from IIS
+    # even when the webserver and app pool are stopped - copy works!
+    [System.IO.Directory]::CreateDirectory("$TempCopyDir")
     foreach ($file in $files) {
-        $fileName = $file.name
-        Write-Output $file_name
-        $zipName = (Get-Item ($SourceDir + $fileName)).Basename + "_" + $InstanceId + ".zip"
-        Write-Output $zipName
-        Compress-Archive -Path "$SourceDir$fileName" -DestinationPath "$SourceDir$zipName"
-    }
-    # Compress-Archive returns before the process has finished and locks the file for some time afterwards.
-    # This is the reason to split the compressing from the copy-delete to give the process to finish and unlock the file.
-    Start-Sleep -Seconds 5
-    foreach ($file in $files) {
-        if (Test-Path -Path "$SourceDir$zipName" -PathType Leaf) {
-            $targetName = Set-FileName -bucket $bucket -keyPrefix $keyPrefix -fileName $fileName
-            aws s3 cp $SourceDir$zipName s3://$bucket/$keyPrefix/$targetName
-            if ($LASTEXITCODE -eq 0) {
-                Remove-Item -Path "$SourceDir$fileName"
-            }
-            Remove-Item -Path "$SourceDir$zipName"
+        $zipName = (Get-Item ("$SourceDir/$file")).Basename + "_" + $InstanceId + ".zip"
+        if (Test-Path -Path "$TempCopyDir/$zipName" -PathType Leaf) {
+            Remove-Item "$TempCopyDir/$zipName"
         }
+        Copy-Item -Path "$SourceDir/$file" -Destination "$TempCopyDir/$file"
+        Compress-Archive -Path "$TempCopyDir/$file" -DestinationPath "$TempCopyDir/$zipName"
+        if (Test-Path -Path "$TempCopyDir/$zipName" -PathType Leaf) {
+            Remove-Item "$TempCopyDir/$file"
+            Remove-Item "$SourceDir/$file"
+        }
+    }
+    $files = Get-ChildItem -Path ($TempCopyDir + "/*.zip") -Name
+    foreach ($file in $files) {
+        $zipBase = (Get-Item ("$TempCopyDir/$file")).Basename
+        $targetName = Set-FileName -bucket "$Bucket" -keyPrefix "$KeyPrefix" -baseName "$zipBase"
+        aws s3 cp $TempCopyDir/$file s3://$bucket/$keyPrefix/$targetName
+        Remove-Item -Path "$TempCopyDir/$file"
     }
 }
