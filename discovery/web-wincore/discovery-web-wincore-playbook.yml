@@ -268,18 +268,23 @@
 
   - name: copy webserver stop script
     ansible.windows.win_copy:
-      src: "./files/startup.ps1"
+      src: "./files/stop-webserver.ps1"
       dest: "c:\\tna-startup\\stop-webserver.ps1"
 
   - name: copy webserver start script
     ansible.windows.win_copy:
-      src: "./files/startup.ps1"
+      src: "./files/start-webserver.ps1"
       dest: "c:\\tna-startup\\start-webserver.ps1"
 
   - name: copy startup script
     ansible.windows.win_copy:
       src: "./files/startup.ps1"
       dest: "c:\\tna-startup\\startup.ps1"
+
+  - name: copy logfile push script
+    ansible.windows.win_copy:
+      src: "./files/push-logfiles.ps1"
+      dest: "c:\\tna-startup\\push-logfiles.ps1"
 
   - name: copy updEnv script
     ansible.windows.win_copy:
