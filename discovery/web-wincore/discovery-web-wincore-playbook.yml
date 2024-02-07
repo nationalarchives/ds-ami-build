@@ -5,9 +5,9 @@
   hosts: localhost
   gather_facts: false
   tasks:
-  - name: load variables
-    ansible.builtin.include_vars:
-      file: "{{ cur_dir }}/{{ ansible_var_file }}"
+#  - name: load variables
+#    ansible.builtin.include_vars:
+#      file: "{{ cur_dir }}/{{ ansible_var_file }}"
 
   - name: switch role credentials
     community.aws.sts_assume_role:

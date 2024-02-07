@@ -1,7 +1,4 @@
 ---
-Xkey_name: "discovery-web-dev-eu-west-2"
-Xregion: "eu-west-2"
-service: "discovery"
 tier: "web"
 env: "dev"
 volume_size: 30
