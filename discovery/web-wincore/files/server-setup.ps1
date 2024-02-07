@@ -4,7 +4,8 @@
 param(
 	[string]$application = "",
 	[string]$environment = "",
-	[string]$tier = ""
+	[string]$tier = "",
+    [string] $keyfile = ""
 )
 
 $logFile = "\debug.txt"
@@ -160,6 +161,21 @@ try {
 
     write-log -Message "---- add X-Forwarded-For to IIS log file"
     Add-WebConfigurationProperty -filter "system.applicationHost/sites/siteDefaults/logFile/customFields" -name "." -value @{logFieldName='xff';sourceName='X-Forwarded-For';sourceType='RequestHeader'}
+
+    write-log -Message "===> set up scheduler"
+    write-log -Message "---- get credentials"
+    $InstanceId = Get-EC2InstanceMetadata -Category InstanceId
+    $InstancePassword = Get-EC2PasswordData -InstanceId $InstanceId -Decrypt -PemFile "C:\tna-startup\$keyfile"
+    $UserName = "Administrator"
+    $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $UserName, $InstancePassword
+    $Password = $Credentials.GetNetworkCredential().Password
+
+    write-log -Message "---- set up and register scheduled task"
+    $action = New-ScheduledTaskAction -Execute "c:\tna-start-up\push-logfiles.ps1"
+    $trigger = New-ScheduledTaskTrigger -Daily -At '8:15 AM'
+    $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Minutes 15) -DontStopOnIdleEnd -RestartInterval (New-TimeSpan -Minutes 5) -RestartCount 5 -StartWhenAvailable
+    $task = New-ScheduledTask -Action $action -Trigger $trigger -Settings $settings
+    $task | Register-ScheduledTask 'PushLogfiles' -User $UserName -Password $Password
 
     Start-WebSite -Name $webSiteName
 
