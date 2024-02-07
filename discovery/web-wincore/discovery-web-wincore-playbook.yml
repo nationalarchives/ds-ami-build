@@ -6,11 +6,9 @@
   gather_facts: false
   tasks:
   - name: check
-    ansible.windows.win_powershell:
-      chdir: "c:\\temp"
-      script: |
-        cd
-        ls
+    run: |
+      echo $(pwd)
+      ls
     ignore_errors: yes
 
   - name: load variables
