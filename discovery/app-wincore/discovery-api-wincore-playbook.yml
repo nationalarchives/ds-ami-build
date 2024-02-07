@@ -9,16 +9,8 @@
     ansible.builtin.include_vars:
       file: "{{ ansible_var_file }}"
 
-  - name: get AWS session token
-    community.aws.sts_session_token:
-      duration_seconds: 3600
-    register: session_credentials
-
   - name: switch role credentials
     community.aws.sts_assume_role:
-      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
-      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
-      security_token: "{{ session_credentials.sts_creds.session_token }}"
       role_arn: "{{ lookup ('env', 'AWS_ROLE_ARN') }}"
       role_session_name: "s-devops"
     register: assumed_role
@@ -28,9 +20,6 @@
   # ----------------------------------------------------------------------------
   - name: get Windows 2019 Core AMI
     amazon.aws.ec2_ami_info:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       owners: amazon
       region: "{{ region }}"
       filters:
@@ -45,9 +34,6 @@
 
   - name: create security group - allowing updates and downloads
     amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-discovery-app-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
@@ -96,9 +82,6 @@
 
   - name: provisioning instance
     amazon.aws.ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
       instance_role: "ansible-github-discovery-deployment-role"
@@ -291,6 +274,11 @@
       src: "./files/updEnv.ps1"
       dest: "c:\\tna-startup\\updEnv.ps1"
 
+  - name: copy SSH key
+    ansible.windows.win_copy:
+      src: "./{{ keypair }}"
+      dest: "c:\\tna-startup\\{{ keypair }}"
+
   - ansible.builtin.debug:
       msg:
         - "====================================================================="
@@ -347,9 +335,6 @@
 
   - name: create AMI
     amazon.aws.ec2_ami:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance_id: "{{ instance_id }}"
       name: "{{ service }}-app-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
       description: "Discovery Backend server - wincore - ready for deployment"
@@ -366,18 +351,12 @@
 
   - name: terminate instance
     ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance_ids: "{{ instance_id }}"
       region: "{{ region }}"
       state: "absent"
 
   - name: remove security group
     amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-discovery-app-sg"
       region: "{{ region }}"
       state: "absent"
