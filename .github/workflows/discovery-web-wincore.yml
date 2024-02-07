@@ -84,7 +84,7 @@ jobs:
           export AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }}
           export AWS_DEFAULT_REGION="${{ env.region }}"
           ansible-playbook \
-          --extra-vars "ansible_var_file=${{ env.ANSIBLE_VAR_FILE }} key_name=${{ env.key_name }}" \
+          --extra-vars "ansible_var_file=${{ env.ANSIBLE_VAR_FILE }} key_name=${{ env.key_name }} region=${{ env.region }}" \
           --private-key $cur_dir/${{ env.SSH_KEY_FILE }} \
           discovery-web-wincore-playbook.yml
 
