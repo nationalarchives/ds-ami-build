@@ -6,7 +6,7 @@
   gather_facts: false
   tasks:
   - name: check
-    run: |
+    ansible.builtin.shell: |
       echo $(pwd)
       ls
     ignore_errors: yes
