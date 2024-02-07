@@ -5,12 +5,6 @@
   hosts: localhost
   gather_facts: false
   tasks:
-  - name: check
-    ansible.builtin.shell: |
-      echo $(pwd)
-      ls
-    ignore_errors: yes
-
   - name: load variables
     ansible.builtin.include_vars:
       file: "{{ cur_dir }}/{{ ansible_var_file }}"
