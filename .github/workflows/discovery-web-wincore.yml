@@ -36,10 +36,10 @@ jobs:
         with:
           ref: "${{ github.event.inputs.branch }}"
 
-      - name: set ansible var file for dev
-        run: |
-          echo "ANSIBLE_VAR_FILE=${{ env.ansible_var_file }}" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=${{ env.key_name }}" >> $GITHUB_ENV
+#      - name: set ansible var file for dev
+#        run: |
+#          echo "ANSIBLE_VAR_FILE=${{ env.ansible_var_file }}" >> $GITHUB_ENV
+#          echo "SSH_KEY_FILE=${{ env.key_name }}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         id: creds
@@ -54,7 +54,7 @@ jobs:
         with:
           command: cp
           source: s3://ds-dev-kpf-administration/discovery/${{ env.key_name }}
-          destination: ${{ env.key_name }}
+          destination: ./${{ env.key_name }}
           aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
           aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
           aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
@@ -101,10 +101,10 @@ jobs:
         with:
           ref: "${{ github.event.inputs.branch }}"
 
-      - name: set ansible var file for staging
-        run: |
-          echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=discovery-web-staging-eu-west-2" >> $GITHUB_ENV
+#      - name: set ansible var file for staging
+#        run: |
+#          echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
+#          echo "SSH_KEY_FILE=discovery-web-staging-eu-west-2" >> $GITHUB_ENV
 
       - name: aws variable settings
         run: |
