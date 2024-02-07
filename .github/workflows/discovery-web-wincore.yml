@@ -37,9 +37,12 @@ jobs:
           ref: "${{ github.event.inputs.branch }}"
 
       - name: set ansible var file for dev
+        env:
+          VAR_FILE: "${{ env.ansible_var_file }}"
+          KEY_FILE: "${{ env.key_name }}"
         run: |
-          echo "ANSIBLE_VAR_FILE=${{ env.ansible_var_file }}" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=${{ env.key_name }}" >> $GITHUB_ENV
+          echo "ANSIBLE_VAR_FILE=$VAR_FILE" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=$KEY_FILE" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         id: creds
