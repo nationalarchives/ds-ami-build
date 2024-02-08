@@ -32,6 +32,8 @@ jobs:
       region: "eu-west-2"
       aws_role_arn: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
       playbook_role_arn: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
+      vpc_id: ${{ secrets.VPC_ID }}
+      subnet_id: ${{ secrets.SUBNET_ID }}
 
 # ------------------------------------------------------------------------------
 # staging deployment
