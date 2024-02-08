@@ -84,7 +84,7 @@
     amazon.aws.ec2_instance:
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
-      instance_role: "ansible-github-discovery-deployment-role"
+      instance_role: "discovery-ansible-ami-build-instance-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
