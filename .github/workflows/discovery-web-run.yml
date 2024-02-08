@@ -30,17 +30,17 @@ on:
         type: string
         required: true
           
-          - name: checkout repo
-        uses: actions/checkout@v4
-        with:
-          ref: "${{ branch }}"
-
 jobs:
   web-run:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ branch }}"
+
       - name: set ansible var file for dev
         run: |
           echo "ANSIBLE_VAR_FILE=${{ ansible_var_file }}" >> $GITHUB_ENV
