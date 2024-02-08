@@ -23,17 +23,15 @@ jobs:
 # ------------------------------------------------------------------------------
   discovery-web-wincore-ami-dev:
     if: github.event.inputs.deploy-environment == 'dev'
-    runs-on: ubuntu-latest
-    environment: discovery-dev
-    env:
+    uses: discovery-workflows/web-run.yml
+    with:
+      branch: "${{ github.event.inputs.branch }}"
+      environment: "dev"
       ansible_var_file: "vars_${{ github.event.inputs.deploy-environment }}.yml"
-      region: "eu-west-2"
       key_name: "discovery-web-${{ github.event.inputs.deploy-environment }}-eu-west-2"
+      region: "eu-west-2"
       aws_role_arn: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
-    steps:
-      - name: include web-run
-        include_tasks: discovery-includes/web-run.yml
-
+      playbook_role_arn: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
 
 # ------------------------------------------------------------------------------
 # staging deployment

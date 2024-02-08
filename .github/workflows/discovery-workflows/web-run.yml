@@ -1,31 +1,69 @@
-      - name: checkout repo
+---
+name: Set up Discovery Web AMI
+
+permissions:
+  id-token: write
+  contents: write
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        required: true
+      environment:
+        type: string
+        required: true
+      ansible_var_file:
+        type: string
+        required: true
+      key_name:
+        type: string
+        required: true
+      region:
+        type: string
+        required: true
+      aws_role_arn:
+        type: string
+        required: true
+      playbook_role_arn:
+        type: string
+        required: true
+          
+          - name: checkout repo
         uses: actions/checkout@v4
         with:
-          ref: "${{ github.event.inputs.branch }}"
+          ref: "${{ branch }}"
 
+jobs:
+  web-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
       - name: set ansible var file for dev
         run: |
-          echo "ANSIBLE_VAR_FILE=${{ env.ansible_var_file }}" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=${{ env.key_name }}" >> $GITHUB_ENV
+          echo "ANSIBLE_VAR_FILE=${{ ansible_var_file }}" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=${{ key_name }}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         id: creds
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: "${{ env.region }}"
-          role-to-assume: "${{ env.aws_role_arn }}"
+          aws-region: "${{ region }}"
+          role-to-assume: "${{ aws_role_arn }}"
           output-credentials: true
 
       - name: download key file
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
-          source: s3://ds-dev-kpf-administration/discovery/${{ env.key_name }}
-          destination: ./${{ env.key_name }}
+          source: s3://ds-dev-kpf-administration/discovery/${{ key_name }}
+          destination: ./${{ key_name }}
           aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
           aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
           aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
-          aws_region: ${{ env.region }}
+          aws_region: ${{ region }}
 
       - name: install python
         uses: actions/setup-python@v5
@@ -49,8 +87,8 @@
           export AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }}
           export AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
           export AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }}
-          export AWS_DEFAULT_REGION="${{ env.region }}"
+          export AWS_DEFAULT_REGION="${{ region }}"
           ansible-playbook \
-          --extra-vars "ansible_var_file=${{ env.ANSIBLE_VAR_FILE }} key_name=${{ env.key_name }} region=${{ env.region }} env=${{ github.event.inputs.deploy-environment }}" \
+          --extra-vars "ansible_var_file=${{ ansible_var_file }} key_name=${{ key_name }} region=${{ region }} env=${{ github.event.inputs.deploy-environment }}" \
           --private-key $cur_dir/${{ env.SSH_KEY_FILE }} \
           discovery-web-wincore-playbook.yml
