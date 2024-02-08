@@ -289,7 +289,7 @@
     ansible.windows.win_powershell:
       chdir: "c:\\temp"
       script: |
-        ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery -keyfile {{ key_name }}"
+        ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "web" -application "discovery" -keyfile "{{ key_name }}"
     ignore_errors: yes
 
 - name: switch to localhost
