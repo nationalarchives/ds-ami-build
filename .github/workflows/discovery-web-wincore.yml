@@ -23,7 +23,7 @@ jobs:
 # ------------------------------------------------------------------------------
   discovery-web-wincore-ami-dev:
     if: github.event.inputs.deploy-environment == 'dev'
-    uses: ./.github/workflows/discovery-web-run.yml
+    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-web-ami-build.yml@main
     with:
       branch: "${{ github.event.inputs.branch }}"
       environment: "dev"
