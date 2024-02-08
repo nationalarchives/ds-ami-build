@@ -84,7 +84,7 @@
     amazon.aws.ec2_instance:
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
-      instance_role: "ansible-github-discovery-deployment-role"
+      instance_role: "discovery-ansible-ami-build-instance-role"
       instance_type: "t3a.large"
       metadata_options:
         http_endpoint: "enabled"
@@ -276,8 +276,8 @@
 
   - name: copy SSH key
     ansible.windows.win_copy:
-      src: "./{{ keypair }}"
-      dest: "c:\\tna-startup\\{{ keypair }}"
+      src: "./{{ key_name }}"
+      dest: "c:\\tna-startup\\{{ key_name }}"
 
   - ansible.builtin.debug:
       msg:
@@ -289,7 +289,7 @@
     ansible.windows.win_powershell:
       chdir: "c:\\temp"
       script: |
-        ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "api" -application "discovery"
+        ./server-setup.ps1 -environment "{{ hostvars['localhost']['env'] }}" -tier "api" -application "discovery" -keyfile "{{ key_name }}"
     ignore_errors: yes
 
 - name: switch to localhost
