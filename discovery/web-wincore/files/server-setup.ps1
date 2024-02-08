@@ -100,9 +100,11 @@ try {
     write-log -Message "===> get credentials"
     $InstanceId = Get-EC2InstanceMetadata -Category InstanceId
     $InstancePassword = Get-EC2PasswordData -InstanceId $InstanceId -Decrypt -PemFile "C:\tna-startup\$keyfile"
+    $PWord = ConvertTo-SecureString "$InstancePassword" -AsPlainText -Force
     $UserName = "Administrator"
-    $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $UserName, $InstancePassword
+    $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $UserName, $PWord
     $Password = $Credentials.GetNetworkCredential().Password
+    Remove-Item "C:\tna-startup\$keyfile" -Force
 
     write-log -Message "===> aquire AWS credentials for intersite"
     $sts = (Use-STSRole -RoleArn "arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access" -RoleSessionName "MyRoleSessionName").Credentials
