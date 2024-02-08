@@ -53,7 +53,7 @@ jobs:
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
-          source: s3://ds-dev-kpf-administration/discovery/${{ env.key_name }}
+          source: s3://ds-${{ github.event.inputs.deploy-environment }}-kpf-administration/discovery/${{ env.key_name }}
           destination: ${{ env.key_name }}
           aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
           aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
@@ -123,7 +123,7 @@ jobs:
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
-          source: s3://ds-dev-kpf-administration/discovery/${{ env.key_name }}
+          source: s3://ds-${{ github.event.inputs.deploy-environment }}-kpf-administration/discovery/${{ env.key_name }}
           destination: ./${{ env.key_name }}
           aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
           aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
@@ -193,7 +193,7 @@ jobs:
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
-          source: s3://ds-dev-kpf-administration/discovery/${{ env.key_name }}
+          source: s3://ds-${{ github.event.inputs.deploy-environment }}-kpf-administration/discovery/${{ env.key_name }}
           destination: ./${{ env.key_name }}
           aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
           aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
