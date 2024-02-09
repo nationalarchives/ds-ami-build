@@ -28,7 +28,7 @@ jobs:
     env:
       ansible_var_file: "vars_${{ github.event.inputs.deploy-environment }}.yml"
       region: "eu-west-2"
-      key_name: "discovery-web-${{ github.event.inputs.deploy-environment }}-eu-west-2"
+      key_name: "discovery-app-${{ github.event.inputs.deploy-environment }}-eu-west-2"
       aws_role_arn: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
     steps:
       - name: checkout repo
@@ -98,7 +98,7 @@ jobs:
     env:
       ansible_var_file: "vars_${{ github.event.inputs.deploy-environment }}.yml"
       region: "eu-west-2"
-      key_name: "discovery-web-${{ github.event.inputs.deploy-environment }}-eu-west-2"
+      key_name: "discovery-app-${{ github.event.inputs.deploy-environment }}-eu-west-2"
       aws_role_arn: "arn:aws:iam::337670467269:role/GitHubActionRole"
     steps:
       - name: checkout repo
@@ -168,7 +168,7 @@ jobs:
     env:
       ansible_var_file: "vars_${{ github.event.inputs.deploy-environment }}.yml"
       region: "eu-west-2"
-      key_name: "discovery-web-${{ github.event.inputs.deploy-environment }}-eu-west-2"
+      key_name: "discovery-app-${{ github.event.inputs.deploy-environment }}-eu-west-2"
       aws_role_arn: "arn:aws:iam::968803923593:role/github-oidc-Role-1QSZDDE2NZQV0"
     steps:
       - name: checkout repo
