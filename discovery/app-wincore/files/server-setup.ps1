@@ -108,7 +108,7 @@ try {
     $Password = $Credentials.GetNetworkCredential().Password
     Remove-Item "C:\tna-startup\$keyfile" -Force
 
-write-log -Message "===> aquire AWS credentials"
+    write-log -Message "===> aquire AWS credentials"
     $sts = (Use-STSRole -RoleArn "arn:aws:iam::500447081210:role/discovery-s3-deployment-source-access" -RoleSessionName "MyRoleSessionName").Credentials
     $Env:AWS_ACCESS_KEY_ID = $sts.AccessKeyId
     $Env:AWS_SECRET_ACCESS_KEY = $sts.SecretAccessKey
