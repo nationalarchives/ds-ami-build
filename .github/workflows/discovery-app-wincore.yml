@@ -86,7 +86,7 @@ jobs:
           ansible-playbook \
           --extra-vars "ansible_var_file=${{ env.ANSIBLE_VAR_FILE }} key_name=${{ env.key_name }} region=${{ env.region }} env=${{ github.event.inputs.deploy-environment }}" \
           --private-key $cur_dir/${{ env.SSH_KEY_FILE }} \
-          discovery-web-wincore-playbook.yml
+          discovery-api-wincore-playbook.yml
 
 # ------------------------------------------------------------------------------
 # staging deployment
