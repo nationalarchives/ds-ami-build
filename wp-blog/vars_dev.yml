@@ -1,7 +1,7 @@
 ---
 env: "dev"
 service: "blog"
-volume_size: 100
+volume_size: 40
 
 s3_deployment_bucket: "ds-dev-deployment-source"
 s3_deployment_root: "website"
