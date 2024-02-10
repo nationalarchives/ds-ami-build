@@ -25,51 +25,65 @@ jobs:
     if: github.event.inputs.deploy-environment == 'dev'
     runs-on: ubuntu-latest
     environment: blog-dev
+    env:
+      ansible_var_file: "vars_${{ github.event.inputs.deploy-environment }}.yml"
+      region: "eu-west-2"
+      key_name: "blog-app-${{ github.event.inputs.deploy-environment }}-eu-west-2"
+      aws_role_arn: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
     steps:
       - name: checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: "${{ github.event.inputs.branch }}"
 
       - name: set ansible var file for dev
         run: |
-          echo "ANSIBLE_VAR_FILE=vars_dev.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=blog-app-dev-eu-west-2" >> $GITHUB_ENV
+          echo "ANSIBLE_VAR_FILE=${{ env.ansible_var_file }}" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=${{ env.key_name }}" >> $GITHUB_ENV
 
-      - name: aws variable settings
-        run: |
-          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
-          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
-          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+      - name: Configure AWS Credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "${{ env.region }}"
+          role-to-assume: "${{ env.aws_role_arn }}"
+          output-credentials: true
 
-      - name: write ssh key file
-        run: |
-          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
-          chmod 0600 ${{ env.SSH_KEY_FILE }}
+      - name: download key file
+        uses: keithweaver/aws-s3-github-action@v1.0.0
+        with:
+          command: cp
+          source: s3://ds-${{ github.event.inputs.deploy-environment }}-kpf-administration/blog/${{ env.key_name }}
+          destination: ./${{ env.key_name }}
+          aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
+          aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
+          aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
+          aws_region: ${{ env.region }}
 
       - name: install python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           cache: 'pip'
           cache-dependency-path: '**/wp-blog-req.txt'
-
       - run: pip install -r ${{ github.workspace }}/.github/workflows/wp-blog-req.txt
 
       - name: run ansible playbook
         env:
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          AWS_ROLE_ARN: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
           VPC_ID: ${{ secrets.VPC_ID }}
           SUBNET_ID: ${{ secrets.SUBNET_ID }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-blog
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          export AWS_DEFAULT_REGION=eu-west-2
-          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} blog-playbook.yml
+          export AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }}
+          export AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
+          export AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }}
+          export AWS_DEFAULT_REGION="${{ env.region }}"
+          ansible-playbook \
+          --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}' key_name=${{ env.key_name }} region=${{ env.region }} env=${{ github.event.inputs.deploy-environment }}" \
+          --private-key $cur_dir/${{ env.SSH_KEY_FILE }} \
+          blog-playbook.yml
 
 # ------------------------------------------------------------------------------
 # staging deployment
@@ -78,51 +92,65 @@ jobs:
     if: github.event.inputs.deploy-environment == 'staging'
     runs-on: ubuntu-latest
     environment: blog-staging
+    env:
+      ansible_var_file: "vars_${{ github.event.inputs.deploy-environment }}.yml"
+      region: "eu-west-2"
+      key_name: "blog-app-${{ github.event.inputs.deploy-environment }}-eu-west-2"
+      aws_role_arn: "arn:aws:iam::337670467269:role/GitHubActionRole"
     steps:
       - name: checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: "${{ github.event.inputs.branch }}"
 
       - name: set ansible var file for staging
         run: |
-          echo "ANSIBLE_VAR_FILE=vars_staging.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=blog-app-staging-eu-west-2" >> $GITHUB_ENV
+          echo "ANSIBLE_VAR_FILE=${{ env.ansible_var_file }}" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=${{ env.key_name }}" >> $GITHUB_ENV
 
-      - name: aws variable settings
-        run: |
-          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
-          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
-          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+      - name: Configure AWS Credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "${{ env.region }}"
+          role-to-assume: "${{ env.aws_role_arn }}"
+          output-credentials: true
 
-      - name: write ssh key file
-        run: |
-          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
-          chmod 0600 ${{ env.SSH_KEY_FILE }}
+      - name: download key file
+        uses: keithweaver/aws-s3-github-action@v1.0.0
+        with:
+          command: cp
+          source: s3://ds-${{ github.event.inputs.deploy-environment }}-kpf-administration/blog/${{ env.key_name }}
+          destination: ./${{ env.key_name }}
+          aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
+          aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
+          aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
+          aws_region: ${{ env.region }}
 
       - name: install python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           cache: 'pip'
           cache-dependency-path: '**/wp-blog-req.txt'
-
       - run: pip install -r ${{ github.workspace }}/.github/workflows/wp-blog-req.txt
 
       - name: run ansible playbook
         env:
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          AWS_ROLE_ARN: "arn:aws:iam::337670467269:role/s-devops-ansible-amis"
           VPC_ID: ${{ secrets.VPC_ID }}
           SUBNET_ID: ${{ secrets.SUBNET_ID }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-blog
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          export AWS_DEFAULT_REGION=eu-west-2
-          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} blog-playbook.yml
+          export AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }}
+          export AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
+          export AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }}
+          export AWS_DEFAULT_REGION="${{ env.region }}"
+          ansible-playbook \
+          --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}' key_name=${{ env.key_name }} region=${{ env.region }} env=${{ github.event.inputs.deploy-environment }}" \
+          --private-key $cur_dir/${{ env.SSH_KEY_FILE }} \
+          blog-playbook.yml
 
 # ------------------------------------------------------------------------------
 # live deployment
@@ -131,49 +159,63 @@ jobs:
     if: github.event.inputs.deploy-environment == 'live'
     runs-on: ubuntu-latest
     environment: blog-live
+    env:
+      ansible_var_file: "vars_${{ github.event.inputs.deploy-environment }}.yml"
+      region: "eu-west-2"
+      key_name: "blog-app-${{ github.event.inputs.deploy-environment }}-eu-west-2"
+      aws_role_arn: "arn:aws:iam::968803923593:role/github-oidc-Role-1QSZDDE2NZQV0"
     steps:
       - name: checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: "${{ github.event.inputs.branch }}"
 
       - name: set ansible var file for live
         run: |
-          echo "ANSIBLE_VAR_FILE=vars_live.yml" >> $GITHUB_ENV
-          echo "SSH_KEY_FILE=blog-app-live-eu-west-2" >> $GITHUB_ENV
+          echo "ANSIBLE_VAR_FILE=${{ env.ansible_var_file }}" >> $GITHUB_ENV
+          echo "SSH_KEY_FILE=${{ env.key_name }}" >> $GITHUB_ENV
 
-      - name: aws variable settings
-        run: |
-          echo AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }} >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=eu-west-2 >> $GITHUB_ENV
-          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> $GITHUB_ENV
-          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $GITHUB_ENV
+      - name: Configure AWS Credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "${{ env.region }}"
+          role-to-assume: "${{ env.aws_role_arn }}"
+          output-credentials: true
 
-      - name: write ssh key file
-        run: |
-          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > ${{ env.SSH_KEY_FILE }}
-          chmod 0600 ${{ env.SSH_KEY_FILE }}
+      - name: download key file
+        uses: keithweaver/aws-s3-github-action@v1.0.0
+        with:
+          command: cp
+          source: s3://ds-${{ github.event.inputs.deploy-environment }}-kpf-administration/blog/${{ env.key_name }}
+          destination: ./${{ env.key_name }}
+          aws_access_key_id: ${{ steps.creds.outputs.aws-access-key-id }}
+          aws_secret_access_key: ${{ steps.creds.outputs.aws-secret-access-key }}
+          aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
+          aws_region: ${{ env.region }}
 
       - name: install python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           cache: 'pip'
           cache-dependency-path: '**/wp-blog-req.txt'
-
       - run: pip install -r ${{ github.workspace }}/.github/workflows/wp-blog-req.txt
 
       - name: run ansible playbook
         env:
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          AWS_ROLE_ARN: "arn:aws:iam::968803923593:role/s-devops-ansible-amis"
           VPC_ID: ${{ secrets.VPC_ID }}
           SUBNET_ID: ${{ secrets.SUBNET_ID }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         run: |
           cur_dir=$(pwd)
           cd $cur_dir/wp-blog
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          export AWS_DEFAULT_REGION=eu-west-2
-          ansible-playbook --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}'" --private-key $cur_dir/${{ env.SSH_KEY_FILE }} blog-playbook.yml
+          export AWS_ACCESS_KEY_ID=${{ steps.creds.outputs.aws-access-key-id }}
+          export AWS_SECRET_ACCESS_KEY=${{ steps.creds.outputs.aws-secret-access-key }}
+          export AWS_SESSION_TOKEN=${{ steps.creds.outputs.aws-session-token }}
+          export AWS_DEFAULT_REGION="${{ env.region }}"
+          ansible-playbook \
+          --extra-vars "ansible_var_file='${{ env.ANSIBLE_VAR_FILE }}' key_name=${{ env.key_name }} region=${{ env.region }} env=${{ github.event.inputs.deploy-environment }}" \
+          --private-key $cur_dir/${{ env.SSH_KEY_FILE }} \
+          blog-playbook.yml
 ...

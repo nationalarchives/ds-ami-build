@@ -1,9 +1,8 @@
 ---
-key_name: "blog-app-staging-eu-west-2"
-region: "eu-west-2"
-service: "blog"
 env: "staging"
+service: "blog"
 volume_size: 100
+
 s3_deployment_bucket: "ds-staging-deployment-source"
 s3_deployment_root: "website"
 
