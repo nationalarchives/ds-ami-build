@@ -1,9 +1,8 @@
 ---
-key_name: "blog-app-dev-eu-west-2"
-region: "eu-west-2"
-service: "blog"
 env: "dev"
+service: "blog"
 volume_size: 100
+
 s3_deployment_bucket: "ds-dev-deployment-source"
 s3_deployment_root: "website"
 
