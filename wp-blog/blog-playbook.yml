@@ -34,11 +34,13 @@
     vars:
       secret_data: "{{ lookup('amazon.aws.aws_secret', 'application/blog/wp/credentials', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
     set_fact:
-        db_user: "{{ secret_data.db_username }}"
-        db_pass: "{{ secret_data.db_password }}"
-        github_token: "{{ secret_data.github_token }}"
-        ses_user: "{{ secret_data.ses_username }}"
-        ses_pass: "{{ secret_data.ses_password }}"
+      db_host: "{{ secret_data.db_host }}"
+      db_name: "{{ secret_data.db_name }}"
+      db_user: "{{ secret_data.db_username }}"
+      db_pass: "{{ secret_data.db_password }}"
+      github_token: "{{ secret_data.github_token }}"
+      ses_user: "{{ secret_data.ses_username }}"
+      ses_pass: "{{ secret_data.ses_password }}"
 
   - name: template deployment policy
     template:
@@ -114,9 +116,6 @@
     register: ec2_sec_group
 
   - name: template userdata
-    vars:
-      db_host: "db.{{ service }}wp.{{ env }}.local"
-      db_name: "{{ service }}wp"
     template:
       src: "./templates/userdata.sh.j2"
       dest: "./userdata.sh"
