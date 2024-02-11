@@ -36,9 +36,8 @@
     set_fact:
       db_host: "{{ secret_data.db_host }}"
       db_name: "{{ secret_data.db_name }}"
-      website_db_username: "{{ secret_data.website_db_username }}"
-      website_db_password: "{{ secret_data.website_db_password }}"
-      website_db_name: "{{ secret_data.website_db_name }}"
+      db_username: "{{ secret_data.website_db_username }}"
+      db_password: "{{ secret_data.website_db_password }}"
       github_token: "{{ secret_data.github_token }}"
       ses_username: "{{ secret_data.ses_username }}"
       ses_password: "{{ secret_data.ses_password }}"
