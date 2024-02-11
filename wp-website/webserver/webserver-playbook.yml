@@ -30,14 +30,14 @@
       latest_ami: >
         {{ findami.images | sort(attribute='creation_date') | last }}
 
-  - name: set secrets for wordpress
+  - name: set wordpress database credentials
     vars:
       secret_data: "{{ lookup('amazon.aws.aws_secret', 'application/website/wp/credentials', region=region, aws_access_key=assumed_role.sts_creds.access_key, aws_secret_key=assumed_role.sts_creds.secret_key, aws_security_token=assumed_role.sts_creds.session_token, on_denied='warn') | from_json }}"
     set_fact:
       db_host: "{{ secret_data.db_host }}"
       db_name: "{{ secret_data.db_name }}"
-      db_username: "{{ secret_data.website_db_username }}"
-      db_password: "{{ secret_data.website_db_password }}"
+      db_username: "{{ secret_data.db_username }}"
+      db_password: "{{ secret_data.db_password }}"
       github_token: "{{ secret_data.github_token }}"
       ses_username: "{{ secret_data.ses_username }}"
       ses_password: "{{ secret_data.ses_password }}"
