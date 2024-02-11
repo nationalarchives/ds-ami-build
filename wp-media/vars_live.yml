@@ -1,9 +1,8 @@
 ---
-key_name: "media-app-live-eu-west-2"
-region: "eu-west-2"
-service: "media"
 env: "live"
+service: "media"
 volume_size: 100
+
 s3_deployment_bucket: "ds-live-deployment-source"
 s3_deployment_root: "website"
 
