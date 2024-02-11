@@ -6,29 +6,19 @@
   gather_facts: false
 
   tasks:
+
   - name: load variables
     ansible.builtin.include_vars:
       file: "{{ ansible_var_file }}"
 
-  - name: get AWS session token
-    community.aws.sts_session_token:
-      duration_seconds: 3600
-    register: session_credentials
-
   - name: switch role credentials
     community.aws.sts_assume_role:
-      aws_access_key: "{{ session_credentials.sts_creds.access_key }}"
-      aws_secret_key: "{{ session_credentials.sts_creds.secret_key }}"
-      security_token: "{{ session_credentials.sts_creds.session_token }}"
       role_arn: "{{ lookup ('env', 'AWS_ROLE_ARN') }}"
       role_session_name: "s-devops"
     register: assumed_role
 
   - name: get linux2 AMI
     amazon.aws.ec2_ami_info:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       owners: amazon
       region: "{{ region }}"
       filters:
@@ -67,9 +57,6 @@
 
   - name: get RDS security group ID
     amazon.aws.ec2_group_info:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       filters:
         group-name:
           - "web_db_sg"
@@ -82,9 +69,6 @@
 
   - name: create deployment policy
     community.aws.iam_managed_policy:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       policy_name: "ansible-ami-website-wp-s3-policy"
       policy: "{{ lookup('file', './instance-role-policy.json') }}"
       state: "present"
@@ -92,9 +76,6 @@
 
   - name: create webserver IAM role
     community.aws.iam_role:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-website-wp-role"
       region: "{{ region }}"
       assume_role_policy_document: "{{ lookup('file', './wp-role-policy.json') }}"
@@ -107,9 +88,6 @@
 
   - name: create security group - allowing updates and downloads
     amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-website-wp-sg"
       description: "security group allowing updates and downloads"
       region: "{{ region }}"
@@ -160,9 +138,6 @@
 
   - name: provisioning instance
     amazon.aws.ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
       instance_role: "ansible-ami-website-wp-role"
@@ -320,9 +295,6 @@
   tasks:
   - name: create AMI
     amazon.aws.ec2_ami:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance_id: "{{ instance_id }}"
       name: "{{ service }}-wp-primer-{{ env }}-{{ ansible_date_time.date }} {{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
       description: "Website webserver - ready for deployment"
@@ -339,27 +311,18 @@
 
   - name: terminate instance
     ec2_instance:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       instance_ids: "{{ instance_id }}"
       region: "{{ region }}"
       state: "absent"
 
   - name: remove security group
     amazon.aws.ec2_group:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-website-wp-sg"
       region: "{{ region }}"
       state: "absent"
 
   - name: remove IAM role
     community.aws.iam_role:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       name: "ansible-ami-website-wp-role"
       region: "{{ region }}"
       delete_instance_profile: yes
@@ -367,9 +330,6 @@
 
   - name: remove deployment policy
     community.aws.iam_managed_policy:
-      aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
-      aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-      security_token: "{{ assumed_role.sts_creds.session_token }}"
       policy_name: "ansible-ami-website-wp-s3-policy"
       state: "absent"
 ...
