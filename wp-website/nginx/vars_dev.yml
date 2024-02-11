@@ -1,9 +1,8 @@
 ---
-key_name: "rp-app-dev-eu-west-2"
-region: "eu-west-2"
-service: "website"
 env: "dev"
-volume_size: 100
+service: "website"
+volume_size: 40
+
 s3_deployment_bucket: "ds-dev-deployment-source"
 s3_deployment_root: "website"
 s3_logfile_bucket: "ds-dev-logfiles"
