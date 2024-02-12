@@ -60,7 +60,7 @@
     amazon.aws.ec2_group_info:
       filters:
         group-name:
-          - "web_db_sg"
+          - "mysql-ami-build-sg"
     register: db_sg
   - ansible.builtin.debug:
       msg:
