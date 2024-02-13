@@ -1,11 +1,14 @@
 # ds-ami-build
 Building AMIs for services in AWS
 
-Currently the snapshots are stored in the accounts which will deploy the AMIs. This allows the AMIs being encrypted using the AWS generated keys rather than introducing our own encrypttion key handling. 
-## Action Steps
-1. Authenticate with AWS
+AMI are stored in the accounts in which the services will be deployed.
+Centralising the AMIs in a single account and share them to the different environments would introduce a complication of managing a KMS key which need sharing across the environments.
+[source: AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/sharingamis-explicit.html)
+
+## General Steps
+1. Authenticate with AWS (OIDC)
 2. Assume role in AWS account
-3. Create required resources for the target instance (security groups, instance role/profile)
+3. Create required resources for the target instance (i.e. security groups, instance role/profile)
 4. Start up primer instance; running initial bash script copying needed files from S3
 5. Wait until primer instance is in stable condition
 6. Create AMI from primer instance
@@ -13,17 +16,16 @@ Currently the snapshots are stored in the accounts which will deploy the AMIs. T
 8. Remove not needed resources created in point #3
 ## Prerequisites
 ### AWS
-- account s-devops-ansible-amis in tna-iam with assume role permission
-- role s-devops-ansible-amis with permission in EC2, S3, IAM and Secrets Manager
+- Existing key pair files in the target account; to create a key pair: `ssh-keygen -t rsa -b 4096 -f [key-pair-file-name] -N "" -C "platform-team@nationalarchives.gov.uk" -m PEM`
+- Registered key pair in EC2 - Network & Security - Kay Pairs section
+- role s-devops-ansible-amis in target account with the required permissions
 ### Action Secrets (repo-wide)
-- AWS_ACCESS_KEY_ID
-- AWS_SECRET_ACCESS_KEY
+- SUBNET_ID - public subnet in target account
+- VPC_ID - vpc of the public subnet
 ### Action Secrets (each environment - dev, staging and production)
 - AWS_ACCOUNT_ID - target account for storing the AMI
 - AWS_ROLE_ARN - role s-devops-ansible-amis in target account
 - SSH_KEY - ssh private key used to log in to primer instance and the deployed instance. Note, this is the contents of the key, not the filename!
-- SUBNET_ID - public subnet in target account
-- VPC_ID - vpc of the public subnet
 ### GitHub Actions/Ansible
 - branching for each environment - dev, staging and production
 
@@ -44,7 +46,7 @@ and us the instance ids returned with this statement\
 If the resulting AMI is faulty or shouldn't be use for other reasons it needs be deregister.\
 To identify the latest built AMI use following command\
 `aws ec2 describe-images --filter "Name=name,Values=discovery-web-*" --query "reverse(sort_by(Images, &CreationDate))[1].ImageId" --output json`\
-_Please change the value for the filter to match the ami as close as possible._\
+_Please change the value for the filter to match the ami as close as possible._
 
 and to deregister the images use command \
 `aws ec2 deregister-image --image-id i-1234567890abcdef0`\
@@ -61,11 +63,11 @@ and to deregister the images use command \
 _The id should be replace by the result from the describe-images command._/
 
 To see all AMIs including if they were launched use command\
-`aws ec2 describe-images --filter "Name=name,Values=discovery-web-*" --query "reverse(sort_by(Images, &CreationDate))[3:].ImageId" --output json | jq -r -c '.[]' | while read id; do aws ec2 describe-image-attribute --attribute lastLaunchedTime --image-id $id --output text; done`\
+`aws ec2 describe-images --filter "Name=name,Values=discovery-web-*" --query "reverse(sort_by(Images, &CreationDate))[3:].ImageId" --output json | jq -r -c '.[]' | while read id; do aws ec2 describe-image-attribute --attribute lastLaunchedTime --image-id $id --output text; done`
 
 
 >!!! Danger Zone !!!\
->Using above loop to deregister AMIs might remove images which are in use. Use the following command with caution!\
+>Using above loop to deregister AMIs might remove images which are in use. Use the following command with caution!
 >
 >aws ec2 describe-images --filter "Name=name,Values=discovery-web-*" --query "reverse(sort_by(Images, &CreationDate))[3:].ImageId" --output json | jq -r -c '.[]' | while read id; do aws ec2 deregister-image --image-id $id; done
 
