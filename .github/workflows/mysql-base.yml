@@ -32,11 +32,11 @@ jobs:
     with:
       account: "dev"
       region: "eu-west-2"
-      key-name: "mysql-${{ github.event.inputs.project-name }}-dev-eu-west-2"
+      key_name: "mysql-${{ github.event.inputs.project-name }}-dev-eu-west-2"
       branch: "${{ github.event.inputs.branch }}"
-      base-role: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
-      playbook-role: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
-      project-name: "${{ github.event.inputs.project-name }}"
+      base_role: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
+      playbook_role: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
+      project_name: "${{ github.event.inputs.project-name }}"
       instance_type: 't3a.small'
       volume_size: 20
       asm_key: "/infrastructure/credentials/mysql-${{ github.event.inputs.project-name }}"
@@ -50,11 +50,11 @@ jobs:
     with:
       account: "staging"
       region: "eu-west-2"
-      key-name: "mysql-${{ github.event.inputs.project-name }}-staging-eu-west-2"
+      key_name: "mysql-${{ github.event.inputs.project-name }}-staging-eu-west-2"
       branch: "${{ github.event.inputs.branch }}"
-      base-role: "arn:aws:iam::337670467269:role/GitHubActionRole"
-      playbook-role: "arn:aws:iam::337670467269:role/s-devops-ansible-amis"
-      project-name: "${{ github.event.inputs.project-name }}"
+      base_role: "arn:aws:iam::337670467269:role/GitHubActionRole"
+      playbook_role: "arn:aws:iam::337670467269:role/s-devops-ansible-amis"
+      project_name: "${{ github.event.inputs.project-name }}"
       instance_type: 't3a.small'
       volume_size: 40
       asm_key: "/infrastructure/credentials/mysql-${{ github.event.inputs.project-name }}"
