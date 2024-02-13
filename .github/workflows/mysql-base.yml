@@ -36,12 +36,10 @@ jobs:
       branch: "${{ github.event.inputs.branch }}"
       base-role: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
       playbook-role: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
-      vpc-id: "${{ secrets.VPC_ID_DEV }}"
-      subnet-id: "${{ secrets.SUBNET_ID_2A_DEV }}"
       project-name: "${{ github.event.inputs.project-name }}"
       instance_type: 't3a.small'
       volume_size: 20
-      asm_key: "/infrastructure/credentails/mysql-${{ github.event.inputs.project-name }}"
+      asm_key: "/infrastructure/credentials/mysql-${{ github.event.inputs.project-name }}"
 
 # ------------------------------------------------------------------------------
 # staging deployment
@@ -56,10 +54,8 @@ jobs:
       branch: "${{ github.event.inputs.branch }}"
       base-role: "arn:aws:iam::337670467269:role/GitHubActionRole"
       playbook-role: "arn:aws:iam::337670467269:role/s-devops-ansible-amis"
-      vpc-id: "${{ secrets.VPC_ID_STAGING }}"
-      subnet-id: "${{ secrets.SUBNET_ID_2A_STAGING }}"
       project-name: "${{ github.event.inputs.project-name }}"
       instance_type: 't3a.small'
       volume_size: 40
-      asm_key: "/infrastructure/credentails/mysql-${{ github.event.inputs.project-name }}"
+      asm_key: "/infrastructure/credentials/mysql-${{ github.event.inputs.project-name }}"
 ...
