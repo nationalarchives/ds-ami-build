@@ -28,6 +28,20 @@ jobs:
 # ------------------------------------------------------------------------------
   mysql-base-ami-dev:
     if: github.event.inputs.deploy-environment == 'dev'
+    uses: nationalarchives/ds-github-actions/.github/workflows/mysql-ami-build.yml@main
+    with:
+      account: "dev"
+      ansible-var-file: "vars_dev.yml"
+      region: "eu-west-2"
+      key-name: "mysql-${{ github.event.inputs.project-name }}-dev-eu-west-2"
+      branch: "${{ github.event.inputs.branch }}"
+      base-role: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
+      playbook-role: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
+      vpc-id: "${{ secrets.VPC_ID }}"
+      subnet-id: "${{ secrets.SUBNET_ID }}"
+      project-name: "${{ github.event.inputs.project-name }}"
+
+
     runs-on: ubuntu-latest
     environment: mysql-base-dev
     env:

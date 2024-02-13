@@ -126,7 +126,7 @@
 
   - name: provisioning instance
     amazon.aws.ec2_instance:
-      key_name: "{{ keypair }}"
+      key_name: "{{ key_name }}"
       image_id: "{{ latest_ami.image_id }}"#
       instance_role: "ansible-ami-mysql-{{ project_name }}-role"
       instance_type: "{{ instance_type }}"
