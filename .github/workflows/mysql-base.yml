@@ -50,6 +50,7 @@ jobs:
     uses: nationalarchives/ds-github-actions/.github/workflows/mysql-ami-build.yml@main
     with:
       account: "${{ github.event.inputs.deploy-environment }}"
+      ansible_var_file: "vars_${{ github.event.inputs.deploy-environment }}.yml"
       region: "eu-west-2"
       key_name: "mysql-${{ github.event.inputs.project-name }}-${{ github.event.inputs.deploy-environment }}-eu-west-2"
       branch: "${{ github.event.inputs.branch }}"
