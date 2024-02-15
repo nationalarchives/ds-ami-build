@@ -30,7 +30,7 @@ jobs:
       base_role: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
       playbook_role: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
       instance_type: "t3a.medium"
-      volume_size": 40
+      volume_size: 40
       s3_deployment_bucket: "ds-intersite-deployment"
       s3_deployment_root: "discovery/installation-packages"
       account: "${{ github.event.inputs.account }}"
@@ -51,7 +51,7 @@ jobs:
       base_role: "arn:aws:iam::337670467269:role/GitHubActionRole"
       playbook_role: "arn:aws:iam::337670467269:role/s-devops-ansible-amis"
       instance_type: "t3a.large"
-      volume_size": 80
+      volume_size: 80
       s3_deployment_bucket: "ds-intersite-deployment"
       s3_deployment_root: "discovery/installation-packages"
       account: "${{ github.event.inputs.account }}"
@@ -72,7 +72,7 @@ jobs:
       base_role: "arn:aws:iam::968803923593:role/github-oidc-Role-1QSZDDE2NZQV0"
       playbook_role: "arn:aws:iam::968803923593:role/s-devops-ansible-amis"
       instance_type: "t3a.large"
-      volume_size": 100
+      volume_size: 100
       s3_deployment_bucket: "ds-intersite-deployment"
       s3_deployment_root: "discovery/installation-packages"
       account: "${{ github.event.inputs.account }}"
