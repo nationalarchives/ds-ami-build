@@ -23,7 +23,7 @@ jobs:
 # ------------------------------------------------------------------------------
   discovery-api-wincore-ami-dev:
     if: github.event.inputs.account == 'dev'
-    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-app-wincore.yml@karl/split-discovery-workflows
+    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-app-wincore.yml@main
     with:
       region: "eu-west-2"
       key_name: "discovery-app-${{ github.event.inputs.account }}-eu-west-2"
@@ -44,7 +44,7 @@ jobs:
 # ------------------------------------------------------------------------------
   discovery-api-wincore-ami-staging:
     if: github.event.inputs.account == 'staging'
-    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-app-wincore.yml@karl/split-discovery-workflows
+    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-app-wincore.yml@main
     with:
       region: "eu-west-2"
       key_name: "discovery-app-${{ github.event.inputs.account }}-eu-west-2"
@@ -65,7 +65,7 @@ jobs:
 # ------------------------------------------------------------------------------
   discovery-api-wincore-ami-live:
     if: github.event.inputs.account == 'live'
-    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-app-wincore.yml@karl/split-discovery-workflows
+    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-app-wincore.yml@main
     with:
       region: "eu-west-2"
       key_name: "discovery-app-${{ github.event.inputs.account }}-eu-west-2"
