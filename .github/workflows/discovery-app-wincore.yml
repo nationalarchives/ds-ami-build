@@ -23,7 +23,7 @@ jobs:
 # ------------------------------------------------------------------------------
   discovery-api-wincore-ami-dev:
     if: github.event.inputs.account == 'dev'
-    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-app-wincore.yml@main
+    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-app-wincore.yml@split-discovery-workflows
     with:
       region: "eu-west-2"
       key_name: "discovery-app-${{ github.event.inputs.account }}-eu-west-2"
