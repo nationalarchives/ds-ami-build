@@ -7,9 +7,9 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
-      deploy-environment:
+      account:
         type: choice
-        description: Environment
+        description: AWS account
         required: true
         options:
           - staging
@@ -20,8 +20,8 @@ jobs:
   # dev deployment
   # ------------------------------------------------------------------------------
   taxonomy-updater-ami-dev:
-    if: github.event.inputs.deploy-environment == 'dev'
-    uses: nationalarchives/ds-github-actions/.github/workflows/taxonomy-indexer.yml@main
+    if: github.event.inputs.account == 'dev'
+    uses: nationalarchives/ds-github-actions/.github/workflows/taxonomy-updater.yml@main
     with:
       region: "eu-west-2"
       key_name: "taxonomy-updater-${{ github.event.inputs.account }}-eu-west-2"
@@ -41,8 +41,8 @@ jobs:
   # staging deployment
   # ------------------------------------------------------------------------------
   taxonomy-updater-ami-staging:
-    if: github.event.inputs.deploy-environment == 'staging'
-    uses: nationalarchives/ds-github-actions/.github/workflows/taxonomy-indexer.yml@main
+    if: github.event.inputs.account == 'staging'
+    uses: nationalarchives/ds-github-actions/.github/workflows/taxonomy-updater.yml@main
     with:
       region: "eu-west-2"
       key_name: "taxonomy-updater-${{ github.event.inputs.account }}-eu-west-2"
