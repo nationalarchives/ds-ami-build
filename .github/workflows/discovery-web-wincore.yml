@@ -23,6 +23,23 @@ jobs:
 # ------------------------------------------------------------------------------
   discovery-web-wincore-ami-dev:
     if: github.event.inputs.deploy-environment == 'dev'
+    uses: nationalarchives/ds-github-actions/.github/workflows/discovery-web-wincore.yml@main
+    with:
+      account: "${{ github.event.inputs.account }}"
+      branch: "${{ github.event.inputs.branch }}"
+      region: "eu-west-2"
+      key_name: "discovery-app-${{ github.event.inputs.account }}-eu-west-2"
+      base_role: "arn:aws:iam::846769538626:role/GithubOIDCProviderIAMRolePermissions-Role-I80RXHT6O1PL"
+      playbook_role: "arn:aws:iam::846769538626:role/s-devops-ansible-amis"
+      instance_type: "t3a.medium"
+      volume_size: 40
+      s3_deployment_bucket: "ds-intersite-deployment"
+      s3_deployment_root: "discovery/installation-packages"
+    secrets:
+      vpc_id: ${{ secrets.VPC_ID_DEV }}
+      subnet_id: ${{ secrets.SUBNET_ID_2A_DEV }}
+
+  xxx:
     runs-on: ubuntu-latest
     environment: discovery-dev
     env:
